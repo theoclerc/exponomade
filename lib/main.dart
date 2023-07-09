@@ -1,5 +1,5 @@
+import 'package:exponomade/home_page.dart';
 import 'package:flutter/material.dart';
-import 'mapToggle.dart';
 
  void main() {
      runApp(const MainApp());
@@ -10,8 +10,8 @@ import 'mapToggle.dart';
 
     @override
    Widget build(BuildContext context) {
-      return const MaterialApp(
-      home: mapToggle(),
+      return  const MaterialApp(
+      home: HomePage(),
       );
    }
  }

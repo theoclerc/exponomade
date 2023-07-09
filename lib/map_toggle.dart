@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-class mapToggle extends StatefulWidget{
+class MapToggle extends StatefulWidget{
 
 @override
 _MapToggleState createState() => _MapToggleState();
   
-  const mapToggle({super.key});
+  const MapToggle({super.key});
   
 }
 
-class _MapToggleState extends State<mapToggle> {
+class _MapToggleState extends State<MapToggle> {
 @override
   Widget build(BuildContext context){
 
@@ -21,7 +21,7 @@ class _MapToggleState extends State<mapToggle> {
       //Châteaux de Sion
       Marker(
         point: const LatLng(46.2352107258,7.36683686598),
-        builder: (ctx) => const Icon(Icons.pin_drop), 
+        builder: (ctx) => const Icon(Icons.pin_drop_outlined), 
       ),
       //Aéroport Sion
       Marker(
@@ -32,7 +32,7 @@ class _MapToggleState extends State<mapToggle> {
 
     return Scaffold(
       body: Center(
-        child: Container(
+        
           child: Column(
             children: [
               Flexible(
@@ -52,7 +52,7 @@ class _MapToggleState extends State<mapToggle> {
               ),
             ],
           ), 
-        ),
+        
       ),
     );
   }
