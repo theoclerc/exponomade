@@ -1,6 +1,8 @@
 
-import 'package:exponomade/map_toggle.dart';
+import 'package:exponomade/screens/map_toggle.dart';
 import 'package:flutter/material.dart';
+import 'package:exponomade/screens/contact_page.dart';
+import 'package:exponomade/screens/quiz_page.dart';
 
 class HomePage extends StatefulWidget{
   const HomePage({super.key});
@@ -24,11 +26,11 @@ class _HomePageState extends State<HomePage> {
         break;
       //Contact
       case 1:
-        page = const Placeholder(); //Replace by contact page 
+        page = const ContactPage(); //Replace by contact page 
         break;
       //Quiz
       case 2:
-        page = const Placeholder(); //Replace by quiz page
+        page = const QuizPage(); //Replace by quiz page
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
