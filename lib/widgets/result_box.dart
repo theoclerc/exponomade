@@ -43,7 +43,7 @@ class ResultBox extends StatelessWidget {
                   ? 'Almost there!'
                   : result < questionLength / 2
                       ? 'Try again!'
-                      : 'Great',
+                      : 'Great!',
               style: const TextStyle(color: neutral),
             ),
             const SizedBox(height: 25.0),

@@ -1,25 +1,25 @@
-import 'package:http/http.dart' as http;
 import './question_model.dart';
-import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class DBconnect{
-  final url = Uri.parse('https://exponomade-87d35-default-rtdb.europe-west1.firebasedatabase.app/questions.json');
+class DBconnect {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<List<Question>> fetchQuestions() async{
-    return http.get(url).then((reponse){
-      var data = json.decode(reponse.body);
-      List<Question> newQuestions = [];
-      data.forEach((key, value) {
-        var newQuestion = Question(
-          id: key,
-          title: value['title'],
-          options: Map.castFrom(value['options']),
-        );
-        newQuestions.add(newQuestion);
-      });
-      return newQuestions;
+  Future<List<Question>> fetchQuestions() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('quiz').get();
+    List<Question> newQuestions = [];
 
-    });
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      var newQuestion = Question(
+        id: doc.id,
+        title: data['title'] as String,
+        options: Map<String, bool>.from(data['options'] as Map),
+      );
+      newQuestions.add(newQuestion);
+    }
 
+    return newQuestions;
   }
 }
+
+
