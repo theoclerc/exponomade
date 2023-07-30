@@ -7,7 +7,6 @@ class Question {
 
   @override
   String toString() {
-    // TODO: implement toString
-    return 'Question{id: $id, title: $title, options: $options}';
+    return 'Question{id: $id, title: $title, options: ${options.entries.map((entry) => '${entry.key}: ${entry.value}').join(', ')}}';
   }
 }

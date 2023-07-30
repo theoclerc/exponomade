@@ -111,7 +111,7 @@ class _ContactPageState extends State<ContactPage> {
   Widget customTextField(TextEditingController controller, IconData icon,
       String labelText, String hintText) {
     return Container(
-      padding: EdgeInsets.only(left: 10.0, right: 10.0),
+      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
       decoration: BoxDecoration(
         color: neutral,
         borderRadius: BorderRadius.circular(15.0),
