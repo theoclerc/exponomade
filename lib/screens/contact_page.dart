@@ -37,6 +37,8 @@ Future sendEmail() async {
 }
 
 class _ContactPageState extends State<ContactPage> {
+  final _formKey = GlobalKey<FormState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,59 +51,64 @@ class _ContactPageState extends State<ContactPage> {
         ),
         body: Padding(
           padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
-          child: Column(
-            children: [
-              customTextField(nameController, Icons.account_circle, 'Name',
-                  'Type your name...'),
-              const SizedBox(
-                height: 25,
-              ),
-              customTextField(subjectController, Icons.subject_rounded,
-                  'Subject', 'Type the subject...'),
-              const SizedBox(
-                height: 25,
-              ),
-              customTextField(
-                  emailController, Icons.email, 'Email', 'Type your email...'),
-              const SizedBox(
-                height: 25,
-              ),
-              customTextField(messageController, Icons.message, 'Message',
-                  'Type your message...'),
-              const SizedBox(
-                height: 25,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  sendEmail();
-                  _clearTextFields();
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Form Submitted!'),
-                      behavior: SnackBarBehavior.floating,
-                      margin: EdgeInsets.only(
-                          bottom: 20.0, left: 20.0, right: 20.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                customTextField(nameController, Icons.account_circle, 'Name',
+                    'Type your name...'),
+                const SizedBox(
+                  height: 25,
+                ),
+                customTextField(subjectController, Icons.subject_rounded,
+                    'Subject', 'Type the subject...'),
+                const SizedBox(
+                  height: 25,
+                ),
+                customTextField(
+                    emailController, Icons.email, 'Email', 'Type your email...'),
+                const SizedBox(
+                  height: 25,
+                ),
+                customTextField(messageController, Icons.message, 'Message',
+                    'Type your message...'),
+                const SizedBox(
+                  height: 25,
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      sendEmail();
+                      _clearTextFields();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Form Submitted!'),
+                          behavior: SnackBarBehavior.floating,
+                          margin: EdgeInsets.only(
+                              bottom: 20.0, left: 20.0, right: 20.0),
+                        ),
+                      );
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: neutral,
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.0),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: neutral,
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15.0),
                   ),
-                ),
-                child: const Text(
-                  "Send",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
+                  child: const Text(
+                    "Send",
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              )
-            ],
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -124,6 +131,12 @@ class _ContactPageState extends State<ContactPage> {
           hintText: hintText,
           border: InputBorder.none,
         ),
+        validator: (value) {
+          if (value == null || value.isEmpty) {
+            return 'This field is required';
+          }
+          return null;
+        },
       ),
     );
   }
