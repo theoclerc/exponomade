@@ -46,7 +46,7 @@ class _ContactPageState extends State<ContactPage> {
       home: Scaffold(
         backgroundColor: background,
         appBar: AppBar(
-          title: const Text('Contact Us'),
+          title: const Text('Formulaire de contact'),
           backgroundColor: background,
         ),
         body: Padding(
@@ -55,23 +55,23 @@ class _ContactPageState extends State<ContactPage> {
             key: _formKey,
             child: Column(
               children: [
-                customTextField(nameController, Icons.account_circle, 'Name',
-                    'Type your name...'),
+                customTextField(nameController, Icons.account_circle, 'Nom',
+                    'écris ton nom ici'),
                 const SizedBox(
                   height: 25,
                 ),
                 customTextField(subjectController, Icons.subject_rounded,
-                    'Subject', 'Type the subject...'),
+                    'Sujet', 'écris le sujet de ton message ici'),
                 const SizedBox(
                   height: 25,
                 ),
                 customTextField(
-                    emailController, Icons.email, 'Email', 'Type your email...'),
+                    emailController, Icons.email, 'Email', 'à quelle adresse pouvons-nous te répondre ?'),
                 const SizedBox(
                   height: 25,
                 ),
                 customTextField(messageController, Icons.message, 'Message',
-                    'Type your message...'),
+                    'écris ton message ici'),
                 const SizedBox(
                   height: 25,
                 ),
@@ -82,7 +82,7 @@ class _ContactPageState extends State<ContactPage> {
                       _clearTextFields();
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Form Submitted!'),
+                          content: Text('Formulaire envoyé !'),
                           behavior: SnackBarBehavior.floating,
                           margin: EdgeInsets.only(
                               bottom: 20.0, left: 20.0, right: 20.0),
@@ -99,7 +99,7 @@ class _ContactPageState extends State<ContactPage> {
                     ),
                   ),
                   child: const Text(
-                    "Send",
+                    "Envoyer",
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.black,
@@ -133,7 +133,7 @@ class _ContactPageState extends State<ContactPage> {
         ),
         validator: (value) {
           if (value == null || value.isEmpty) {
-            return 'This field is required';
+            return 'Ce champ est obligatoire';
           }
           return null;
         },

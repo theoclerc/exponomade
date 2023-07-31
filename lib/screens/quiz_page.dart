@@ -57,7 +57,7 @@ class _QuizPageState extends State<QuizPage> {
         ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any existing SnackBar
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please select an option to continue'),
+            content: Text('Une réponse est requise'),
             behavior: SnackBarBehavior.floating,
             margin: EdgeInsets.only(bottom: 80.0, left: 20.0, right: 20.0), // Adjust margin to control position
           ),
@@ -106,7 +106,7 @@ class _QuizPageState extends State<QuizPage> {
             return Scaffold(
               backgroundColor: background,
               appBar: AppBar(
-                title: const Text('Quiz Page'),
+                title: const Text('Questionnaire'),
                 backgroundColor: background,
                 //shadowColor: Colors.transparent,
                 actions: [
@@ -173,7 +173,7 @@ class _QuizPageState extends State<QuizPage> {
                 const CircularProgressIndicator(),
                 const SizedBox(height: 20.0),
                 Text(
-                  'Loading...',
+                  'Chargement...',
                   style: TextStyle(
                     color: Theme.of(context).primaryColor,
                     decoration: TextDecoration.none,
@@ -186,7 +186,7 @@ class _QuizPageState extends State<QuizPage> {
         }
 
         return const Center(
-          child: Text('No data'),
+          child: Text('Aucune donnée trouvée'),
         );
       },
     );

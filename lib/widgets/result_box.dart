@@ -23,7 +23,7 @@ class ResultBox extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Text(
-              'Result',
+              'Résultat',
               style: TextStyle(color: neutral, fontSize: 22.0),
             ),
             const SizedBox(height: 20.0),
@@ -40,16 +40,16 @@ class ResultBox extends StatelessWidget {
             const SizedBox(height: 20.0),
             Text(
               result == questionLength / 2
-                  ? 'Almost there!'
+                  ? 'Tu y es presque!'
                   : result < questionLength / 2
-                      ? 'Try again!'
-                      : 'Great!',
+                      ? 'Beurk!'
+                      : 'Joli!',
               style: const TextStyle(color: neutral),
             ),
             const SizedBox(height: 25.0),
             GestureDetector(
               onTap: onPressed,
-              child: const Text('Start Over',
+              child: const Text('Recommencer',
                   style: TextStyle(
                     color: Colors.blue,
                     fontSize: 20.0,
