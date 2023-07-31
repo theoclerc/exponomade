@@ -21,7 +21,7 @@ class _QuizPageState extends State<QuizPage> {
   Future<List<Question>> getData() async {
     List<Question> questions = await db.fetchQuestions();
     questions.shuffle();
-    return questions.take(3).toList();
+    return questions.take(10).toList();
   }
 
   @override
