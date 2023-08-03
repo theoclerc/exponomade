@@ -8,10 +8,13 @@ Marker createMuseumMarker(BuildContext context, Museum museum) {
     markerId: MarkerId(museum.name),
     position: museum.location,
     onTap: () {
-      showDialog(
+      print(museum.name);
+      
+      // implémenter ici le popup pour les infos
+      /* showDialog(
         context: context,
         builder: (context) => MuseumInfoPopup(museum: museum),
-      );
+      ); */
     },
   );
 }

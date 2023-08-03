@@ -1,17 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'museum_marker.dart';
+import 'data.dart';
 
-class MapToggle extends StatefulWidget{
+class MapToggle extends StatefulWidget {
+  const MapToggle({Key? key}) : super(key: key);
 
-@override
-_MapToggleState createState() => _MapToggleState();
-  
-  const MapToggle({super.key});
-  
+  @override
+  _MapToggleState createState() => _MapToggleState();
 }
 
 class _MapToggleState extends State<MapToggle> {
-late GoogleMapController mapController;
+  late GoogleMapController mapController;
 
   final LatLng _center = const LatLng(46.229352, 7.362049);
 
@@ -29,9 +29,9 @@ late GoogleMapController mapController;
             target: _center,
             zoom: 11.0,
           ),
+          markers: museums.map((museum) => createMuseumMarker(context, museum)).toSet(),
         ),
       ),
     );
   }
-
 }

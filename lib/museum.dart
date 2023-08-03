@@ -5,5 +5,9 @@ class Museum {
   final LatLng location;
   final List<String> objects;
 
-  Museum({this.name, this.location, this.objects});
+  Museum({
+    required this.name,
+    required this.location,
+    required this.objects,
+  });
 }

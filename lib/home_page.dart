@@ -20,7 +20,7 @@ class _HomePageState extends State<HomePage> {
     switch (selectedIndex) {
       //Map
       case 0:
-        page = const MapToggle();
+        page = MapToggle();
         break;
       //Contact
       case 1:

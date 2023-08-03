@@ -4,7 +4,7 @@ import 'museum.dart';
 class MuseumInfoPopup extends StatelessWidget {
   final Museum museum;
 
-  MuseumInfoPopup({this.museum});
+  MuseumInfoPopup({required this.museum});
 
   @override
   Widget build(BuildContext context) {
