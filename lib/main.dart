@@ -1,4 +1,4 @@
-import 'package:exponomade/home_page.dart';
+import 'package:exponomade/appNavigation/home_page.dart';
 import 'package:flutter/material.dart';
 
  void main() {
