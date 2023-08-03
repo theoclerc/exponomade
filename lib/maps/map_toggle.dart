@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'museum_marker.dart';
-import 'data.dart';
+import '../museum/museum_marker.dart';
+import '../database/data.dart';
 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);

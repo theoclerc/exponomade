@@ -1,5 +1,5 @@
 
-import 'package:exponomade/map_toggle.dart';
+import 'package:exponomade/maps/map_toggle.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget{

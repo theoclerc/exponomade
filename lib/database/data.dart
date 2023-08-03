@@ -1,4 +1,4 @@
-import 'museum.dart';
+import '../museum/museum.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 List<Museum> museums = [
