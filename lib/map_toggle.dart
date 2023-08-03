@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class MapToggle extends StatefulWidget{
 
@@ -12,47 +11,25 @@ _MapToggleState createState() => _MapToggleState();
 }
 
 class _MapToggleState extends State<MapToggle> {
-@override
-  Widget build(BuildContext context){
+late GoogleMapController mapController;
 
-    var marker = <Marker>[];
+  final LatLng _center = const LatLng(46.229352, 7.362049);
 
-    marker = [
-      //Châteaux de Sion
-      Marker(
-        point: const LatLng(46.2352107258,7.36683686598),
-        builder: (ctx) => const Icon(Icons.pin_drop_outlined), 
-      ),
-      //Aéroport Sion
-      Marker(
-        point: const LatLng(46.219277,7.329936),
-        builder: (ctx) => const Icon(Icons.pin_drop), 
-      ),
-    ];
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
+  }
 
-    return Scaffold(
-      body: Center(
-        
-          child: Column(
-            children: [
-              Flexible(
-                child: FlutterMap(
-                  options: 
-                    MapOptions(center: const LatLng(46.229352,7.362049),zoom: 8),
-                  children: [
-                    TileLayer(
-                    urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.example.app',
-                    ),
-                    MarkerLayer(
-                      markers: marker,
-                    )
-                  ],
-                ),
-              ),
-            ],
-          ), 
-        
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: GoogleMap(
+          onMapCreated: _onMapCreated,
+          initialCameraPosition: CameraPosition(
+            target: _center,
+            zoom: 11.0,
+          ),
+        ),
       ),
     );
   }
