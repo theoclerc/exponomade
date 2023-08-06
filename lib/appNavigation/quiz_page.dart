@@ -6,6 +6,7 @@ import '../widgets/next_button.dart';
 import '../widgets/option_card.dart';
 import '../widgets/result_box.dart';
 import '../database/db_connect.dart';
+import 'package:exponomade/appNavigation/contact_page.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
@@ -44,6 +45,7 @@ class _QuizPageState extends State<QuizPage> {
           result: score,
           questionLength: questionLength,
           onPressed: startOver,
+          onContactPressed: redirectToContact,
         ),
       );
     } else {
@@ -90,6 +92,10 @@ class _QuizPageState extends State<QuizPage> {
     });
     Navigator.pop(context);
   }
+
+  void redirectToContact() {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactPage()));
+}
 
   @override
   Widget build(BuildContext context) {

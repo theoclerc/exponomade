@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import '../constants.dart';
 
 class ResultBox extends StatelessWidget {
-  const ResultBox(
-      {Key? key,
-      required this.result,
-      required this.questionLength,
-      required this.onPressed})
-      : super(key: key);
+  const ResultBox({
+    Key? key,
+    required this.result,
+    required this.questionLength,
+    required this.onPressed,
+    required this.onContactPressed,
+  }) : super(key: key);
 
   final int result;
   final int questionLength;
   final VoidCallback onPressed;
+  final VoidCallback onContactPressed; 
+
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
@@ -51,7 +54,17 @@ class ResultBox extends StatelessWidget {
               onTap: onPressed,
               child: const Text('Recommencer',
                   style: TextStyle(
-                    color: Colors.blue,
+                    color: neutral,
+                    fontSize: 20.0,
+                    letterSpacing: 1.0,
+                  )),
+            ),
+            const SizedBox(height: 20.0),  
+            GestureDetector(
+              onTap: onContactPressed,  
+              child: const Text('Nous contacter',
+                  style: TextStyle(
+                    color: neutral,
                     fontSize: 20.0,
                     letterSpacing: 1.0,
                   )),
