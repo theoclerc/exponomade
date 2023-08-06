@@ -1,17 +1,25 @@
 import 'package:exponomade/appNavigation/home_page.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 
- void main() {
-     runApp(const MainApp());
- }
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
 
- class MainApp extends StatelessWidget {
-     const MainApp({super.key});
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
-    @override
-   Widget build(BuildContext context) {
-      return  const MaterialApp(
+  runApp(const MainApp());
+}
+
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const MaterialApp(
       home: HomePage(),
-      );
-   }
- }
+    );
+  }
+}
