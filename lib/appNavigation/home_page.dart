@@ -1,7 +1,6 @@
 import 'package:exponomade/maps/map_toggle.dart';
-import 'package:exponomade/contact_page.dart';
+import 'contact_page.dart';
 import 'package:flutter/material.dart';
-import 'package:exponomade/appNavigation/contact_page.dart';
 import 'package:exponomade/appNavigation/quiz_page.dart';
 
 class HomePage extends StatefulWidget{
