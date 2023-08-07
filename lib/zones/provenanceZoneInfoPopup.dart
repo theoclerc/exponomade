@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
-import 'museum.dart';
+import 'provenanceZone.dart';
 
-class MuseumInfoPopup extends StatelessWidget {
-  final Museum museum;
+class provenanceZoneInfoPopup extends StatelessWidget {
+  final ProvenanceZone zone;
 
-  const MuseumInfoPopup({super.key, required this.museum});
+  const provenanceZoneInfoPopup({super.key, required this.zone});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(museum.name),
+      title: Text(zone.provenanceNom),
       content: ListView.builder(
-        itemCount: museum.objects.length,
+        itemCount: zone.reasons.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(museum.objects[index]),
+            title: Text(zone.reasons[index]),
           );
         },
       ),
