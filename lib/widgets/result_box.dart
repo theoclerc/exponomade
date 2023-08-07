@@ -13,7 +13,7 @@ class ResultBox extends StatelessWidget {
   final int result;
   final int questionLength;
   final VoidCallback onPressed;
-  final VoidCallback onContactPressed; 
+  final VoidCallback onContactPressed;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +38,7 @@ class ResultBox extends StatelessWidget {
                       ? incorrect
                       : correct,
               child: Text('$result/$questionLength',
-                  style: const TextStyle(fontSize: 30.0)),        
+                  style: const TextStyle(fontSize: 30.0)),
             ),
             const SizedBox(height: 20.0),
             Text(
@@ -50,24 +50,50 @@ class ResultBox extends StatelessWidget {
               style: const TextStyle(color: neutral),
             ),
             const SizedBox(height: 25.0),
-            GestureDetector(
-              onTap: onPressed,
-              child: const Text('Recommencer',
-                  style: TextStyle(
-                    color: neutral,
-                    fontSize: 20.0,
-                    letterSpacing: 1.0,
-                  )),
+            ElevatedButton(
+              onPressed: onPressed,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                foregroundColor: neutral,
+                side: const BorderSide(color: neutral, width: 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.refresh, size: 24.0),
+                  SizedBox(width: 10.0),
+                  Text('Recommencer',
+                      style: TextStyle(fontSize: 22.0, letterSpacing: 1.0)),
+                ],
+              ),
             ),
-            const SizedBox(height: 20.0),  
-            GestureDetector(
-              onTap: onContactPressed,  
-              child: const Text('Nous contacter',
-                  style: TextStyle(
-                    color: neutral,
-                    fontSize: 20.0,
-                    letterSpacing: 1.0,
-                  )),
+            const SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: onContactPressed,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                foregroundColor: neutral,
+                side: const BorderSide(color: neutral, width: 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(15.0),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.mail_outline, size: 24.0),
+                  SizedBox(width: 10.0),
+                  Text('Nous contacter',
+                      style: TextStyle(fontSize: 22.0, letterSpacing: 1.0)),
+                ],
+              ),
             ),
           ],
         ),
