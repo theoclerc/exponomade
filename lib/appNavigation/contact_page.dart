@@ -1,7 +1,8 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import '../constants.dart';
+import '../services/contact_services.dart';
+import '../widgets/custom_textfield.dart';
+
 
 class ContactPage extends StatefulWidget {
   const ContactPage({Key? key}) : super(key: key);
@@ -10,39 +11,12 @@ class ContactPage extends StatefulWidget {
   _ContactPageState createState() => _ContactPageState();
 }
 
-final nameController = TextEditingController();
-final subjectController = TextEditingController();
-final emailController = TextEditingController();
-final messageController = TextEditingController();
-
-Future sendEmail() async {
-  final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
-  const serviceId = "service_0pvl2j5";
-  const templateId = "template_eukwi3w";
-  const userId = "cAyLawFqO24GkUAng";
-  final response = await http.post(url,
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({
-        "service_id": serviceId,
-        "template_id": templateId,
-        "user_id": userId,
-        "template_params": {
-          "name": nameController.text,
-          "subject": subjectController.text,
-          "user_email": emailController.text,
-          "message": messageController.text,
-        }
-      }));
-  return response.statusCode;
-}
-
 class _ContactPageState extends State<ContactPage> {
   final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
       home: Scaffold(
         backgroundColor: background,
         appBar: AppBar(
@@ -55,31 +29,39 @@ class _ContactPageState extends State<ContactPage> {
             key: _formKey,
             child: Column(
               children: [
-                customTextField(nameController, Icons.account_circle, 'Nom',
-                    'écris ton nom ici'),
-                const SizedBox(
-                  height: 25,
+                CustomTextField(
+                  controller: ContactService.nameController,
+                  icon: Icons.account_circle,
+                  labelText: 'Nom',
+                  hintText: 'écris ton nom ici',
                 ),
-                customTextField(subjectController, Icons.subject_rounded,
-                    'Sujet', 'écris le sujet de ton message ici'),
-                const SizedBox(
-                  height: 25,
+                const SizedBox(height: 25),
+                CustomTextField(
+                  controller: ContactService.subjectController,
+                  icon: Icons.subject_rounded,
+                  labelText: 'Sujet',
+                  hintText: 'écris le sujet de ton message ici',
                 ),
-                customTextField(
-                    emailController, Icons.email, 'Email', 'à quelle adresse pouvons-nous te répondre ?'),
-                const SizedBox(
-                  height: 25,
+                const SizedBox(height: 25),
+                CustomTextField(
+                  controller: ContactService.emailController,
+                  icon: Icons.email,
+                  labelText: 'Email',
+                  hintText: 'à quelle adresse pouvons-nous te répondre ?',
                 ),
-                customTextField(messageController, Icons.message, 'Message',
-                    'écris ton message ici'),
-                const SizedBox(
-                  height: 25,
+                const SizedBox(height: 25),
+                CustomTextField(
+                  controller: ContactService.messageController,
+                  icon: Icons.message,
+                  labelText: 'Message',
+                  hintText: 'écris ton message ici',
                 ),
+                const SizedBox(height: 25),
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      sendEmail();
-                      _clearTextFields();
+                      ContactService.sendEmail();
+                      ContactService.clearTextFields(); 
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
                           content: Text('Formulaire envoyé !'),
@@ -113,38 +95,5 @@ class _ContactPageState extends State<ContactPage> {
         ),
       ),
     );
-  }
-
-  Widget customTextField(TextEditingController controller, IconData icon,
-      String labelText, String hintText) {
-    return Container(
-      padding: const EdgeInsets.only(left: 10.0, right: 10.0),
-      decoration: BoxDecoration(
-        color: neutral,
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      child: TextFormField(
-        controller: controller,
-        decoration: InputDecoration(
-          icon: Icon(icon),
-          labelText: labelText,
-          hintText: hintText,
-          border: InputBorder.none,
-        ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire';
-          }
-          return null;
-        },
-      ),
-    );
-  }
-
-  void _clearTextFields() {
-    nameController.clear();
-    subjectController.clear();
-    emailController.clear();
-    messageController.clear();
   }
 }
