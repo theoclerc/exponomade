@@ -4,7 +4,7 @@ import 'provenanceZone.dart';
 class provenanceZoneInfoPopup extends StatelessWidget {
   final ProvenanceZone zone;
 
-  provenanceZoneInfoPopup({required this.zone});
+  const provenanceZoneInfoPopup({super.key, required this.zone});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class provenanceZoneInfoPopup extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Close'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.of(context).pop();
           },

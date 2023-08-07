@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'museum.dart';
-import 'museum_info_popup.dart';
 
 Future<Marker> createMuseumMarker(BuildContext context, Museum museum) async {
   BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
-    ImageConfiguration(devicePixelRatio: 10),
+    const ImageConfiguration(devicePixelRatio: 10),
     "assets/musee.png",
   );
 
