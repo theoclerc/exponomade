@@ -4,7 +4,7 @@ import 'museum.dart';
 class MuseumInfoPopup extends StatelessWidget {
   final Museum museum;
 
-  MuseumInfoPopup({required this.museum});
+  const MuseumInfoPopup({super.key, required this.museum});
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +20,7 @@ class MuseumInfoPopup extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Close'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.of(context).pop();
           },

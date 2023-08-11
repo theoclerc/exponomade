@@ -4,7 +4,7 @@ import 'arriveZone.dart';
 class arriveZoneInfoPopup extends StatelessWidget {
   final arriveZone zone;
 
-  arriveZoneInfoPopup({required this.zone});
+  const arriveZoneInfoPopup({super.key, required this.zone});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: Text('Close'),
+          child: const Text('Close'),
           onPressed: () {
             Navigator.of(context).pop();
           },
