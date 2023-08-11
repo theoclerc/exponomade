@@ -1,8 +1,10 @@
-import '../models/question_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../models/question_model.dart';
 import '../models/musee_model.dart';
 import '../museum/objet.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../zones/arriveZone.dart'; 
+import '../zones/provenanceZone.dart';
 
 class DBconnect {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -39,7 +41,6 @@ class DBconnect {
           List<Map<String, dynamic>> objetsData =
               List<Map<String, dynamic>>.from(data['objets'] as List);
           List<Objet> objets = objetsData.map((objetData) {
-            // todo : changer la chronologie en num plutot que String une fois que la chronologie dans la DB sera remplie
             Map<String, String> chronologie = {
               'from': objetData['chronologie']['from'] as String,
               'to': objetData['chronologie']['to'] as String,
@@ -75,4 +76,68 @@ class DBconnect {
       return []; // Return an empty list if an error occurs
     }
   }
+
+Future<List<arriveZone>> fetchArriveZones() async {
+  try {
+    DocumentSnapshot querySnapshot = await _firestore.collection('zones').doc('HpaJ7k9BYzlKRKnQA79E').get();
+    Map<String, dynamic> data = querySnapshot.data() as Map<String, dynamic>;
+
+    List<dynamic> arriveeZoneData = data['arriveeZone'];
+
+    // Assurer que chaque élément est une GeoPoint, puis transformer en LatLng
+    List<LatLng> coordinates = arriveeZoneData.map((e) {
+      GeoPoint geoPoint = e as GeoPoint;
+      return LatLng(geoPoint.latitude, geoPoint.longitude);
+    }).toList();
+    
+    print("Arrive Zones coordinates: $coordinates"); // Log pour vérifier les coordonnées
+
+    Map<String, dynamic> chronologieZone = data['chronologieZone'];
+    DateTime from = DateTime.fromMillisecondsSinceEpoch(chronologieZone['from']);
+    DateTime to = DateTime.fromMillisecondsSinceEpoch(chronologieZone['to']);
+
+    return [
+      arriveZone(
+        name: data['nomZone'],
+        coordinates: coordinates,
+        from: from,
+        to: to,
+      ),
+    ];
+  } catch (e) {
+    print("Une erreur s'est produite lors de la récupération des données des zones d'arrivée: $e");
+    return [];
+  }
+}
+
+Future<List<ProvenanceZone>> fetchProvenanceZones() async {
+  try {
+    DocumentSnapshot querySnapshot = await _firestore.collection('zones').doc('HpaJ7k9BYzlKRKnQA79E').get();
+    Map<String, dynamic> data = querySnapshot.data() as Map<String, dynamic>;
+
+    List<dynamic> provenanceZoneData = data['provenanceZone'];
+
+    // Assurer que chaque élément est une GeoPoint, puis transformer en LatLng
+    List<LatLng> coordinates = provenanceZoneData.map((e) {
+      GeoPoint geoPoint = e as GeoPoint;
+      return LatLng(geoPoint.latitude, geoPoint.longitude);
+    }).toList();
+
+    print("Provenance Zones coordinates: $coordinates"); // Log pour vérifier les coordonnées
+
+    List<String> reasons = List<String>.from(data['raisons']);
+
+    return [
+      ProvenanceZone(
+        provenanceNom: data['provenanceNom'],
+        provenanceZone: coordinates,
+        reasons: reasons,
+        reasonsDescription: data['raisonsDescription'],
+      ),
+    ];
+  } catch (e) {
+    print("Une erreur s'est produite lors de la récupération des données des zones de provenance: $e");
+    return [];
+  }
+}
 }

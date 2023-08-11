@@ -12,6 +12,7 @@ class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
 
   @override
+ 
   _MapToggleState createState() => _MapToggleState();
 }
 
@@ -44,43 +45,24 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
-  void _createPolygons() {
-    // arriveeZone
-    var arriveeZoneCoordinates = [
-     LatLng(46.3027, 7.5736), // Bois de Finges
-  LatLng(46.1144, 7.5094), // Évolène
-  LatLng(46.0911, 7.4386), // Mont Fort
-  LatLng(46.2076, 7.1872), // Chamoson
-  LatLng(46.3208, 7.1561), // Les Diablerets
-  LatLng(46.3033, 7.4186), // Wildhorn
-  LatLng(46.3027, 7.5736), // Retour au Bois de Finges
-    ];
-    var arriveeZone = arriveZone(
-      name: 'Arrival Zone',
-      coordinates: arriveeZoneCoordinates,
-      from: DateTime.now(),
-      to: DateTime.now().add(Duration(days: 1)),
-    );
-    polygons.add(arriveZonePolygon(arriveeZone));
+  Future<void> _createPolygons() async {
+    // Fetching arrival and provenance zones from Firestore
+    List<arriveZone> arriveeZones = await db.fetchArriveZones();
+    List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
 
-    // provenanceZone
-  var provenanceZoneCoordinates = [
-  LatLng(50.1109, 9.6825),  // Frontière nord de l'Empire en Germanie
-  LatLng(43.325, -6.364),   // Nord de l'Espagne
-  LatLng(36.527, -6.289),   // Sud de l'Espagne
-  LatLng(36.862, 10.323),   // Tunisie, près de Carthage
-  LatLng(31.200, 29.918),   // Égypte, près d'Alexandrie
-  LatLng(36.202, 36.157),   // Côte turque
-  LatLng(44.409, 28.965),   // Près de la côte de la Mer Noire en Roumanie
-  LatLng(51.165, 10.451),   // Frontière nord de l'Empire en Germanie (retour)
-    ];
-    var provenanceZoneData = ProvenanceZone(
-      provenanceNom: 'Provenance Zone',
-      provenanceZone: provenanceZoneCoordinates,
-      reasons: ['Reason 1', 'Reason 2'],
-      reasonsDescription: 'Description',
-    );
-    polygons.add(provenanceZonePolygon(provenanceZoneData));
+    // Adding polygons for arrival zones
+    for (var arriveeZone in arriveeZones) {
+      setState(() {
+        polygons.add(arriveZonePolygon(arriveeZone));
+      });
+    }
+
+    // Adding polygons for provenance zones
+    for (var provenanceZoneData in provenanceZones) {
+      setState(() {
+        polygons.add(provenanceZonePolygon(provenanceZoneData));
+      });
+    }
   }
 
   @override
