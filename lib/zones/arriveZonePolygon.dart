@@ -6,7 +6,7 @@ Polygon arriveZonePolygon(arriveZone zone) {
   return Polygon(
     polygonId: PolygonId(zone.name),
     points: zone.coordinates,
-    fillColor: Colors.blue.withOpacity(0.5),  // Change as needed
+    fillColor: Colors.blue.withOpacity(0.7),  // Change as needed
     strokeWidth: 1,
     strokeColor: Colors.blue,  // Change as needed
   );
