@@ -9,5 +9,6 @@ Polygon arriveZonePolygon(arriveZone zone) {
     fillColor: Colors.blue.withOpacity(0.7),  // Change as needed
     strokeWidth: 1,
     strokeColor: Colors.blue,  // Change as needed
+   
   );
 }
