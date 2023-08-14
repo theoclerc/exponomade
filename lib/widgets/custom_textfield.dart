@@ -6,14 +6,16 @@ class CustomTextField extends StatelessWidget {
   final IconData icon;
   final String labelText;
   final String hintText;
+  final FormFieldValidator<String>? validator;
 
   const CustomTextField({
-    Key? key, 
+    Key? key,
     required this.controller,
     required this.icon,
     required this.labelText,
     required this.hintText,
-  }) : super(key: key); 
+    this.validator,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -31,12 +33,13 @@ class CustomTextField extends StatelessWidget {
           hintText: hintText,
           border: InputBorder.none,
         ),
-        validator: (value) {
-          if (value == null || value.isEmpty) {
-            return 'Ce champ est obligatoire';
-          }
-          return null;
-        },
+        validator: validator ??
+            (value) { 
+              if (value == null || value.isEmpty) {
+                return 'Ce champ est obligatoire';
+              }
+              return null;
+            },
       ),
     );
   }

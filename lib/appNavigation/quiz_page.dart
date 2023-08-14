@@ -1,40 +1,32 @@
 import 'package:flutter/material.dart';
 import '../constants.dart';
 import '../models/question_model.dart';
+import '../services/quiz_services.dart';
 import '../widgets/question_widget.dart';
 import '../widgets/next_button.dart';
 import '../widgets/option_card.dart';
 import '../widgets/result_box.dart';
-import '../database/db_connect.dart';
-import 'package:exponomade/appNavigation/contact_page.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
 
-  @override
-  _QuizPageState createState() => _QuizPageState();
+  @override 
+  State<QuizPage> createState() => _QuizPageState();
 }
 
 class _QuizPageState extends State<QuizPage> {
-  var db = DBconnect();
   late Future _question;
-
-  Future<List<Question>> getData() async {
-    List<Question> questions = await db.fetchQuestions();
-    questions.shuffle();
-    return questions.take(3).toList();
-  }
-
-  @override
-  void initState() {
-    _question = getData();
-    super.initState();
-  }
 
   int index = 0;
   int score = 0;
   bool isPressed = false;
   bool isAlreadySelected = false;
+
+  @override
+  void initState() {
+    _question = QuizServices.getData();
+    super.initState();
+  }
 
   void nextQuestion(int questionLength) {
     if (index == questionLength - 1) {
@@ -45,7 +37,7 @@ class _QuizPageState extends State<QuizPage> {
           result: score,
           questionLength: questionLength,
           onPressed: startOver,
-          onContactPressed: redirectToContact,
+          onContactPressed: () => QuizServices.redirectToContact(context),
         ),
       );
     } else {
@@ -56,35 +48,21 @@ class _QuizPageState extends State<QuizPage> {
           isAlreadySelected = false;
         });
       } else {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar(); // Hide any existing SnackBar
+        ScaffoldMessenger.of(context).hideCurrentSnackBar();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Une réponse est requise'),
             behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(bottom: 80.0, left: 20.0, right: 20.0), // Adjust margin to control position
+            margin: EdgeInsets.only(bottom: 80.0, left: 20.0, right: 20.0),
           ),
         );
       }
     }
   }
 
-  void checkAnswerAndUpdate(bool value) {
-    if (isAlreadySelected) {
-      return;
-    } else {
-      if (value == true) {
-        score++;
-      }
-      setState(() {
-        isPressed = true;
-        isAlreadySelected = true;
-      });
-    }
-  }
-
   void startOver() {
     setState(() {
-      _question = getData(); // Fetch new questions
+      _question = QuizServices.getData();
       index = 0;
       score = 0;
       isPressed = false;
@@ -93,10 +71,6 @@ class _QuizPageState extends State<QuizPage> {
     Navigator.pop(context);
   }
 
-  void redirectToContact() {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => const ContactPage()));
-}
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -104,9 +78,7 @@ class _QuizPageState extends State<QuizPage> {
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasError) {
-            return Center(
-              child: Text('${snapshot.error}'),
-            );
+            return Center(child: Text('${snapshot.error}'));
           } else if (snapshot.hasData) {
             var extractedData = snapshot.data as List<Question>;
             return Scaffold(
@@ -114,14 +86,10 @@ class _QuizPageState extends State<QuizPage> {
               appBar: AppBar(
                 title: const Text('Questionnaire'),
                 backgroundColor: background,
-                //shadowColor: Colors.transparent,
                 actions: [
                   Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: Text(
-                      'Score: $score',
-                      style: const TextStyle(fontSize: 18.0),
-                    ),
+                    child: Text('Score: $score', style: const TextStyle(fontSize: 18.0)),
                   ),
                 ],
               ),
@@ -135,24 +103,28 @@ class _QuizPageState extends State<QuizPage> {
                       question: extractedData[index].title,
                       totalQuestions: extractedData.length,
                     ),
-                    //const Divider(color: neutral),
                     const SizedBox(height: 10.0),
-                    for (int i = 0;
-                        i < extractedData[index].options.length;
-                        i++)
+                    for (int i = 0; i < extractedData[index].options.length; i++)
                       GestureDetector(
-                        onTap: () => checkAnswerAndUpdate(
-                            extractedData[index].options.values.toList()[i]),
+                        onTap: () => QuizServices.checkAnswerAndUpdate(
+                          value: extractedData[index].options.values.toList()[i],
+                          isAlreadySelected: isAlreadySelected,
+                          setPressed: () => setState(() {
+                            isPressed = true;
+                          }),
+                          setAlreadySelected: () => setState(() {
+                            isAlreadySelected = true;
+                          }),
+                          incrementScore: () => setState(() {
+                            score++;
+                          }),
+                        ),
                         child: OptionCard(
                           option: extractedData[index].options.keys.toList()[i],
                           color: isPressed
-                              ? extractedData[index]
-                                          .options
-                                          .values
-                                          .toList()[i] ==
-                                      true
-                                  ? correct
-                                  : incorrect
+                              ? extractedData[index].options.values.toList()[i] == true
+                                ? correct
+                                : incorrect
                               : neutral,
                         ),
                       ),
@@ -166,8 +138,7 @@ class _QuizPageState extends State<QuizPage> {
                   child: NextButton(),
                 ),
               ),
-              floatingActionButtonLocation:
-                  FloatingActionButtonLocation.centerFloat,
+              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
             );
           }
         } else {
@@ -191,9 +162,7 @@ class _QuizPageState extends State<QuizPage> {
           );
         }
 
-        return const Center(
-          child: Text('Aucune donnée trouvée'),
-        );
+        return const Center(child: Text('Aucune donnée trouvée'));
       },
     );
   }

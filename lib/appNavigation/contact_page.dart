@@ -8,7 +8,7 @@ class ContactPage extends StatefulWidget {
   const ContactPage({Key? key}) : super(key: key);
 
   @override
-  _ContactPageState createState() => _ContactPageState();
+  State<ContactPage> createState() => _ContactPageState();
 }
 
 class _ContactPageState extends State<ContactPage> {
@@ -44,10 +44,19 @@ class _ContactPageState extends State<ContactPage> {
                 ),
                 const SizedBox(height: 25),
                 CustomTextField(
-                  controller: ContactService.emailController,
-                  icon: Icons.email,
-                  labelText: 'Email',
-                  hintText: 'à quelle adresse pouvons-nous te répondre ?',
+                    controller: ContactService.emailController,
+                    icon: Icons.email,
+                    labelText: 'Email',
+                    hintText: 'à quelle adresse pouvons-nous te répondre ?',
+                    validator: (value) {
+                        Pattern pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
+                        RegExp regex = RegExp(pattern as String);
+                        if (!regex.hasMatch(value!)) {
+                            return 'Entrez un e-mail valide';
+                        } else {
+                            return null;
+                        }
+                    },
                 ),
                 const SizedBox(height: 25),
                 CustomTextField(
