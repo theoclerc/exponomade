@@ -5,7 +5,6 @@ import '../services/quiz_services.dart';
 import '../widgets/question_widget.dart';
 import '../widgets/next_button.dart';
 import '../widgets/option_card.dart';
-import '../widgets/result_box.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
@@ -26,49 +25,6 @@ class _QuizPageState extends State<QuizPage> {
   void initState() {
     _question = QuizServices.getData();
     super.initState();
-  }
-
-  void nextQuestion(int questionLength) {
-    if (index == questionLength - 1) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => ResultBox(
-          result: score,
-          questionLength: questionLength,
-          onPressed: startOver,
-          onContactPressed: () => QuizServices.redirectToContact(context),
-        ),
-      );
-    } else {
-      if (isPressed) {
-        setState(() {
-          index++;
-          isPressed = false;
-          isAlreadySelected = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Une réponse est requise'),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(bottom: 80.0, left: 20.0, right: 20.0),
-          ),
-        );
-      }
-    }
-  }
-
-  void startOver() {
-    setState(() {
-      _question = QuizServices.getData();
-      index = 0;
-      score = 0;
-      isPressed = false;
-      isAlreadySelected = false;
-    });
-    Navigator.pop(context);
   }
 
   @override
@@ -132,7 +88,21 @@ class _QuizPageState extends State<QuizPage> {
                 ),
               ),
               floatingActionButton: GestureDetector(
-                onTap: () => nextQuestion(extractedData.length),
+                onTap: () => QuizServices.nextQuestion(
+                  context: context,
+                  index: index,
+                  score: score,
+                  isPressed: isPressed,
+                  extractedData: extractedData,
+                  updateState: (indexValue, scoreValue, isPressedValue, isAlreadySelectedValue) {
+                    setState(() {
+                      index = indexValue;
+                      score = scoreValue;
+                      isPressed = isPressedValue;
+                      isAlreadySelected = isAlreadySelectedValue;
+                    });
+                  }
+                ),
                 child: const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 10.0),
                   child: NextButton(),
