@@ -12,7 +12,6 @@ class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
 
   @override
- 
   _MapToggleState createState() => _MapToggleState();
 }
 
@@ -22,6 +21,17 @@ class _MapToggleState extends State<MapToggle> {
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
   var db = DBconnect();
+
+  // Period options
+  List<String> periodOptions = [
+    "Prehistoric",
+    "Ancient",
+    "Medieval",
+    "Modern",
+    "Contemporary",
+  ];
+
+  String selectedPeriod = "Prehistoric"; // Default selected period
 
   @override
   void initState() {
@@ -35,7 +45,8 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   Future<void> _createMarkers() async {
-    List<Musee> museums = await db.fetchMusees(); // Fetching museums from Firestore
+    List<Musee> museums =
+        await db.fetchMusees(); // Fetching museums from Firestore
 
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
@@ -65,18 +76,112 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
+  // Function to show the period selection BottomSheet
+  void _showPeriodSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor:
+          Colors.transparent, // Set the background color to transparent
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          widthFactor: 0.5, // Adjust the width factor as needed
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const ListTile(
+                  title: Text("Sélectionnez une période :",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Divider(),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: periodOptions.length,
+                  itemBuilder: (context, index) {
+                    final period = periodOptions[index];
+                    return ListTile(
+                      title: Text(period),
+                      onTap: () {
+                        setState(() {
+                          selectedPeriod = period;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        body: GoogleMap(
-          onMapCreated: _onMapCreated,
-          initialCameraPosition: CameraPosition(
-            target: _center,
-            zoom: 11.0,
-          ),
-          markers: markers,
-          polygons: polygons, // Ajout des polygones
+        body: Stack(
+          children: [
+            GoogleMap(
+              onMapCreated: _onMapCreated,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 11.0,
+              ),
+              markers: markers,
+              polygons: polygons, // Ajout des polygones
+            ),
+            Positioned(
+              right: 60,
+              bottom: 24,
+              child: Container(
+                width: 180,
+                height: 80,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6.0,
+                      spreadRadius: 2.0,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: GestureDetector(
+                  onTap: _showPeriodSelection,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.history),
+                      const SizedBox(width: 8),
+                      RichText(
+                          text: TextSpan(children: [
+                        const TextSpan(
+                          text: "Période choisie :\n",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: selectedPeriod)
+                      ])),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
