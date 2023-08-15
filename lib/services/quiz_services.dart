@@ -47,7 +47,7 @@ class QuizServices {
         builder: (ctx) => ResultBox(
           result: score,
           questionLength: extractedData.length,
-          onPressed: () => startOver(updateState, context),
+          onPressed: () => startOver(context),
           onContactPressed: () => redirectToContact(context),
         ),
       );
@@ -67,9 +67,8 @@ class QuizServices {
     }
   }
 
-  static void startOver(Function updateState, BuildContext context) {
-    updateState(0, 0, false, false);
-    Navigator.pop(context);
+  static void startOver(BuildContext context) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(initialPage: 2)));
   }
 
   static void redirectToContact(BuildContext context) {
