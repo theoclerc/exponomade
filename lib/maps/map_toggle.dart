@@ -7,12 +7,14 @@ import '../zones/provenanceZone.dart';
 import '../zones/provenanceZonepolygon.dart';
 import '../models/musee_model.dart';
 import '../database/db_connect.dart';
+import '../zones/arriveZoneInfoPopup.dart';
+import '../zones/provenanceZoneInfoPopup.dart';
+
 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
 
   @override
- 
   _MapToggleState createState() => _MapToggleState();
 }
 
@@ -26,16 +28,30 @@ class _MapToggleState extends State<MapToggle> {
   @override
   void initState() {
     super.initState();
-    _createMarkers();
-    _createPolygons();
+    _createMarkersAndPolygons();
   }
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
   }
 
-  Future<void> _createMarkers() async {
-    List<Musee> museums = await db.fetchMusees(); // Fetching museums from Firestore
+  LatLng _getPolygonCenter(List<LatLng> coordinates) {
+    double latitude = 0;
+    double longitude = 0;
+    int count = coordinates.length;
+
+    for (var coordinate in coordinates) {
+      latitude += coordinate.latitude;
+      longitude += coordinate.longitude;
+    }
+
+    return LatLng(latitude / count, longitude / count);
+  }
+
+  Future<void> _createMarkersAndPolygons() async {
+    List<Musee> museums = await db.fetchMusees();
+    List<arriveZone> arriveeZones = await db.fetchArriveZones();
+    List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
 
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
@@ -43,24 +59,40 @@ class _MapToggleState extends State<MapToggle> {
         markers.add(marker);
       });
     }
-  }
 
-  Future<void> _createPolygons() async {
-    // Fetching arrival and provenance zones from Firestore
-    List<arriveZone> arriveeZones = await db.fetchArriveZones();
-    List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
-
-    // Adding polygons for arrival zones
     for (var arriveeZone in arriveeZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(arriveeZone.name),
+        position: _getPolygonCenter(arriveeZone.coordinates),
+        infoWindow: InfoWindow(title: arriveeZone.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+          );
+        },
+      );
       setState(() {
+        markers.add(marker);
         polygons.add(arriveZonePolygon(arriveeZone));
       });
     }
 
-    // Adding polygons for provenance zones
-    for (var provenanceZoneData in provenanceZones) {
+    for (var provenanceZone in provenanceZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(provenanceZone.provenanceNom),
+        position: _getPolygonCenter(provenanceZone.provenanceZone),
+        infoWindow: InfoWindow(title: provenanceZone.provenanceNom),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => provenanceZoneInfoPopup(zone: provenanceZone),
+          );
+        },
+      );
       setState(() {
-        polygons.add(provenanceZonePolygon(provenanceZoneData));
+        markers.add(marker);
+        polygons.add(provenanceZonePolygon(provenanceZone));
       });
     }
   }
@@ -76,7 +108,7 @@ class _MapToggleState extends State<MapToggle> {
             zoom: 11.0,
           ),
           markers: markers,
-          polygons: polygons, // Ajout des polygones
+          polygons: polygons,
         ),
       ),
     );

@@ -93,8 +93,8 @@ Future<List<arriveZone>> fetchArriveZones() async {
     print("Arrive Zones coordinates: $coordinates"); // Log pour vérifier les coordonnées
 
     Map<String, dynamic> chronologieZone = data['chronologieZone'];
-    DateTime from = DateTime.fromMillisecondsSinceEpoch(chronologieZone['from']);
-    DateTime to = DateTime.fromMillisecondsSinceEpoch(chronologieZone['to']);
+    int from = chronologieZone['from'];
+    int to = chronologieZone['to'];
 
     return [
       arriveZone(
