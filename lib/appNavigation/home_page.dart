@@ -3,8 +3,11 @@ import 'contact_page.dart';
 import 'package:flutter/material.dart';
 import 'package:exponomade/appNavigation/quiz_page.dart';
 
-class HomePage extends StatefulWidget{
-  const HomePage({super.key});
+class HomePage extends StatefulWidget {
+  
+  final int initialPage;
+
+  const HomePage({Key? key, this.initialPage = 0}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -12,7 +15,13 @@ class HomePage extends StatefulWidget{
 
 class _HomePageState extends State<HomePage> {
 
-  var selectedIndex = 0; 
+  late int selectedIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedIndex = widget.initialPage;
+  }
 
   @override
   Widget build(BuildContext context){

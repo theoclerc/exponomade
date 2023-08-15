@@ -25,6 +25,17 @@ class _MapToggleState extends State<MapToggle> {
   Set<Polygon> polygons = {};
   var db = DBconnect();
 
+  // Period options
+  List<String> periodOptions = [
+    "Prehistoric",
+    "Ancient",
+    "Medieval",
+    "Modern",
+    "Contemporary",
+  ];
+
+  String selectedPeriod = "Prehistoric"; // Default selected period
+
   @override
   void initState() {
     super.initState();
@@ -95,6 +106,57 @@ class _MapToggleState extends State<MapToggle> {
         polygons.add(provenanceZonePolygon(provenanceZone));
       });
     }
+  }
+
+  // Function to show the period selection BottomSheet
+  void _showPeriodSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor:
+          Colors.transparent, // Set the background color to transparent
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          widthFactor: 0.5, // Adjust the width factor as needed
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const ListTile(
+                  title: Text("Sélectionnez une période :",
+                      style: TextStyle(fontWeight: FontWeight.bold)),
+                ),
+                Divider(),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: periodOptions.length,
+                  itemBuilder: (context, index) {
+                    final period = periodOptions[index];
+                    return ListTile(
+                      title: Text(period),
+                      onTap: () {
+                        setState(() {
+                          selectedPeriod = period;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   @override
