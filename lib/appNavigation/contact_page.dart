@@ -34,6 +34,7 @@ class _ContactPageState extends State<ContactPage> {
                   icon: Icons.account_circle,
                   labelText: 'Nom',
                   hintText: 'écris ton nom ici',
+                  maxLength: 30,
                 ),
                 const SizedBox(height: 25),
                 CustomTextField(
@@ -41,6 +42,7 @@ class _ContactPageState extends State<ContactPage> {
                   icon: Icons.subject_rounded,
                   labelText: 'Sujet',
                   hintText: 'écris le sujet de ton message ici',
+                  maxLength: 20,
                 ),
                 const SizedBox(height: 25),
                 CustomTextField(
@@ -48,6 +50,7 @@ class _ContactPageState extends State<ContactPage> {
                     icon: Icons.email,
                     labelText: 'Email',
                     hintText: 'à quelle adresse pouvons-nous te répondre ?',
+                    maxLength: 40,
                     validator: (value) {
                         Pattern pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$';
                         RegExp regex = RegExp(pattern as String);
@@ -64,6 +67,10 @@ class _ContactPageState extends State<ContactPage> {
                   icon: Icons.message,
                   labelText: 'Message',
                   hintText: 'écris ton message ici',
+                  maxLength: 300,
+                  minLines: 3,
+                  maxLines: null,
+                  keyboardType: TextInputType.multiline,
                 ),
                 const SizedBox(height: 25),
                 ElevatedButton(
