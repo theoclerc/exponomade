@@ -27,11 +27,19 @@ class _MapToggleState extends State<MapToggle> {
   // Period options
   List<String> periodOptions = [];
   String selectedPeriod = '';
+  // Reasons options
+  List<String> reasonOptions = [];
+  String selectedReason = '';
+  // Population options
+  List<String> populationOptions = [];
+  String selectedPopulation = '';
 
   @override
   void initState() {
     super.initState();
     _fetchPeriods();
+    _fetchReasons();
+    _fetchPopulations();
     _createMarkersAndPolygons();
   }
 
@@ -42,6 +50,24 @@ class _MapToggleState extends State<MapToggle> {
       periodOptions = periods;
       print(periodOptions);
       selectedPeriod = periodOptions[5];
+    });
+  }
+
+  Future<void> _fetchReasons() async {
+    List<String> reasons = await db.fetchReasons();
+
+    setState(() {
+      reasonOptions = reasons;
+      selectedReason = reasonOptions[0];
+    });
+  }
+
+  Future<void> _fetchPopulations() async {
+    List<String> populations = await db.fetchPopulations();
+
+    setState(() {
+      populationOptions = populations;
+      selectedPopulation = populationOptions[0];
     });
   }
 
@@ -151,7 +177,7 @@ class _MapToggleState extends State<MapToggle> {
                   ),
                 ),
                 const Divider(),
-                Container(
+                SizedBox(
                   height: MediaQuery.of(context).size.height * 0.4,
                   child: ListView.builder(
                     itemCount: periodOptions.length,
@@ -163,6 +189,114 @@ class _MapToggleState extends State<MapToggle> {
                           setState(() {
                             selectedPeriod = period;
                             _updateZonesForSelectedPeriod(); // Call the method here
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showReasonsSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          widthFactor: 0.5,
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const ListTile(
+                  title: Text(
+                    "Sélectionnez une raison :",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Divider(),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: ListView.builder(
+                    itemCount: reasonOptions.length,
+                    itemBuilder: (context, index) {
+                      final reason = reasonOptions[index];
+                      return ListTile(
+                        title: Text(reason),
+                        onTap: () {
+                          setState(() {
+                            selectedReason = reason;
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void _showPopulationSelection() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (BuildContext context) {
+        return FractionallySizedBox(
+          widthFactor: 0.5,
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.all(16),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(16),
+                topRight: Radius.circular(16),
+              ),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const ListTile(
+                  title: Text(
+                    "Sélectionnez une population :",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const Divider(),
+                SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: ListView.builder(
+                    itemCount: populationOptions.length,
+                    itemBuilder: (context, index) {
+                      final population = populationOptions[index];
+                      return ListTile(
+                        title: Text(population),
+                        onTap: () {
+                          setState(() {
+                            selectedPopulation = population;
                           });
                           Navigator.pop(context);
                         },
@@ -282,6 +416,84 @@ class _MapToggleState extends State<MapToggle> {
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                         TextSpan(text: selectedPeriod)
+                      ])),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 250,
+              bottom: 24,
+              child: Container(
+                width: 180,
+                height: 80,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6.0,
+                      spreadRadius: 2.0,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: GestureDetector(
+                  onTap: _showReasonsSelection,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.lightbulb_outline),
+                      const SizedBox(width: 8),
+                      RichText(
+                          text: TextSpan(children: [
+                        const TextSpan(
+                          text: "Raison choisie :\n",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: selectedReason)
+                      ])),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 440, // Adjusted the position for the new container
+              bottom: 24,
+              child: Container(
+                width: 180,
+                height: 80,
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 6.0,
+                      spreadRadius: 2.0,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: GestureDetector(
+                  onTap: _showPopulationSelection,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.people),
+                      const SizedBox(width: 8),
+                      RichText(
+                          text: TextSpan(children: [
+                        const TextSpan(
+                          text: "Population choisie :\n",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        TextSpan(text: selectedPopulation)
                       ])),
                     ],
                   ),
