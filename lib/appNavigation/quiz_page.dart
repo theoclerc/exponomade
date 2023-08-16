@@ -133,7 +133,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
           );
         }
-
         return const Center(child: Text('Aucune donnée trouvée'));
       },
     );

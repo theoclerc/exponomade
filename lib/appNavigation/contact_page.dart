@@ -27,9 +27,9 @@ class _ContactPageState extends State<ContactPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
-        child: Center( // Wrap with Center
-          child: ConstrainedBox( // Constrain maximum width
-            constraints: BoxConstraints(maxWidth: 600), // Adjust this value as needed
+        child: Center( 
+          child: ConstrainedBox( 
+            constraints: const BoxConstraints(maxWidth: 600), 
             child: Form(
               key: _formKey,
               child: Column(
