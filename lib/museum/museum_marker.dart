@@ -9,15 +9,36 @@ Future<Marker> createMuseumMarker(BuildContext context, Musee musee) async {
   );
 
   return Marker(
-    markerId: MarkerId(musee.nomMusee), // Use musee.nomMusee
-    position: musee.coord, // Use musee.coord
-    icon: markerbitmap,
-    onTap: () {
-      print(musee.nomMusee);
-      
-      // implement popup for info here
-    },
-  );
+  markerId: MarkerId(musee.nomMusee),
+  position: musee.coord,
+  icon: markerbitmap,
+  onTap: () {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(musee.nomMusee),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Objets: ${musee.objets}"),
+            ],
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Close'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  },
+);
+
 }
 
 
