@@ -53,7 +53,7 @@ class _MapToggleState extends State<MapToggle> {
   }
 
     Future<void> _fetchReasons() async {
-    List<String> reasons = await db.fetchPeriods();
+    List<String> reasons = await db.fetchReasons();
 
     setState(() {
       reasonOptions = reasons;

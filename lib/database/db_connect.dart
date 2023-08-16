@@ -181,6 +181,39 @@ class DBconnect {
       return [];
     }
   }
+
+Future<List<String>> fetchReasons() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('zones').get();
+
+      List<String> reasons = ["Aucune"];
+      Set<String> uniqueReasons = {}; // Utilisez un ensemble pour stocker les raisons uniques
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['raisons'] != null) {
+          List<dynamic> reasonsData = data['raisons'];
+          for (dynamic reason in reasonsData) {
+            uniqueReasons.add("$reason"); // Ajoutez chaque raison à l'ensemble
+          }
+        }
+      }
+
+      List<String> reasonsToAdd = uniqueReasons.toList();
+
+      //Sort
+      reasonsToAdd.sort();
+      reasons.insertAll(1, reasonsToAdd);
+      
+      return reasons;
+    } catch (e) {
+      print(
+          "Une erreur s'est produite lors de la récupération des raisons : $e");
+      return [];
+    }
+  }
+
 }
 
 
