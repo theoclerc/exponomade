@@ -15,14 +15,14 @@ class MuseumInfoPopup extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: musee.objets.map((objet) {
             return ListTile(
-              title: Text(objet.nomObjet),
+              title: Text("Nom: ${objet.nomObjet}"),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(objet.image),
-                  Text(objet.descriptionObjet),
-                  Text("De ${objet.chronologie}"),
-                  Text("Raison de la migration: ${objet.raisons}"),
+                  Text("Image: ${objet.image}"),
+                  Text("Description: ${objet.descriptionObjet}"),
+                  Text("De ${objet.chronologie['from']} à ${objet.chronologie['to']}"),
+                  Text("Raison de la migration: ${objet.raisons.join(", ")}"),
                   Text("Population: ${objet.population}"),
                 ],
               ),
