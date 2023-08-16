@@ -182,13 +182,14 @@ class DBconnect {
     }
   }
 
-Future<List<String>> fetchReasons() async {
+  Future<List<String>> fetchReasons() async {
     try {
       QuerySnapshot snapshot =
           await FirebaseFirestore.instance.collection('zones').get();
 
       List<String> reasons = ["Aucune"];
-      Set<String> uniqueReasons = {}; // Utilisez un ensemble pour stocker les raisons uniques
+      Set<String> uniqueReasons =
+          {}; // Utilisez un ensemble pour stocker les raisons uniques
 
       for (QueryDocumentSnapshot doc in snapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
@@ -205,7 +206,7 @@ Future<List<String>> fetchReasons() async {
       //Sort
       reasonsToAdd.sort();
       reasons.insertAll(1, reasonsToAdd);
-      
+
       return reasons;
     } catch (e) {
       print(
@@ -214,6 +215,135 @@ Future<List<String>> fetchReasons() async {
     }
   }
 
+  Future<List<String>> fetchPopulations() async {
+    try {
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('zones').get();
+
+      List<String> populations = ["Aucune"];
+      Set<String> uniquePopulations =
+          {}; // Utilisez un ensemble pour stocker les populations uniques
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['population'] != null &&
+            data['population'].trim().isNotEmpty) {
+          String populationData = data['population'];
+          uniquePopulations
+              .add(populationData); // Ajoutez chaque population à l'ensemble
+        }
+      }
+
+      List<String> populationsToAdd = uniquePopulations.toList();
+
+      //Sort
+      populationsToAdd.sort();
+      populations.insertAll(1, populationsToAdd);
+
+      return populations;
+    } catch (e) {
+      print(
+          "Une erreur s'est produite lors de la récupération des populations : $e");
+      return [];
+    }
+  }
+
+  Future<List<arriveZone>> updateArriveZonesForSelectedPeriod(
+      String period) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
+
+      List<arriveZone> filteredZones = [];
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['chronologieZone'] != null) {
+          int zonePeriodStart = data['chronologieZone']['from'];
+          int zonePeriodEnd = data['chronologieZone']['to'];
+
+          // Get the start and end years of the selected period
+          int selectedPeriodStart =
+              int.parse(period.split("à")[0].trim().split(" ").last);
+          int selectedPeriodEnd =
+              int.parse(period.split("à")[1].trim().split(" ").last);
+
+          // Filter the zones based on the selected period
+          if (selectedPeriodStart >= zonePeriodStart &&
+              selectedPeriodEnd <= zonePeriodEnd) {
+            List<dynamic> arriveeZoneData = data['arriveeZone'];
+
+            // Assure that each element is a GeoPoint, then transform it into LatLng
+            List<LatLng> coordinates = arriveeZoneData.map((e) {
+              GeoPoint geoPoint = e as GeoPoint;
+              return LatLng(geoPoint.latitude, geoPoint.longitude);
+            }).toList();
+
+            arriveZone zone = arriveZone(
+              name: data['nomZone'],
+              coordinates: coordinates,
+              from: zonePeriodStart,
+              to: zonePeriodEnd,
+            );
+
+            filteredZones.add(zone);
+          }
+        }
+      }
+
+      return filteredZones;
+    } catch (e) {
+      print(
+          "An error occurred while updating arrivee zones for selected period: $e");
+      return [];
+    }
+  }
+
+  Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedPeriod(
+      String period) async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('zones').get();
+
+      List<ProvenanceZone> zones = [];
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['chronologieZone'] != null) {
+          int from = data['chronologieZone']['from'];
+          int to = data['chronologieZone']['to'];
+
+          // Get the start and end years of the selected period
+          int selectedPeriodStart =
+              int.parse(period.split("à")[0].trim().split(" ").last);
+          int selectedPeriodEnd =
+              int.parse(period.split("à")[1].trim().split(" ").last);
+
+          if (selectedPeriodStart >= from && selectedPeriodEnd <= to) {
+            List<dynamic> provenanceZoneData = data['provenanceZone'];
+
+            // Assure that each element is a GeoPoint, then transform it into LatLng
+            List<LatLng> coordinates = provenanceZoneData.map((e) {
+              GeoPoint geoPoint = e as GeoPoint;
+              return LatLng(geoPoint.latitude, geoPoint.longitude);
+            }).toList();
+
+            List<String> reasons = List<String>.from(data['raisons']);
+
+            ProvenanceZone zone = ProvenanceZone(
+              provenanceNom: data['provenanceNom'],
+              provenanceZone: coordinates,
+              reasons: reasons,
+              reasonsDescription: data['raisonsDescription'],
+            );
+
+            zones.add(zone);
+          }
+        }
+      }
+
+      return zones;
+    } catch (e) {
+      print("An error occurred while fetching provenance zone data: $e");
+      return [];
+    }
+  }
 }
-
-

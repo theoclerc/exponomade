@@ -48,11 +48,12 @@ class _MapToggleState extends State<MapToggle> {
 
     setState(() {
       periodOptions = periods;
-      selectedPeriod = periodOptions[0];
+      print(periodOptions);
+      selectedPeriod = periodOptions[5];
     });
   }
 
-    Future<void> _fetchReasons() async {
+  Future<void> _fetchReasons() async {
     List<String> reasons = await db.fetchReasons();
 
     setState(() {
@@ -61,8 +62,8 @@ class _MapToggleState extends State<MapToggle> {
     });
   }
 
-    Future<void> _fetchPopulations() async {
-    List<String> populations = await db.fetchPeriods();
+  Future<void> _fetchPopulations() async {
+    List<String> populations = await db.fetchPopulations();
 
     setState(() {
       populationOptions = populations;
@@ -87,16 +88,27 @@ class _MapToggleState extends State<MapToggle> {
     return LatLng(latitude / count, longitude / count);
   }
 
-  Future<void> _createMarkersAndPolygons() async {
+  Future<void> _addMuseumMarkers() async {
     List<Musee> museums = await db.fetchMusees();
-    List<arriveZone> arriveeZones = await db.fetchArriveZones();
-    List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
 
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
       setState(() {
         markers.add(marker);
       });
+    }
+  }
+
+  Future<void> _createMarkersAndPolygons() async {
+    List<arriveZone> arriveeZones = await db.fetchArriveZones();
+    List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
+    await _addMuseumMarkers();
+
+    if (selectedPeriod != "Aucune") {
+      arriveeZones =
+          await db.updateArriveZonesForSelectedPeriod(selectedPeriod);
+      provenanceZones =
+          await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
     }
 
     for (var arriveeZone in arriveeZones) {
@@ -176,6 +188,7 @@ class _MapToggleState extends State<MapToggle> {
                         onTap: () {
                           setState(() {
                             selectedPeriod = period;
+                            _updateZonesForSelectedPeriod(); // Call the method here
                           });
                           Navigator.pop(context);
                         },
@@ -245,7 +258,7 @@ class _MapToggleState extends State<MapToggle> {
     );
   }
 
-    void _showPopulationSelection() {
+  void _showPopulationSelection() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -297,6 +310,62 @@ class _MapToggleState extends State<MapToggle> {
         );
       },
     );
+  }
+
+  Future<void> _updateZonesForSelectedPeriod() async {
+    // Update arriveeZones
+    List<arriveZone> updatedArriveeZones =
+        await db.updateArriveZonesForSelectedPeriod(selectedPeriod);
+
+    // Update provenanceZones
+    List<ProvenanceZone> updatedProvenanceZones =
+        await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
+
+    // Clear existing polygons and markers
+    setState(() {
+      polygons.clear();
+      markers.clear();
+    });
+
+    await _addMuseumMarkers();
+
+    // Add markers and polygons for updated zones
+    for (var arriveeZone in updatedArriveeZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(arriveeZone.name),
+        position: _getPolygonCenter(arriveeZone.coordinates),
+        infoWindow: InfoWindow(title: arriveeZone.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+          );
+        },
+      );
+      setState(() {
+        markers.add(marker);
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+      });
+
+      for (var zone in updatedProvenanceZones) {
+        Marker marker = Marker(
+          markerId: MarkerId(zone.provenanceNom),
+          position: _getPolygonCenter(zone.provenanceZone),
+          infoWindow: InfoWindow(title: zone.provenanceNom),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => provenanceZoneInfoPopup(zone: zone),
+            );
+          },
+        );
+
+        setState(() {
+          markers.add(marker);
+          polygons.add(provenanceZonePolygon(zone));
+        });
+      }
+    }
   }
 
   @override
@@ -392,7 +461,7 @@ class _MapToggleState extends State<MapToggle> {
                 ),
               ),
             ),
-                        Positioned(
+            Positioned(
               right: 440, // Adjusted the position for the new container
               bottom: 24,
               child: Container(
