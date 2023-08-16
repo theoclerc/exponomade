@@ -139,7 +139,6 @@ class _MapToggleState extends State<MapToggle> {
                   ),
                 ),
                 const Divider(),
-                const Divider(),
                 Container(
                   height: MediaQuery.of(context).size.height * 0.4,
                   child: ListView.builder(
@@ -168,8 +167,13 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   Future<void> _updateZonesForSelectedPeriod() async {
+    // Update arriveeZones
     List<arriveZone> updatedArriveeZones =
         await db.updateArriveZonesForSelectedPeriod(selectedPeriod);
+
+    // Update provenanceZones
+    List<ProvenanceZone> updatedProvenanceZones =
+        await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
 
     // Clear existing polygons and markers
     setState(() {
@@ -194,6 +198,25 @@ class _MapToggleState extends State<MapToggle> {
         markers.add(marker);
         polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
+
+      for (var zone in updatedProvenanceZones) {
+        Marker marker = Marker(
+          markerId: MarkerId(zone.provenanceNom),
+          position: _getPolygonCenter(zone.provenanceZone),
+          infoWindow: InfoWindow(title: zone.provenanceNom),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => provenanceZoneInfoPopup(zone: zone),
+            );
+          },
+        );
+
+        setState(() {
+          markers.add(marker);
+          polygons.add(provenanceZonePolygon(zone));
+        });
+      }
     }
   }
 

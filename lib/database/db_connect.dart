@@ -231,4 +231,53 @@ class DBconnect {
       return [];
     }
   }
+
+  Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedPeriod(
+      String period) async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('zones').get();
+
+      List<ProvenanceZone> zones = [];
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['chronologieZone'] != null) {
+          int from = data['chronologieZone']['from'];
+          int to = data['chronologieZone']['to'];
+
+          // Get the start and end years of the selected period
+          int selectedPeriodStart =
+              int.parse(period.split("à")[0].trim().split(" ").last);
+          int selectedPeriodEnd =
+              int.parse(period.split("à")[1].trim().split(" ").last);
+
+          if (selectedPeriodStart >= from && selectedPeriodEnd <= to) {
+            List<dynamic> provenanceZoneData = data['provenanceZone'];
+
+            // Assure that each element is a GeoPoint, then transform it into LatLng
+            List<LatLng> coordinates = provenanceZoneData.map((e) {
+              GeoPoint geoPoint = e as GeoPoint;
+              return LatLng(geoPoint.latitude, geoPoint.longitude);
+            }).toList();
+
+            List<String> reasons = List<String>.from(data['raisons']);
+
+            ProvenanceZone zone = ProvenanceZone(
+              provenanceNom: data['provenanceNom'],
+              provenanceZone: coordinates,
+              reasons: reasons,
+              reasonsDescription: data['raisonsDescription'],
+            );
+
+            zones.add(zone);
+          }
+        }
+      }
+
+      return zones;
+    } catch (e) {
+      print("An error occurred while fetching provenance zone data: $e");
+      return [];
+    }
+  }
 }
