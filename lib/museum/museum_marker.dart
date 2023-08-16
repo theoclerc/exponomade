@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/musee_model.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'museum_info_popup.dart';
 
 Future<Marker> createMuseumMarker(BuildContext context, Musee musee) async {
   BitmapDescriptor markerbitmap = await BitmapDescriptor.fromAssetImage(
@@ -13,29 +14,43 @@ Future<Marker> createMuseumMarker(BuildContext context, Musee musee) async {
   position: musee.coord,
   icon: markerbitmap,
   onTap: () {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text(musee.nomMusee),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Objets: ${musee.objets}"),
-            ],
-          ),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Close'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+
+  showDialog(
+  context: context,
+  builder: (BuildContext context) {
+    return AlertDialog(
+      title: Text(musee.nomMusee),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("Objets:"),
+          SingleChildScrollView(
+            child: Column(
+              children: musee.objets.map((objet) {
+                return ListTile(
+                  title: Text(objet.nomObjet),
+                );
+              }).toList(),
             ),
-          ],
-        );
-      },
+          ),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('Close'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
     );
+  },
+);
+
+
+
+    
   },
 );
 

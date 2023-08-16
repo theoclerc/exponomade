@@ -1,20 +1,21 @@
+import 'package:exponomade/models/musee_model.dart';
+import 'package:exponomade/museum/museum.dart';
 import 'package:flutter/material.dart';
-import 'museum.dart';
 
 class MuseumInfoPopup extends StatelessWidget {
-  final Museum museum;
+  final Museum musee;
 
-  const MuseumInfoPopup({super.key, required this.museum});
+  const MuseumInfoPopup({super.key, required this.musee});
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(museum.name),
+      title: Text(musee.name),
       content: ListView.builder(
-        itemCount: museum.objects.length,
+        itemCount: musee.objects.length,
         itemBuilder: (context, index) {
           return ListTile(
-            title: Text(museum.objects[index]),
+            title: Text(musee.objects[index]),
           );
         },
       ),
