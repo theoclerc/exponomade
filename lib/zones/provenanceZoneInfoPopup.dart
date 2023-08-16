@@ -4,25 +4,27 @@ import 'provenanceZone.dart';
 class provenanceZoneInfoPopup extends StatelessWidget {
   final ProvenanceZone zone;
 
-  const provenanceZoneInfoPopup({super.key, required this.zone});
+  const provenanceZoneInfoPopup({Key? key, required this.zone}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       title: Text(zone.provenanceNom),
-      content: ListView.builder(
-        itemCount: zone.reasons.length,
-        itemBuilder: (context, index) {
-          return ListTile(
-            title: Text(zone.reasons[index]),
-          );
-        },
+      content: SingleChildScrollView(
+        child: ListBody(
+          children: [
+            ...zone.reasons.map((reason) => ListTile(title: Text(reason))).toList(),
+            ListTile(
+              title: Text(zone.reasonsDescription),
+            ),
+          ],
+        ),
       ),
       actions: <Widget>[
         TextButton(
           child: const Text('Close'),
           onPressed: () {
-            Navigator.of(context).pop();
+            Navigator.of(context).pop(); // Fermeture du dialogue
           },
         ),
       ],

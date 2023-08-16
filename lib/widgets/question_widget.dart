@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../constants.dart';
+import '../utils/constants.dart';
 
 class QuestionWidget extends StatelessWidget {
   const QuestionWidget({

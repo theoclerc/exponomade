@@ -95,11 +95,9 @@ class DBconnect {
 
       print(
           "Arrive Zones coordinates: $coordinates"); // Log pour vérifier les coordonnées
-
       Map<String, dynamic> chronologieZone = data['chronologieZone'];
-      DateTime from =
-          DateTime.fromMillisecondsSinceEpoch(chronologieZone['from']);
-      DateTime to = DateTime.fromMillisecondsSinceEpoch(chronologieZone['to']);
+      int from = chronologieZone['from'];
+      int to = chronologieZone['to'];
 
       return [
         arriveZone(
@@ -154,9 +152,8 @@ class DBconnect {
 
   Future<List<String>> fetchPeriods() async {
     try {
-      QuerySnapshot snapshot = await FirebaseFirestore.instance
-          .collection('zones') // Change this to your collection name
-          .get();
+      QuerySnapshot snapshot =
+          await FirebaseFirestore.instance.collection('zones').get();
 
       List<String> periods = ["Aucune"];
       for (QueryDocumentSnapshot doc in snapshot.docs) {

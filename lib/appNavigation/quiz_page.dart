@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../constants.dart';
+import '../utils/constants.dart';
 import '../models/question_model.dart';
 import '../services/quiz_services.dart';
 import '../widgets/question_widget.dart';
 import '../widgets/next_button.dart';
 import '../widgets/option_card.dart';
-import '../widgets/result_box.dart';
 
 class QuizPage extends StatefulWidget {
   const QuizPage({Key? key}) : super(key: key);
@@ -28,49 +27,6 @@ class _QuizPageState extends State<QuizPage> {
     super.initState();
   }
 
-  void nextQuestion(int questionLength) {
-    if (index == questionLength - 1) {
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (ctx) => ResultBox(
-          result: score,
-          questionLength: questionLength,
-          onPressed: startOver,
-          onContactPressed: () => QuizServices.redirectToContact(context),
-        ),
-      );
-    } else {
-      if (isPressed) {
-        setState(() {
-          index++;
-          isPressed = false;
-          isAlreadySelected = false;
-        });
-      } else {
-        ScaffoldMessenger.of(context).hideCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Une réponse est requise'),
-            behavior: SnackBarBehavior.floating,
-            margin: EdgeInsets.only(bottom: 80.0, left: 20.0, right: 20.0),
-          ),
-        );
-      }
-    }
-  }
-
-  void startOver() {
-    setState(() {
-      _question = QuizServices.getData();
-      index = 0;
-      score = 0;
-      isPressed = false;
-      isAlreadySelected = false;
-    });
-    Navigator.pop(context);
-  }
-
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -80,67 +36,83 @@ class _QuizPageState extends State<QuizPage> {
           if (snapshot.hasError) {
             return Center(child: Text('${snapshot.error}'));
           } else if (snapshot.hasData) {
-            var extractedData = snapshot.data as List<Question>;
-            return Scaffold(
-              backgroundColor: background,
-              appBar: AppBar(
-                title: const Text('Questionnaire'),
+              var extractedData = snapshot.data as List<Question>;
+              return Scaffold(
                 backgroundColor: background,
-                actions: [
-                  Padding(
-                    padding: const EdgeInsets.all(18.0),
-                    child: Text('Score: $score', style: const TextStyle(fontSize: 18.0)),
-                  ),
-                ],
-              ),
-              body: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                child: Column(
-                  children: [
-                    QuestionWidget(
-                      indexAction: index,
-                      question: extractedData[index].title,
-                      totalQuestions: extractedData.length,
+                appBar: AppBar(
+                  title: const Text('Questionnaire'),
+                  backgroundColor: background,
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.all(18.0),
+                      child: Text('Score: $score', style: const TextStyle(fontSize: 18.0)),
                     ),
-                    const SizedBox(height: 10.0),
-                    for (int i = 0; i < extractedData[index].options.length; i++)
-                      GestureDetector(
-                        onTap: () => QuizServices.checkAnswerAndUpdate(
-                          value: extractedData[index].options.values.toList()[i],
-                          isAlreadySelected: isAlreadySelected,
-                          setPressed: () => setState(() {
-                            isPressed = true;
-                          }),
-                          setAlreadySelected: () => setState(() {
-                            isAlreadySelected = true;
-                          }),
-                          incrementScore: () => setState(() {
-                            score++;
-                          }),
-                        ),
-                        child: OptionCard(
-                          option: extractedData[index].options.keys.toList()[i],
-                          color: isPressed
-                              ? extractedData[index].options.values.toList()[i] == true
-                                ? correct
-                                : incorrect
-                              : neutral,
-                        ),
-                      ),
                   ],
                 ),
-              ),
-              floatingActionButton: GestureDetector(
-                onTap: () => nextQuestion(extractedData.length),
-                child: const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 10.0),
-                  child: NextButton(),
+                body: Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                  child: Column(
+                    children: [
+                      QuestionWidget(
+                        indexAction: index,
+                        question: extractedData[index].title,
+                        totalQuestions: extractedData.length,
+                      ),
+                      const SizedBox(height: 30.0),
+                      for (int i = 0; i < extractedData[index].options.length; i++)
+                        GestureDetector(
+                          onTap: () => QuizServices.checkAnswerAndUpdate(
+                            value: extractedData[index].options.values.toList()[i],
+                            isAlreadySelected: isAlreadySelected,
+                            setPressed: () => setState(() {
+                              isPressed = true;
+                            }),
+                            setAlreadySelected: () => setState(() {
+                              isAlreadySelected = true;
+                            }),
+                            incrementScore: () => setState(() {
+                              score++;
+                            }),
+                          ),
+                          child: SizedBox(
+                            width: 500,
+                            child: OptionCard(
+                              option: extractedData[index].options.keys.toList()[i],
+                              color: isPressed
+                                ? extractedData[index].options.values.toList()[i] == true
+                                  ? correct
+                                  : incorrect
+                                : neutral,
+                          ),
+                        ),
+                        ),
+                      GestureDetector(
+                        onTap: () => QuizServices.nextQuestion(
+                          context: context,
+                          index: index,
+                          score: score,
+                          isPressed: isPressed,
+                          extractedData: extractedData,
+                          updateState: (indexValue, scoreValue, isPressedValue, isAlreadySelectedValue) {
+                            setState(() {
+                              index = indexValue;
+                              score = scoreValue;
+                              isPressed = isPressedValue;
+                              isAlreadySelected = isAlreadySelectedValue;
+                            });
+                          }
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
+                          child: NextButton(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-            );
-          }
+              );
+            }
         } else {
           return Center(
             child: Column(
@@ -161,7 +133,6 @@ class _QuizPageState extends State<QuizPage> {
             ),
           );
         }
-
         return const Center(child: Text('Aucune donnée trouvée'));
       },
     );

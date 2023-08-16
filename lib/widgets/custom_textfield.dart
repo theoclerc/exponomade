@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
-import '../constants.dart';
+import '../utils/constants.dart';
 
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final IconData icon;
   final String labelText;
   final String hintText;
+  final int? maxLength;
+  final int? minLines;
+  final int? maxLines;
+  final TextInputType? keyboardType;
   final FormFieldValidator<String>? validator;
 
   const CustomTextField({
@@ -15,6 +19,10 @@ class CustomTextField extends StatelessWidget {
     required this.labelText,
     required this.hintText,
     this.validator,
+    this.maxLength,
+    this.minLines,
+    this.maxLines,
+    this.keyboardType,
   }) : super(key: key);
 
   @override
@@ -27,14 +35,19 @@ class CustomTextField extends StatelessWidget {
       ),
       child: TextFormField(
         controller: controller,
+        maxLength: maxLength,
+        minLines: minLines,
+        maxLines: maxLines,
+        keyboardType: keyboardType,
         decoration: InputDecoration(
           icon: Icon(icon),
           labelText: labelText,
           hintText: hintText,
           border: InputBorder.none,
+          counterText: '', // this hides the counter
         ),
-        validator: validator ??
-            (value) { 
+        validator: validator ?? 
+            (value) {
               if (value == null || value.isEmpty) {
                 return 'Ce champ est obligatoire';
               }
