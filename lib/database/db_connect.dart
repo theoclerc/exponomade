@@ -181,4 +181,54 @@ class DBconnect {
       return [];
     }
   }
+
+  Future<List<arriveZone>> updateArriveZonesForSelectedPeriod(
+      String period) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
+
+      List<arriveZone> filteredZones = [];
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['chronologieZone'] != null) {
+          int zonePeriodStart = data['chronologieZone']['from'];
+          int zonePeriodEnd = data['chronologieZone']['to'];
+
+          // Get the start and end years of the selected period
+          int selectedPeriodStart =
+              int.parse(period.split("à")[0].trim().split(" ").last);
+          int selectedPeriodEnd =
+              int.parse(period.split("à")[1].trim().split(" ").last);
+
+          // Filter the zones based on the selected period
+          if (selectedPeriodStart >= zonePeriodStart &&
+              selectedPeriodEnd <= zonePeriodEnd) {
+            List<dynamic> arriveeZoneData = data['arriveeZone'];
+
+            // Assure that each element is a GeoPoint, then transform it into LatLng
+            List<LatLng> coordinates = arriveeZoneData.map((e) {
+              GeoPoint geoPoint = e as GeoPoint;
+              return LatLng(geoPoint.latitude, geoPoint.longitude);
+            }).toList();
+
+            arriveZone zone = arriveZone(
+              name: data['nomZone'],
+              coordinates: coordinates,
+              from: zonePeriodStart,
+              to: zonePeriodEnd,
+            );
+
+            filteredZones.add(zone);
+          }
+        }
+      }
+
+      return filteredZones;
+    } catch (e) {
+      print(
+          "An error occurred while updating arrivee zones for selected period: $e");
+      return [];
+    }
+  }
 }
