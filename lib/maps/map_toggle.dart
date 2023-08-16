@@ -23,21 +23,24 @@ class _MapToggleState extends State<MapToggle> {
   var db = DBconnect();
 
   // Period options
-  List<String> periodOptions = [
-    "Prehistoric",
-    "Ancient",
-    "Medieval",
-    "Modern",
-    "Contemporary",
-  ];
-
-  String selectedPeriod = "Prehistoric"; // Default selected period
+  List<String> periodOptions = [];
+  String selectedPeriod = '';
 
   @override
   void initState() {
     super.initState();
+    _fetchPeriods();
     _createMarkers();
     _createPolygons();
+  }
+
+  Future<void> _fetchPeriods() async {
+    List<String> periods = await db.fetchPeriods();
+
+    setState(() {
+      periodOptions = periods;
+      selectedPeriod = periodOptions[0];
+    });
   }
 
   void _onMapCreated(GoogleMapController controller) {
@@ -81,11 +84,11 @@ class _MapToggleState extends State<MapToggle> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor:
-          Colors.transparent, // Set the background color to transparent
+      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return FractionallySizedBox(
-          widthFactor: 0.5, // Adjust the width factor as needed
+          widthFactor: 0.5,
+          alignment: Alignment.bottomCenter,
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: const BoxDecoration(
@@ -99,25 +102,29 @@ class _MapToggleState extends State<MapToggle> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const ListTile(
-                  title: Text("Sélectionnez une période :",
-                      style: TextStyle(fontWeight: FontWeight.bold)),
+                  title: Text(
+                    "Sélectionnez une période :",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
                 ),
-                Divider(),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: periodOptions.length,
-                  itemBuilder: (context, index) {
-                    final period = periodOptions[index];
-                    return ListTile(
-                      title: Text(period),
-                      onTap: () {
-                        setState(() {
-                          selectedPeriod = period;
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  },
+                const Divider(),
+                Container(
+                  height: MediaQuery.of(context).size.height * 0.4,
+                  child: ListView.builder(
+                    itemCount: periodOptions.length,
+                    itemBuilder: (context, index) {
+                      final period = periodOptions[index];
+                      return ListTile(
+                        title: Text(period),
+                        onTap: () {
+                          setState(() {
+                            selectedPeriod = period;
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
