@@ -214,6 +214,35 @@ Future<List<String>> fetchReasons() async {
     }
   }
 
+Future<List<String>> fetchPopulations() async {
+  try {
+    QuerySnapshot snapshot =
+        await FirebaseFirestore.instance.collection('zones').get();
+
+    List<String> populations = ["Aucune"];
+    Set<String> uniquePopulations = {}; // Utilisez un ensemble pour stocker les populations uniques
+
+    for (QueryDocumentSnapshot doc in snapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      if (data['population'] != null && data['population'].trim().isNotEmpty) {
+        String populationData = data['population'];
+        uniquePopulations.add(populationData); // Ajoutez chaque population à l'ensemble
+      }
+    }
+
+    List<String> populationsToAdd = uniquePopulations.toList();
+
+    //Sort
+    populationsToAdd.sort();
+    populations.insertAll(1, populationsToAdd);
+
+    return populations;
+  } catch (e) {
+    print(
+        "Une erreur s'est produite lors de la récupération des populations : $e");
+    return [];
+  }
+}
 }
 
 

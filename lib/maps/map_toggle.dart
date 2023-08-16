@@ -62,7 +62,7 @@ class _MapToggleState extends State<MapToggle> {
   }
 
     Future<void> _fetchPopulations() async {
-    List<String> populations = await db.fetchPeriods();
+    List<String> populations = await db.fetchPopulations();
 
     setState(() {
       populationOptions = populations;
