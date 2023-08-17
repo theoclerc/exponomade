@@ -19,7 +19,13 @@ class MuseumInfoPopup extends StatelessWidget {
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Image: ${objet.image}"),
+                  Image.network(
+                    objet.image,
+                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                      // Affiche un message d'erreur ou une image de remplacement en cas d'erreur.
+                      return const Text('Erreur lors du chargement de l\'image');
+                    },
+                  ),
                   Text("Description: ${objet.descriptionObjet}"),
                   Text("De ${objet.chronologie['from']} à ${objet.chronologie['to']}"),
                   Text("Raison de la migration: ${objet.raisons.join(", ")}"),
