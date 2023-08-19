@@ -156,6 +156,7 @@ class _MapToggleState extends State<MapToggle> {
       backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
         return FractionallySizedBox(
+          heightFactor: 2 / 3,
           widthFactor: 0.5,
           alignment: Alignment.bottomCenter,
           child: Container(
@@ -177,8 +178,7 @@ class _MapToggleState extends State<MapToggle> {
                   ),
                 ),
                 const Divider(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
+                Expanded(
                   child: ListView.builder(
                     itemCount: periodOptions.length,
                     itemBuilder: (context, index) {
@@ -188,7 +188,7 @@ class _MapToggleState extends State<MapToggle> {
                         onTap: () {
                           setState(() {
                             selectedPeriod = period;
-                            _updateZonesForSelectedPeriod(); // Call the method here
+                            _updateZonesForSelectedPeriod();
                           });
                           Navigator.pop(context);
                         },
