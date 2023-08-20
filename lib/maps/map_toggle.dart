@@ -323,13 +323,15 @@ class _MapToggleState extends State<MapToggle> {
     List<ProvenanceZone> updatedProvenanceZones =
         await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
 
+    // Update museums
+    List<Musee> museums =
+        await db.updateMuseumsAndObjectsForSelectedPeriod(selectedPeriod);
+
     // Clear existing polygons and markers
     setState(() {
       polygons.clear();
       markers.clear();
     });
-
-    await _addMuseumMarkers();
 
     // Add markers and polygons for updated zones
     for (var arriveeZone in updatedArriveeZones) {
@@ -348,25 +350,30 @@ class _MapToggleState extends State<MapToggle> {
         markers.add(marker);
         polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
+    }
+    for (var zone in updatedProvenanceZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(zone.provenanceNom),
+        position: _getPolygonCenter(zone.provenanceZone),
+        infoWindow: InfoWindow(title: zone.provenanceNom),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => provenanceZoneInfoPopup(zone: zone),
+          );
+        },
+      );
 
-      for (var zone in updatedProvenanceZones) {
-        Marker marker = Marker(
-          markerId: MarkerId(zone.provenanceNom),
-          position: _getPolygonCenter(zone.provenanceZone),
-          infoWindow: InfoWindow(title: zone.provenanceNom),
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => provenanceZoneInfoPopup(zone: zone),
-            );
-          },
-        );
-
-        setState(() {
-          markers.add(marker);
-          polygons.add(provenanceZonePolygon(zone));
-        });
-      }
+      setState(() {
+        markers.add(marker);
+        polygons.add(provenanceZonePolygon(zone));
+      });
+    }
+    for (var museum in museums) {
+      Marker marker = await createMuseumMarker(context, museum);
+      setState(() {
+        markers.add(marker);
+      });
     }
   }
 

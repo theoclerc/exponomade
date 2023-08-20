@@ -346,4 +346,93 @@ class DBconnect {
       return [];
     }
   }
+
+  Future<List<Musee>> updateMuseumsAndObjectsForSelectedPeriod(
+      String period) async {
+    List<Musee> updatedMuseums = [];
+
+    // Fetch all museums and objects
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('musees').get();
+      List<Musee> museums = [];
+
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        try {
+          GeoPoint coord = data['coordonneesMusee'];
+          var coordLatLng = LatLng(coord.latitude, coord.longitude);
+
+          List<Map<String, dynamic>> objetsData =
+              List<Map<String, dynamic>>.from(data['objets'] as List);
+          List<Objet> objets = objetsData.map((objetData) {
+            Map<String, String> chronologie = {
+              'from': objetData['chronologie']['from'] as String,
+              'to': objetData['chronologie']['to'] as String,
+            };
+            return Objet(
+              chronologie: chronologie,
+              descriptionObjet: objetData['descriptionObjet'] as String,
+              image: objetData['image'] as String,
+              nomObjet: objetData['nomObjet'] as String,
+              population: objetData['population'] as String,
+              raisons: List<String>.from(objetData['raisons'] as List),
+            );
+          }).toList();
+
+          var musee = Musee(
+            id: doc.id,
+            nomMusee: data['nomMusee'] as String,
+            coord: coordLatLng,
+            objets: objets,
+          );
+
+          museums.add(musee);
+        } catch (e) {
+          print(
+              "An error occurred while processing document with ID: ${doc.id}");
+          print("Error details: $e");
+        }
+      }
+
+      if (period == "Aucune") {
+        // If selected period is "Aucune," return all museums and objects
+        return museums;
+      }
+
+      // Filter museums and their objects based on the selected period
+      for (var museum in museums) {
+        List<Objet> filteredObjects = [];
+        for (var objet in museum.objets) {
+          String? from = objet.chronologie['from'];
+          String? to = objet.chronologie['to'];
+          int selectedPeriodStart =
+              int.parse(period.split("à")[0].trim().split(" ").last);
+          int selectedPeriodEnd =
+              int.parse(period.split("à")[1].trim().split(" ").last);
+          int objetFrom = int.parse(from!);
+          int objetTo = int.parse(to!);
+          bool isYearInPeriod =
+              selectedPeriodStart >= objetFrom && selectedPeriodEnd <= objetTo;
+
+          if (isYearInPeriod) {
+            filteredObjects.add(objet);
+          }
+        }
+
+        if (filteredObjects.isNotEmpty) {
+          Musee updatedMuseum = Musee(
+            id: museum.id,
+            nomMusee: museum.nomMusee,
+            coord: museum.coord,
+            objets: filteredObjects,
+          );
+          updatedMuseums.add(updatedMuseum);
+        }
+      }
+    } catch (e) {
+      print("An error occurred while fetching data from Firestore: $e");
+    }
+    return updatedMuseums;
+  }
 }
