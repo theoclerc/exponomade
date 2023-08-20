@@ -7,5 +7,14 @@ class Musee {
   final LatLng coord;
   final List<Objet> objets; // Use List<Objet> here
 
-  Musee({required this.id, required this.nomMusee, required this.coord, required this.objets});
+  Musee(
+      {required this.id,
+      required this.nomMusee,
+      required this.coord,
+      required this.objets});
+
+  @override
+  String toString() {
+    return 'Musee(id: $id, nomMusee: $nomMusee, coord: $coord, objets: $objets)';
+  }
 }

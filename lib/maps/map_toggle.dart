@@ -91,6 +91,8 @@ class _MapToggleState extends State<MapToggle> {
   Future<void> _addMuseumMarkers() async {
     List<Musee> museums = await db.fetchMusees();
 
+    //print("musees fetched: ${museums.toString()}");
+
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
       setState(() {
