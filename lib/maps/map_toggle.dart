@@ -48,7 +48,6 @@ class _MapToggleState extends State<MapToggle> {
 
     setState(() {
       periodOptions = periods;
-      print(periodOptions);
       selectedPeriod = periodOptions[5];
     });
   }
@@ -88,10 +87,10 @@ class _MapToggleState extends State<MapToggle> {
     return LatLng(latitude / count, longitude / count);
   }
 
-  Future<void> _addMuseumMarkers() async {
-    List<Musee> museums = await db.fetchMusees();
-
-    //print("musees fetched: ${museums.toString()}");
+  Future<void> _addMuseumMarkers(selectedPeriod) async {
+    // Update museums
+    List<Musee> museums =
+        await db.updateMuseumsAndObjectsForSelectedPeriod(selectedPeriod);
 
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
@@ -104,7 +103,7 @@ class _MapToggleState extends State<MapToggle> {
   Future<void> _createMarkersAndPolygons() async {
     List<arriveZone> arriveeZones = await db.fetchArriveZones();
     List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
-    await _addMuseumMarkers();
+    await _addMuseumMarkers(selectedPeriod);
 
     if (selectedPeriod != "Aucune") {
       arriveeZones =
@@ -323,10 +322,6 @@ class _MapToggleState extends State<MapToggle> {
     List<ProvenanceZone> updatedProvenanceZones =
         await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
 
-    // Update museums
-    List<Musee> museums =
-        await db.updateMuseumsAndObjectsForSelectedPeriod(selectedPeriod);
-
     // Clear existing polygons and markers
     setState(() {
       polygons.clear();
@@ -369,12 +364,8 @@ class _MapToggleState extends State<MapToggle> {
         polygons.add(provenanceZonePolygon(zone));
       });
     }
-    for (var museum in museums) {
-      Marker marker = await createMuseumMarker(context, museum);
-      setState(() {
-        markers.add(marker);
-      });
-    }
+    // Update museums
+    await _addMuseumMarkers(selectedPeriod);
   }
 
   @override

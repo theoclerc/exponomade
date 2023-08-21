@@ -26,57 +26,6 @@ class DBconnect {
     return newQuestions;
   }
 
-  Future<List<Musee>> fetchMusees() async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore.collection('musees').get();
-      List<Musee> musees = [];
-
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        try {
-          GeoPoint coord = data['coordonneesMusee'];
-          var coordLatLng = LatLng(coord.latitude, coord.longitude);
-
-          List<Map<String, dynamic>> objetsData =
-              List<Map<String, dynamic>>.from(data['objets'] as List);
-          List<Objet> objets = objetsData.map((objetData) {
-            Map<String, String> chronologie = {
-              'from': objetData['chronologie']['from'] as String,
-              'to': objetData['chronologie']['to'] as String,
-            };
-            return Objet(
-              chronologie: chronologie,
-              descriptionObjet: objetData['descriptionObjet'] as String,
-              image: objetData['image'] as String,
-              nomObjet: objetData['nomObjet'] as String,
-              population: objetData['population'] as String,
-              raisons: List<String>.from(objetData['raisons'] as List),
-            );
-          }).toList();
-
-          var musee = Musee(
-            id: doc.id,
-            nomMusee: data['nomMusee'] as String,
-            coord: coordLatLng,
-            objets: objets,
-          );
-
-          musees.add(musee);
-        } catch (e) {
-          print(
-              "An error occurred while processing document with ID: ${doc.id}");
-          print("Error details: $e");
-        }
-      }
-
-      return musees;
-    } catch (e) {
-      print("An error occurred while fetching data from Firestore: $e");
-      return []; // Return an empty list if an error occurs
-    }
-  }
-
   Future<List<arriveZone>> fetchArriveZones() async {
     try {
       DocumentSnapshot querySnapshot = await _firestore
