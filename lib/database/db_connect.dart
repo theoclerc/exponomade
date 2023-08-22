@@ -346,4 +346,128 @@ class DBconnect {
       return [];
     }
   }
+
+  /*Future<List<arriveZone>> updateArriveZonesForSelectedPopulation(String population) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
+
+      List<arriveZone> filteredZones = [];
+
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Check if the zone's population matches the selected population
+        if (data['population'] == population) {
+          int zonePeriodStart = data['chronologieZone']['from'];
+          int zonePeriodEnd = data['chronologieZone']['to'];
+
+          List<dynamic> arriveeZoneData = data['arriveeZone'];
+
+          // Assure that each element is a GeoPoint, then transform it into LatLng
+          List<LatLng> coordinates = arriveeZoneData.map((e) {
+            GeoPoint geoPoint = e as GeoPoint;
+            return LatLng(geoPoint.latitude, geoPoint.longitude);
+          }).toList();
+
+          arriveZone zone = arriveZone(
+            name: data['nomZone'],
+            coordinates: coordinates,
+            from: zonePeriodStart,
+            to: zonePeriodEnd,
+          );
+
+          filteredZones.add(zone);
+        }
+      }
+
+      return filteredZones;
+    } catch (e) {
+      print("An error occurred while updating arrivee zones for selected population: $e");
+      return [];
+    }
+  }*/
+
+    Future<List<arriveZone>> updateArriveZonesForSelectedPopulation(
+      String population) async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('zones').get();
+
+      List<arriveZone> zones = [];
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Check if the zone's population matches the selected population
+        if (data['population'] == population) {
+
+          int zonePeriodStart = data['chronologieZone']['from'];
+          int zonePeriodEnd = data['chronologieZone']['to'];
+
+          List<dynamic> arriveeZoneData = data['arriveeZone'];
+
+          // Assure that each element is a GeoPoint, then transform it into LatLng
+          List<LatLng> coordinates = arriveeZoneData.map((e) {
+            GeoPoint geoPoint = e as GeoPoint;
+            return LatLng(geoPoint.latitude, geoPoint.longitude);
+          }).toList();
+
+
+          arriveZone zone = arriveZone(
+            name: data['nomZone'],
+            coordinates: coordinates,
+            from: zonePeriodStart,
+            to: zonePeriodEnd,
+          );
+
+          zones.add(zone);
+        }
+      }
+
+      return zones;
+    } catch (e) {
+      print("An error occurred while fetching provenance zone data for selected population: $e");
+      return [];
+    }
+  }
+
+  Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedPopulation(
+      String population) async {
+    try {
+      QuerySnapshot snapshot = await _firestore.collection('zones').get();
+
+      List<ProvenanceZone> zones = [];
+
+      for (QueryDocumentSnapshot doc in snapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        // Check if the zone's population matches the selected population
+        if (data['population'] == population) {
+
+          List<dynamic> provenanceZoneData = data['provenanceZone'];
+
+          // Assure that each element is a GeoPoint, then transform it into LatLng
+          List<LatLng> coordinates = provenanceZoneData.map((e) {
+            GeoPoint geoPoint = e as GeoPoint;
+            return LatLng(geoPoint.latitude, geoPoint.longitude);
+          }).toList();
+
+          List<String> reasons = List<String>.from(data['raisons']);
+
+          ProvenanceZone zone = ProvenanceZone(
+            provenanceNom: data['provenanceNom'],
+            provenanceZone: coordinates,
+            reasons: reasons,
+            reasonsDescription: data['raisonsDescription'],
+          );
+
+          zones.add(zone);
+        }
+      }
+
+      return zones;
+    } catch (e) {
+      print("An error occurred while fetching provenance zone data for selected population: $e");
+      return [];
+    }
+  }
 }
