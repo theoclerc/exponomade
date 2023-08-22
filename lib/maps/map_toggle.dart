@@ -9,6 +9,7 @@ import '../models/musee_model.dart';
 import '../database/db_connect.dart';
 import '../zones/arriveZoneInfoPopup.dart';
 import '../zones/provenanceZoneInfoPopup.dart';
+import 'package:flutter/services.dart';
 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class MapToggle extends StatefulWidget {
 
 class _MapToggleState extends State<MapToggle> {
   late GoogleMapController mapController;
+  late String _mapStyle;
   final LatLng _center = const LatLng(46.229352, 7.362049);
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
@@ -41,6 +43,9 @@ class _MapToggleState extends State<MapToggle> {
     _fetchReasons();
     _fetchPopulations();
     _createMarkersAndPolygons();
+    rootBundle.loadString('map_style.json').then((string) {
+      _mapStyle = string;
+    });
   }
 
   Future<void> _fetchPeriods() async {
@@ -72,6 +77,7 @@ class _MapToggleState extends State<MapToggle> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    controller.setMapStyle(_mapStyle);
   }
 
   LatLng _getPolygonCenter(List<LatLng> coordinates) {
