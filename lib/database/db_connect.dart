@@ -217,8 +217,8 @@ class DBconnect {
               int.parse(period.split("à")[1].trim().split(" ").last);
 
           // Filter the zones based on the selected period
-          if (selectedPeriodStart >= zonePeriodStart &&
-              selectedPeriodEnd <= zonePeriodEnd) {
+          if (selectedPeriodStart == zonePeriodStart &&
+              selectedPeriodEnd == zonePeriodEnd) {
             List<dynamic> arriveeZoneData = data['arriveeZone'];
 
             // Assure that each element is a GeoPoint, then transform it into LatLng
@@ -266,7 +266,7 @@ class DBconnect {
           int selectedPeriodEnd =
               int.parse(period.split("à")[1].trim().split(" ").last);
 
-          if (selectedPeriodStart >= from && selectedPeriodEnd <= to) {
+          if (selectedPeriodStart == from && selectedPeriodEnd == to) {
             List<dynamic> provenanceZoneData = data['provenanceZone'];
 
             // Assure that each element is a GeoPoint, then transform it into LatLng
@@ -362,7 +362,7 @@ class DBconnect {
           int objetFrom = int.parse(from!);
           int objetTo = int.parse(to!);
           bool isYearInPeriod =
-              selectedPeriodStart >= objetFrom && selectedPeriodEnd <= objetTo;
+              selectedPeriodStart == objetFrom && selectedPeriodEnd == objetTo;
 
           if (isYearInPeriod) {
             filteredObjects.add(objet);
