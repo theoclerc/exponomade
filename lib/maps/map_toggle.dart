@@ -390,120 +390,118 @@ class _MapToggleState extends State<MapToggle> {
               polygons: polygons,
             ),
             Positioned(
-              right: 60,
+              left: 0,
+              right: 0,
               bottom: 24,
-              child: Container(
-                width: 180,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: _showPeriodSelection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.history),
-                      const SizedBox(width: 8),
-                      RichText(
-                          text: TextSpan(children: [
-                        const TextSpan(
-                          text: "Période choisie :\n",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 180,
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
                         ),
-                        TextSpan(text: selectedPeriod)
-                      ])),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 250,
-              bottom: 24,
-              child: Container(
-                width: 180,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 3),
+                      ],
                     ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: _showReasonsSelection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.lightbulb_outline),
-                      const SizedBox(width: 8),
-                      RichText(
-                          text: TextSpan(children: [
-                        const TextSpan(
-                          text: "Raison choisie :\n",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        TextSpan(text: selectedReason)
-                      ])),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 440, // Adjusted the position for the new container
-              bottom: 24,
-              child: Container(
-                width: 180,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 3),
+                    child: GestureDetector(
+                      onTap: _showPeriodSelection,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.history),
+                          const SizedBox(width: 8),
+                          RichText(
+                              text: TextSpan(children: [
+                            const TextSpan(
+                              text: "Période choisie :\n",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: selectedPeriod)
+                          ])),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: _showPopulationSelection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.people),
-                      const SizedBox(width: 8),
-                      RichText(
-                          text: TextSpan(children: [
-                        const TextSpan(
-                          text: "Population choisie :\n",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        TextSpan(text: selectedPopulation)
-                      ])),
-                    ],
                   ),
-                ),
+                  Container(
+                    width: 180,
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: _showReasonsSelection,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.lightbulb_outline),
+                          const SizedBox(width: 8),
+                          RichText(
+                              text: TextSpan(children: [
+                            const TextSpan(
+                              text: "Raison choisie :\n",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: selectedReason)
+                          ])),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 180,
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: _showPopulationSelection,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.people),
+                          const SizedBox(width: 8),
+                          RichText(
+                              text: TextSpan(children: [
+                            const TextSpan(
+                              text: "Population choisie :\n",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: selectedPopulation)
+                          ])),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
