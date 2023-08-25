@@ -105,6 +105,18 @@ class _MapToggleState extends State<MapToggle> {
       });
     }
   }
+  Future<void> _addMuseumMarkersForSelectedReason(selectedReason) async {
+    // Update museums
+    List<Musee> museums =
+        await db.updateMuseumsAndObjectsForSelectedReason(selectedReason);
+
+    for (var museum in museums) {
+      Marker marker = await createMuseumMarker(context, museum);
+      setState(() {
+        markers.add(marker);
+      });
+    }
+  }
 
   Future<void> _createMarkersAndPolygons() async {
     List<arriveZone> arriveeZones = await db.fetchArriveZones();
@@ -352,8 +364,6 @@ class _MapToggleState extends State<MapToggle> {
       markers.clear();
     });
 
-    await _addMuseumMarkers(selectedReason);
-
     // Add markers and polygons for updated zones
     for (var arriveeZone in updatedArriveeZones) {
       Marker marker = Marker(
@@ -391,6 +401,8 @@ class _MapToggleState extends State<MapToggle> {
         });
       }
     }
+    // Update museums
+    await _addMuseumMarkersForSelectedReason(selectedReason);
   }
 
   @override
