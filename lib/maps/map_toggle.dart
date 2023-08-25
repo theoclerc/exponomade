@@ -118,6 +118,13 @@ class _MapToggleState extends State<MapToggle> {
           await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
     }
 
+    if (selectedReason != "Aucune") {
+      arriveeZones =
+          await db.updateArriveZonesForSelectedReason(selectedReason);
+      provenanceZones =
+          await db.updateProvenanceZonesForSelectedReason(selectedReason);
+    }
+
     for (var arriveeZone in arriveeZones) {
       Marker marker = Marker(
         markerId: MarkerId(arriveeZone.name),
@@ -221,6 +228,7 @@ class _MapToggleState extends State<MapToggle> {
                       onTap: () {
                         setState(() {
                           selectedReason = reason;
+                          _updateZonesForSelectedReason();
                         });
                         Navigator.pop(context);
                       },
@@ -327,6 +335,62 @@ class _MapToggleState extends State<MapToggle> {
     }
     // Update museums
     await _addMuseumMarkers(selectedPeriod);
+  }
+
+  Future<void> _updateZonesForSelectedReason() async {
+    // Update arriveeZones
+    List<arriveZone> updatedArriveeZones =
+        await db.updateArriveZonesForSelectedReason(selectedReason);
+
+    // Update provenanceZones
+    List<ProvenanceZone> updatedProvenanceZones =
+        await db.updateProvenanceZonesForSelectedReason(selectedReason);
+
+    // Clear existing polygons and markers
+    setState(() {
+      polygons.clear();
+      markers.clear();
+    });
+
+    await _addMuseumMarkers(selectedReason);
+
+    // Add markers and polygons for updated zones
+    for (var arriveeZone in updatedArriveeZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(arriveeZone.name),
+        position: _getPolygonCenter(arriveeZone.coordinates),
+        infoWindow: InfoWindow(title: arriveeZone.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+          );
+        },
+      );
+      setState(() {
+        markers.add(marker);
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+      });
+
+      for (var zone in updatedProvenanceZones) {
+        Marker marker = Marker(
+          markerId: MarkerId(zone.provenanceNom),
+          position: _getPolygonCenter(zone.provenanceZone),
+          infoWindow: InfoWindow(title: zone.provenanceNom),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => provenanceZoneInfoPopup(zone: zone),
+            );
+          },
+        );
+
+        setState(() {
+          markers.add(marker);
+          polygons.add(provenanceZonePolygon(zone));
+        });
+      }
+    }
   }
 
   @override
