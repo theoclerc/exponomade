@@ -155,40 +155,25 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
-  // Function to show the period selection BottomSheet
   void _showPeriodSelection() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          heightFactor: 2 / 3,
-          widthFactor: 0.5,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text(
-                    "Sélectionnez une période :",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: periodOptions.length,
-                    itemBuilder: (context, index) {
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une période :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 2 / 3,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(periodOptions.length, (index) {
                       final period = periodOptions[index];
                       return ListTile(
                         title: Text(period),
@@ -200,11 +185,11 @@ class _MapToggleState extends State<MapToggle> {
                           Navigator.pop(context);
                         },
                       );
-                    },
+                    }),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -212,53 +197,38 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   void _showReasonsSelection() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          widthFactor: 0.5,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une raison :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 1 / 2,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: ListView.builder(
+                  itemCount: reasonOptions.length,
+                  itemBuilder: (context, index) {
+                    final reason = reasonOptions[index];
+                    return ListTile(
+                      title: Text(reason),
+                      onTap: () {
+                        setState(() {
+                          selectedReason = reason;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text(
-                    "Sélectionnez une raison :",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  child: ListView.builder(
-                    itemCount: reasonOptions.length,
-                    itemBuilder: (context, index) {
-                      final reason = reasonOptions[index];
-                      return ListTile(
-                        title: Text(reason),
-                        onTap: () {
-                          setState(() {
-                            selectedReason = reason;
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         );
       },
@@ -266,53 +236,38 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   void _showPopulationSelection() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          widthFactor: 0.5,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une population :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 1 / 2,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: ListView.builder(
+                  itemCount: populationOptions.length,
+                  itemBuilder: (context, index) {
+                    final population = populationOptions[index];
+                    return ListTile(
+                      title: Text(population),
+                      onTap: () {
+                        setState(() {
+                          selectedPopulation = population;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text(
-                    "Sélectionnez une population :",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  child: ListView.builder(
-                    itemCount: populationOptions.length,
-                    itemBuilder: (context, index) {
-                      final population = populationOptions[index];
-                      return ListTile(
-                        title: Text(population),
-                        onTap: () {
-                          setState(() {
-                            selectedPopulation = population;
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         );
       },
