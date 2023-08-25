@@ -126,4 +126,3 @@ class arriveZoneInfoPopup extends StatelessWidget {
     );
   }
 }
-
