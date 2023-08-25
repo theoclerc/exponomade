@@ -26,57 +26,6 @@ class DBconnect {
     return newQuestions;
   }
 
-  Future<List<Musee>> fetchMusees() async {
-    try {
-      QuerySnapshot querySnapshot = await _firestore.collection('musees').get();
-      List<Musee> musees = [];
-
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        try {
-          GeoPoint coord = data['coordonneesMusee'];
-          var coordLatLng = LatLng(coord.latitude, coord.longitude);
-
-          List<Map<String, dynamic>> objetsData =
-              List<Map<String, dynamic>>.from(data['objets'] as List);
-          List<Objet> objets = objetsData.map((objetData) {
-            Map<String, String> chronologie = {
-              'from': objetData['chronologie']['from'] as String,
-              'to': objetData['chronologie']['to'] as String,
-            };
-            return Objet(
-              chronologie: chronologie,
-              descriptionObjet: objetData['descriptionObjet'] as String,
-              image: objetData['image'] as String,
-              nomObjet: objetData['nomObjet'] as String,
-              population: objetData['population'] as String,
-              raisons: List<String>.from(objetData['raisons'] as List),
-            );
-          }).toList();
-
-          var musee = Musee(
-            id: doc.id,
-            nomMusee: data['nomMusee'] as String,
-            coord: coordLatLng,
-            objets: objets,
-          );
-
-          musees.add(musee);
-        } catch (e) {
-          print(
-              "An error occurred while processing document with ID: ${doc.id}");
-          print("Error details: $e");
-        }
-      }
-
-      return musees;
-    } catch (e) {
-      print("An error occurred while fetching data from Firestore: $e");
-      return []; // Return an empty list if an error occurs
-    }
-  }
-
   Future<List<arriveZone>> fetchArriveZones() async {
     try {
       DocumentSnapshot querySnapshot = await _firestore
@@ -268,8 +217,8 @@ class DBconnect {
               int.parse(period.split("à")[1].trim().split(" ").last);
 
           // Filter the zones based on the selected period
-          if (selectedPeriodStart >= zonePeriodStart &&
-              selectedPeriodEnd <= zonePeriodEnd) {
+          if (selectedPeriodStart == zonePeriodStart &&
+              selectedPeriodEnd == zonePeriodEnd) {
             List<dynamic> arriveeZoneData = data['arriveeZone'];
 
             // Assure that each element is a GeoPoint, then transform it into LatLng
@@ -317,7 +266,7 @@ class DBconnect {
           int selectedPeriodEnd =
               int.parse(period.split("à")[1].trim().split(" ").last);
 
-          if (selectedPeriodStart >= from && selectedPeriodEnd <= to) {
+          if (selectedPeriodStart == from && selectedPeriodEnd == to) {
             List<dynamic> provenanceZoneData = data['provenanceZone'];
 
             // Assure that each element is a GeoPoint, then transform it into LatLng
@@ -347,17 +296,108 @@ class DBconnect {
     }
   }
 
-  /*Future<List<arriveZone>> updateArriveZonesForSelectedPopulation(String population) async {
+  Future<List<Musee>> updateMuseumsAndObjectsForSelectedPeriod(
+      String period) async {
+    List<Musee> updatedMuseums = [];
+
+    // Fetch all museums and objects
     try {
-      QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
+      QuerySnapshot querySnapshot = await _firestore.collection('musees').get();
+      List<Musee> museums = [];
 
-      List<arriveZone> filteredZones = [];
-
-      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        // Check if the zone's population matches the selected population
-        if (data['population'] == population) {
+        try {
+          GeoPoint coord = data['coordonneesMusee'];
+          var coordLatLng = LatLng(coord.latitude, coord.longitude);
+
+          List<Map<String, dynamic>> objetsData =
+              List<Map<String, dynamic>>.from(data['objets'] as List);
+          List<Objet> objets = objetsData.map((objetData) {
+            Map<String, String> chronologie = {
+              'from': objetData['chronologie']['from'] as String,
+              'to': objetData['chronologie']['to'] as String,
+            };
+            return Objet(
+              chronologie: chronologie,
+              descriptionObjet: objetData['descriptionObjet'] as String,
+              image: objetData['image'] as String,
+              nomObjet: objetData['nomObjet'] as String,
+              population: objetData['population'] as String,
+              raisons: List<String>.from(objetData['raisons'] as List),
+            );
+          }).toList();
+
+          var musee = Musee(
+            id: doc.id,
+            nomMusee: data['nomMusee'] as String,
+            coord: coordLatLng,
+            objets: objets,
+          );
+
+          museums.add(musee);
+        } catch (e) {
+          print(
+              "An error occurred while processing document with ID: ${doc.id}");
+          print("Error details: $e");
+        }
+      }
+
+      if (period == "Aucune") {
+        // If selected period is "Aucune," return all museums and objects
+        return museums;
+      }
+
+      // Filter museums and their objects based on the selected period
+      for (var museum in museums) {
+        List<Objet> filteredObjects = [];
+        for (var objet in museum.objets) {
+          String? from = objet.chronologie['from'];
+          String? to = objet.chronologie['to'];
+          int selectedPeriodStart =
+              int.parse(period.split("à")[0].trim().split(" ").last);
+          int selectedPeriodEnd =
+              int.parse(period.split("à")[1].trim().split(" ").last);
+          int objetFrom = int.parse(from!);
+          int objetTo = int.parse(to!);
+          bool isYearInPeriod =
+              selectedPeriodStart == objetFrom && selectedPeriodEnd == objetTo;
+
+          if (isYearInPeriod) {
+            filteredObjects.add(objet);
+          }
+        }
+
+        if (filteredObjects.isNotEmpty) {
+          Musee updatedMuseum = Musee(
+            id: museum.id,
+            nomMusee: museum.nomMusee,
+            coord: museum.coord,
+            objets: filteredObjects,
+          );
+          updatedMuseums.add(updatedMuseum);
+        }
+      }
+    } catch (e) {
+      print("An error occurred while fetching data from Firestore: $e");
+    }
+    return updatedMuseums;
+  }
+
+  Future<List<arriveZone>> updateArriveZonesForSelectedReason(
+    String reason) async {
+  try {
+    QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
+
+    List<arriveZone> filteredZones = [];
+
+    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      if (data['raisons'] != null) {
+        // Check if the selected reason is in the list of reasons for this zone
+        List<String> reasons = List<String>.from(data['raisons']);
+        if (reasons.contains(reason)) {
           int zonePeriodStart = data['chronologieZone']['from'];
           int zonePeriodEnd = data['chronologieZone']['to'];
 
@@ -379,70 +419,29 @@ class DBconnect {
           filteredZones.add(zone);
         }
       }
-
-      return filteredZones;
-    } catch (e) {
-      print("An error occurred while updating arrivee zones for selected population: $e");
-      return [];
     }
-  }*/
 
-    Future<List<arriveZone>> updateArriveZonesForSelectedPopulation(
-      String population) async {
-    try {
-      QuerySnapshot snapshot = await _firestore.collection('zones').get();
-
-      List<arriveZone> zones = [];
-
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-
-        // Check if the zone's population matches the selected population
-        if (data['population'] == population) {
-
-          int zonePeriodStart = data['chronologieZone']['from'];
-          int zonePeriodEnd = data['chronologieZone']['to'];
-
-          List<dynamic> arriveeZoneData = data['arriveeZone'];
-
-          // Assure that each element is a GeoPoint, then transform it into LatLng
-          List<LatLng> coordinates = arriveeZoneData.map((e) {
-            GeoPoint geoPoint = e as GeoPoint;
-            return LatLng(geoPoint.latitude, geoPoint.longitude);
-          }).toList();
-
-
-          arriveZone zone = arriveZone(
-            name: data['nomZone'],
-            coordinates: coordinates,
-            from: zonePeriodStart,
-            to: zonePeriodEnd,
-          );
-
-          zones.add(zone);
-        }
-      }
-
-      return zones;
-    } catch (e) {
-      print("An error occurred while fetching provenance zone data for selected population: $e");
-      return [];
-    }
+    return filteredZones;
+  } catch (e) {
+    print(
+        "An error occurred while updating arrivee zones for selected reason: $e");
+    return [];
   }
+}
 
-  Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedPopulation(
-      String population) async {
-    try {
-      QuerySnapshot snapshot = await _firestore.collection('zones').get();
+Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedReason(
+    String reason) async {
+  try {
+    QuerySnapshot snapshot = await _firestore.collection('zones').get();
 
-      List<ProvenanceZone> zones = [];
+    List<ProvenanceZone> zones = [];
 
-      for (QueryDocumentSnapshot doc in snapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+    for (QueryDocumentSnapshot doc in snapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        // Check if the zone's population matches the selected population
-        if (data['population'] == population) {
-
+      if (data['raisons'] != null) {
+        List<String> reasons = List<String>.from(data['raisons']);
+        if (reasons.contains(reason)) {
           List<dynamic> provenanceZoneData = data['provenanceZone'];
 
           // Assure that each element is a GeoPoint, then transform it into LatLng
@@ -450,8 +449,6 @@ class DBconnect {
             GeoPoint geoPoint = e as GeoPoint;
             return LatLng(geoPoint.latitude, geoPoint.longitude);
           }).toList();
-
-          List<String> reasons = List<String>.from(data['raisons']);
 
           ProvenanceZone zone = ProvenanceZone(
             provenanceNom: data['provenanceNom'],
@@ -463,11 +460,93 @@ class DBconnect {
           zones.add(zone);
         }
       }
-
-      return zones;
-    } catch (e) {
-      print("An error occurred while fetching provenance zone data for selected population: $e");
-      return [];
     }
+
+    return zones;
+  } catch (e) {
+    print("An error occurred while updating provenance zone data: $e");
+    return [];
   }
+}
+
+  
+ Future<List<Musee>> updateMuseumsAndObjectsForSelectedReason(
+    String reason) async {
+  List<Musee> updatedMuseums = [];
+
+  // Fetch all museums and objects
+  try {
+    QuerySnapshot querySnapshot = await _firestore.collection('musees').get();
+    List<Musee> museums = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+      try {
+        GeoPoint coord = data['coordonneesMusee'];
+        var coordLatLng = LatLng(coord.latitude, coord.longitude);
+
+        List<Map<String, dynamic>> objetsData =
+            List<Map<String, dynamic>>.from(data['objets'] as List);
+        List<Objet> objets = objetsData.map((objetData) {
+          Map<String, String> chronologie = {
+            'from': objetData['chronologie']['from'] as String,
+            'to': objetData['chronologie']['to'] as String,
+          };
+          return Objet(
+            chronologie: chronologie,
+            descriptionObjet: objetData['descriptionObjet'] as String,
+            image: objetData['image'] as String,
+            nomObjet: objetData['nomObjet'] as String,
+            population: objetData['population'] as String,
+            raisons: List<String>.from(objetData['raisons'] as List),
+          );
+        }).toList();
+
+        var musee = Musee(
+          id: doc.id,
+          nomMusee: data['nomMusee'] as String,
+          coord: coordLatLng,
+          objets: objets,
+        );
+
+        museums.add(musee);
+      } catch (e) {
+        print(
+            "An error occurred while processing document with ID: ${doc.id}");
+        print("Error details: $e");
+      }
+    }
+
+    if (reason == "Aucune") {
+      // If selected reason is "Aucune," return all museums
+      return museums;
+    }
+
+    // Filter museums and their objects based on the selected reason
+    for (var museum in museums) {
+      List<Objet> filteredObjects = [];
+      for (var objet in museum.objets) {
+        if (objet.raisons.contains(reason)) {
+          filteredObjects.add(objet);
+        }
+      }
+
+      if (filteredObjects.isNotEmpty) {
+        Musee updatedMuseum = Musee(
+          id: museum.id,
+          nomMusee: museum.nomMusee,
+          coord: museum.coord,
+          objets: filteredObjects,
+        );
+        updatedMuseums.add(updatedMuseum);
+      }
+    }
+  } catch (e) {
+    print("An error occurred while fetching data from Firestore: $e");
+  }
+  return updatedMuseums;
+}
+
+  
 }

@@ -9,6 +9,7 @@ import '../models/musee_model.dart';
 import '../database/db_connect.dart';
 import '../zones/arriveZoneInfoPopup.dart';
 import '../zones/provenanceZoneInfoPopup.dart';
+import 'package:flutter/services.dart';
 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
@@ -19,6 +20,7 @@ class MapToggle extends StatefulWidget {
 
 class _MapToggleState extends State<MapToggle> {
   late GoogleMapController mapController;
+  late String _mapStyle;
   final LatLng _center = const LatLng(46.229352, 7.362049);
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
@@ -41,6 +43,9 @@ class _MapToggleState extends State<MapToggle> {
     _fetchReasons();
     _fetchPopulations();
     _createMarkersAndPolygons();
+    rootBundle.loadString('map_style.json').then((string) {
+      _mapStyle = string;
+    });
   }
 
   Future<void> _fetchPeriods() async {
@@ -48,7 +53,6 @@ class _MapToggleState extends State<MapToggle> {
 
     setState(() {
       periodOptions = periods;
-      print(periodOptions);
       selectedPeriod = periodOptions[5];
     });
   }
@@ -73,6 +77,7 @@ class _MapToggleState extends State<MapToggle> {
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    controller.setMapStyle(_mapStyle);
   }
 
   LatLng _getPolygonCenter(List<LatLng> coordinates) {
@@ -88,10 +93,22 @@ class _MapToggleState extends State<MapToggle> {
     return LatLng(latitude / count, longitude / count);
   }
 
-  Future<void> _addMuseumMarkers() async {
-    List<Musee> museums = await db.fetchMusees();
+  Future<void> _addMuseumMarkers(selectedPeriod) async {
+    // Update museums
+    List<Musee> museums =
+        await db.updateMuseumsAndObjectsForSelectedPeriod(selectedPeriod);
 
-    //print("musees fetched: ${museums.toString()}");
+    for (var museum in museums) {
+      Marker marker = await createMuseumMarker(context, museum);
+      setState(() {
+        markers.add(marker);
+      });
+    }
+  }
+  Future<void> _addMuseumMarkersForSelectedReason(selectedReason) async {
+    // Update museums
+    List<Musee> museums =
+        await db.updateMuseumsAndObjectsForSelectedReason(selectedReason);
 
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
@@ -104,7 +121,7 @@ class _MapToggleState extends State<MapToggle> {
   Future<void> _createMarkersAndPolygons() async {
     List<arriveZone> arriveeZones = await db.fetchArriveZones();
     List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
-    await _addMuseumMarkers();
+    await _addMuseumMarkers(selectedPeriod);
 
     if (selectedPeriod != "Aucune") {
       arriveeZones =
@@ -113,11 +130,11 @@ class _MapToggleState extends State<MapToggle> {
           await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
     }
 
-    if (selectedPopulation != "Aucune") {
+    if (selectedReason != "Aucune") {
       arriveeZones =
-          await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
+          await db.updateArriveZonesForSelectedReason(selectedReason);
       provenanceZones =
-          await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
+          await db.updateProvenanceZonesForSelectedReason(selectedReason);
     }
 
     for (var arriveeZone in arriveeZones) {
@@ -157,56 +174,41 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
-  // Function to show the period selection BottomSheet
   void _showPeriodSelection() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          widthFactor: 0.5,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text(
-                    "Sélectionnez une période :",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  child: ListView.builder(
-                    itemCount: periodOptions.length,
-                    itemBuilder: (context, index) {
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une période :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 2 / 3,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(periodOptions.length, (index) {
                       final period = periodOptions[index];
                       return ListTile(
                         title: Text(period),
                         onTap: () {
                           setState(() {
                             selectedPeriod = period;
-                            _updateZonesForSelectedPeriod(); // Call the method here
+                            _updateZonesForSelectedPeriod();
                           });
                           Navigator.pop(context);
                         },
                       );
-                    },
+                    }),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -214,53 +216,39 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   void _showReasonsSelection() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          widthFactor: 0.5,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une raison :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 1 / 2,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: ListView.builder(
+                  itemCount: reasonOptions.length,
+                  itemBuilder: (context, index) {
+                    final reason = reasonOptions[index];
+                    return ListTile(
+                      title: Text(reason),
+                      onTap: () {
+                        setState(() {
+                          selectedReason = reason;
+                          _updateZonesForSelectedReason();
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text(
-                    "Sélectionnez une raison :",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  child: ListView.builder(
-                    itemCount: reasonOptions.length,
-                    itemBuilder: (context, index) {
-                      final reason = reasonOptions[index];
-                      return ListTile(
-                        title: Text(reason),
-                        onTap: () {
-                          setState(() {
-                            selectedReason = reason;
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         );
       },
@@ -268,54 +256,38 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   void _showPopulationSelection() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
       builder: (BuildContext context) {
-        return FractionallySizedBox(
-          widthFactor: 0.5,
-          alignment: Alignment.bottomCenter,
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une population :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 1 / 2,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: ListView.builder(
+                  itemCount: populationOptions.length,
+                  itemBuilder: (context, index) {
+                    final population = populationOptions[index];
+                    return ListTile(
+                      title: Text(population),
+                      onTap: () {
+                        setState(() {
+                          selectedPopulation = population;
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  },
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const ListTile(
-                  title: Text(
-                    "Sélectionnez une population :",
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                const Divider(),
-                SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.4,
-                  child: ListView.builder(
-                    itemCount: populationOptions.length,
-                    itemBuilder: (context, index) {
-                      final population = populationOptions[index];
-                      return ListTile(
-                        title: Text(population),
-                        onTap: () {
-                          setState(() {
-                            selectedPopulation = population;
-                            _updateZonesForSelectedPopulation();
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+            ],
           ),
         );
       },
@@ -337,8 +309,6 @@ class _MapToggleState extends State<MapToggle> {
       markers.clear();
     });
 
-    await _addMuseumMarkers();
-
     // Add markers and polygons for updated zones
     for (var arriveeZone in updatedArriveeZones) {
       Marker marker = Marker(
@@ -356,36 +326,37 @@ class _MapToggleState extends State<MapToggle> {
         markers.add(marker);
         polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
-
-      for (var zone in updatedProvenanceZones) {
-        Marker marker = Marker(
-          markerId: MarkerId(zone.provenanceNom),
-          position: _getPolygonCenter(zone.provenanceZone),
-          infoWindow: InfoWindow(title: zone.provenanceNom),
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => provenanceZoneInfoPopup(zone: zone),
-            );
-          },
-        );
-
-        setState(() {
-          markers.add(marker);
-          polygons.add(provenanceZonePolygon(zone));
-        });
-      }
     }
+    for (var zone in updatedProvenanceZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(zone.provenanceNom),
+        position: _getPolygonCenter(zone.provenanceZone),
+        infoWindow: InfoWindow(title: zone.provenanceNom),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => provenanceZoneInfoPopup(zone: zone),
+          );
+        },
+      );
+
+      setState(() {
+        markers.add(marker);
+        polygons.add(provenanceZonePolygon(zone));
+      });
+    }
+    // Update museums
+    await _addMuseumMarkers(selectedPeriod);
   }
 
-    Future<void> _updateZonesForSelectedPopulation() async {
+  Future<void> _updateZonesForSelectedReason() async {
     // Update arriveeZones
     List<arriveZone> updatedArriveeZones =
-        await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
+        await db.updateArriveZonesForSelectedReason(selectedReason);
 
     // Update provenanceZones
     List<ProvenanceZone> updatedProvenanceZones =
-        await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
+        await db.updateProvenanceZonesForSelectedReason(selectedReason);
 
     // Clear existing polygons and markers
     setState(() {
@@ -393,8 +364,6 @@ class _MapToggleState extends State<MapToggle> {
       markers.clear();
     });
 
-    await _addMuseumMarkers();
-
     // Add markers and polygons for updated zones
     for (var arriveeZone in updatedArriveeZones) {
       Marker marker = Marker(
@@ -432,7 +401,10 @@ class _MapToggleState extends State<MapToggle> {
         });
       }
     }
+    // Update museums
+    await _addMuseumMarkersForSelectedReason(selectedReason);
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -450,120 +422,118 @@ class _MapToggleState extends State<MapToggle> {
               polygons: polygons,
             ),
             Positioned(
-              right: 60,
+              left: 0,
+              right: 0,
               bottom: 24,
-              child: Container(
-                width: 180,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: _showPeriodSelection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.history),
-                      const SizedBox(width: 8),
-                      RichText(
-                          text: TextSpan(children: [
-                        const TextSpan(
-                          text: "Période choisie :\n",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 180,
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
                         ),
-                        TextSpan(text: selectedPeriod)
-                      ])),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 250,
-              bottom: 24,
-              child: Container(
-                width: 180,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 3),
+                      ],
                     ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: _showReasonsSelection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.lightbulb_outline),
-                      const SizedBox(width: 8),
-                      RichText(
-                          text: TextSpan(children: [
-                        const TextSpan(
-                          text: "Raison choisie :\n",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        TextSpan(text: selectedReason)
-                      ])),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              right: 440, // Adjusted the position for the new container
-              bottom: 24,
-              child: Container(
-                width: 180,
-                height: 80,
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(8),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.2),
-                      blurRadius: 6.0,
-                      spreadRadius: 2.0,
-                      offset: const Offset(0, 3),
+                    child: GestureDetector(
+                      onTap: _showPeriodSelection,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.history),
+                          const SizedBox(width: 8),
+                          RichText(
+                              text: TextSpan(children: [
+                            const TextSpan(
+                              text: "Période choisie :\n",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: selectedPeriod)
+                          ])),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
-                child: GestureDetector(
-                  onTap: _showPopulationSelection,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.people),
-                      const SizedBox(width: 8),
-                      RichText(
-                          text: TextSpan(children: [
-                        const TextSpan(
-                          text: "Population choisie :\n",
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        TextSpan(text: selectedPopulation)
-                      ])),
-                    ],
                   ),
-                ),
+                  Container(
+                    width: 180,
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: _showReasonsSelection,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.lightbulb_outline),
+                          const SizedBox(width: 8),
+                          RichText(
+                              text: TextSpan(children: [
+                            const TextSpan(
+                              text: "Raison choisie :\n",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: selectedReason)
+                          ])),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Container(
+                    width: 180,
+                    height: 80,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: GestureDetector(
+                      onTap: _showPopulationSelection,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Icons.people),
+                          const SizedBox(width: 8),
+                          RichText(
+                              text: TextSpan(children: [
+                            const TextSpan(
+                              text: "Population choisie :\n",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            TextSpan(text: selectedPopulation)
+                          ])),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
