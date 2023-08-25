@@ -63,7 +63,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
-                'Durée de l\'immigration :',
+                'Époque de l\'immigration :',
                 style: TextStyle(
                   color: Colors.blueGrey[600],
                   fontSize: 16.0,
