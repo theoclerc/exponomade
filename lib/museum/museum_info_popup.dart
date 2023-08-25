@@ -29,7 +29,7 @@ class MuseumInfoPopup extends StatelessWidget {
                   Text("Description: ${objet.descriptionObjet}"),
                   Text("De ${objet.chronologie['from']} à ${objet.chronologie['to']}"),
                   Text("Raison de la migration: ${objet.raisons.join(", ")}"),
-                  Text("Population: ${objet.population}"),
+                  Text("Populations: ${objet.population}"),
                 ],
               ),
             );

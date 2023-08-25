@@ -118,6 +118,19 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
+    Future<void> _addMuseumMarkersForSelectedPopulation(selectedPopulation) async {
+    // Update museums
+    List<Musee> museums =
+        await db.updateMuseumsAndObjectsForSelectedPopulation(selectedPopulation);
+
+    for (var museum in museums) {
+      Marker marker = await createMuseumMarker(context, museum);
+      setState(() {
+        markers.add(marker);
+      });
+    }
+  }
+
   Future<void> _createMarkersAndPolygons() async {
     List<arriveZone> arriveeZones = await db.fetchArriveZones();
     List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
@@ -135,6 +148,13 @@ class _MapToggleState extends State<MapToggle> {
           await db.updateArriveZonesForSelectedReason(selectedReason);
       provenanceZones =
           await db.updateProvenanceZonesForSelectedReason(selectedReason);
+    }
+
+        if (selectedReason != "Aucune") {
+      arriveeZones =
+          await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
+      provenanceZones =
+          await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
     }
 
     for (var arriveeZone in arriveeZones) {
@@ -280,6 +300,7 @@ class _MapToggleState extends State<MapToggle> {
                       onTap: () {
                         setState(() {
                           selectedPopulation = population;
+                          _updateZonesForSelectedPopulation();
                         });
                         Navigator.pop(context);
                       },
@@ -403,6 +424,63 @@ class _MapToggleState extends State<MapToggle> {
     }
     // Update museums
     await _addMuseumMarkersForSelectedReason(selectedReason);
+  }
+
+  
+    Future<void> _updateZonesForSelectedPopulation() async {
+    // Update arriveeZones
+    List<arriveZone> updatedArriveeZones =
+        await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
+
+    // Update provenanceZones
+    List<ProvenanceZone> updatedProvenanceZones =
+        await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
+
+    // Clear existing polygons and markers
+    setState(() {
+      polygons.clear();
+      markers.clear();
+    });
+
+    await _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+
+    // Add markers and polygons for updated zones
+    for (var arriveeZone in updatedArriveeZones) {
+      Marker marker = Marker(
+        markerId: MarkerId(arriveeZone.name),
+        position: _getPolygonCenter(arriveeZone.coordinates),
+        infoWindow: InfoWindow(title: arriveeZone.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+          );
+        },
+      );
+      setState(() {
+        markers.add(marker);
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+      });
+
+      for (var zone in updatedProvenanceZones) {
+        Marker marker = Marker(
+          markerId: MarkerId(zone.provenanceNom),
+          position: _getPolygonCenter(zone.provenanceZone),
+          infoWindow: InfoWindow(title: zone.provenanceNom),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => provenanceZoneInfoPopup(zone: zone),
+            );
+          },
+        );
+
+        setState(() {
+          markers.add(marker);
+          polygons.add(provenanceZonePolygon(zone));
+        });
+      }
+    }
   }
 
 
