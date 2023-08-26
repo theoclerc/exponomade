@@ -9,13 +9,6 @@ class arriveZoneInfoPopup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16.0),
-        side: BorderSide(
-          color: Colors.blueGrey[200]!,
-          width: 1.5,
-        ),
-      ),
       titlePadding: EdgeInsets.all(16.0),
       title: Column(
         children: [
