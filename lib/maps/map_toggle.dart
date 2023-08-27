@@ -462,7 +462,7 @@ class _MapToggleState extends State<MapToggle> {
       );
       setState(() {
         markers.add(marker);
-        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+        polygons.add(arriveZonePolygon(context, arriveeZone)); // Adding the polygon
       });
 
       for (var zone in updatedProvenanceZones) {
@@ -480,7 +480,7 @@ class _MapToggleState extends State<MapToggle> {
 
         setState(() {
           markers.add(marker);
-          polygons.add(provenanceZonePolygon(zone));
+          polygons.add(provenanceZonePolygon(context, zone));
         });
       }
     }
