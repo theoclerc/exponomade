@@ -40,6 +40,7 @@ class _QuizPageState extends State<QuizPage> {
               return Scaffold(
                 backgroundColor: background,
                 appBar: AppBar(
+                  automaticallyImplyLeading: false,
                   title: const Text('Questionnaire'),
                   backgroundColor: background,
                   actions: [

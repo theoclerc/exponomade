@@ -22,6 +22,7 @@ class _ContactPageState extends State<ContactPage> {
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('Formulaire de contact'),
         backgroundColor: background,
       ),
