@@ -25,6 +25,7 @@ class _MapToggleState extends State<MapToggle> {
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
   var db = DBconnect();
+  bool isDialogOpen = false;
 
   // Period options
   List<String> periodOptions = [];
@@ -172,7 +173,7 @@ class _MapToggleState extends State<MapToggle> {
       );
       setState(() {
         markers.add(marker);
-        polygons.add(arriveZonePolygon(context, arriveeZone));
+        polygons.add(arriveZonePolygon(arriveeZone));
       });
     }
 
@@ -190,71 +191,81 @@ class _MapToggleState extends State<MapToggle> {
       );
       setState(() {
         markers.add(marker);
-        polygons.add(provenanceZonePolygon(context, provenanceZone));
+        polygons.add(provenanceZonePolygon(provenanceZone));
       });
     }
   }
 
-  void _showPeriodSelection() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "Sélectionnez une période :",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Divider(),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 2 / 3,
-                width: MediaQuery.of(context).size.width * 1 / 4,
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: List.generate(periodOptions.length, (index) {
-                      final period = periodOptions[index];
-                      return ListTile(
-                        title: Text(period),
-                        onTap: () {
-                          setState(() {
-                            selectedPeriod = period;
-                            _updateZonesForSelectedPeriod();
-                          });
-                          Navigator.pop(context);
-                        },
-                      );
-                    }),
-                  ),
+void _showPeriodSelection() {
+  setState(() {
+    isDialogOpen = true; // Dialog is about to open, set this to true
+  });
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text(
+          "Sélectionnez une période :",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Divider(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 2 / 3,
+              width: MediaQuery.of(context).size.width * 1 / 4,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(periodOptions.length, (index) {
+                    final period = periodOptions[index];
+                    return ListTile(
+                      title: Text(period),
+                      onTap: () {
+                        setState(() {
+                          selectedPeriod = period;
+                          _updateZonesForSelectedPeriod();
+                        });
+                        Navigator.pop(context);
+                      },
+                    );
+                  }),
                 ),
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
+    },
+  ).then((value) {
+    setState(() {
+      isDialogOpen = false; // Dialog is closed, set this to false
+    });
+  });
+}
 
-  void _showReasonsSelection() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "Sélectionnez une raison :",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Divider(),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 1 / 2,
-                width: MediaQuery.of(context).size.width * 1 / 4,
-                child: ListView.builder(
-                  itemCount: reasonOptions.length,
-                  itemBuilder: (context, index) {
+void _showReasonsSelection() {
+  setState(() {
+    isDialogOpen = true;
+  });
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text(
+          "Select a Reason:",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Divider(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 2 / 3,
+              width: MediaQuery.of(context).size.width * 1 / 4,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(reasonOptions.length, (index) {
                     final reason = reasonOptions[index];
                     return ListTile(
                       title: Text(reason),
@@ -266,35 +277,43 @@ class _MapToggleState extends State<MapToggle> {
                         Navigator.pop(context);
                       },
                     );
-                  },
+                  }),
                 ),
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
+    },
+  ).then((value) {
+    setState(() {
+      isDialogOpen = false;
+    });
+  });
+}
 
-  void _showPopulationSelection() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text(
-            "Sélectionnez une population :",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Divider(),
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 1 / 2,
-                width: MediaQuery.of(context).size.width * 1 / 4,
-                child: ListView.builder(
-                  itemCount: populationOptions.length,
-                  itemBuilder: (context, index) {
+void _showPopulationSelection() {
+  setState(() {
+    isDialogOpen = true;
+  });
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: const Text(
+          "Select a Population Type:",
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Divider(),
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 2 / 3,
+              width: MediaQuery.of(context).size.width * 1 / 4,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: List.generate(populationOptions.length, (index) {
                     final population = populationOptions[index];
                     return ListTile(
                       title: Text(population),
@@ -306,15 +325,20 @@ class _MapToggleState extends State<MapToggle> {
                         Navigator.pop(context);
                       },
                     );
-                  },
+                  }),
                 ),
               ),
-            ],
-          ),
-        );
-      },
-    );
-  }
+            ),
+          ],
+        ),
+      );
+    },
+  ).then((value) {
+    setState(() {
+      isDialogOpen = false;
+    });
+  });
+}
 
   Future<void> _updateZonesForSelectedPeriod() async {
     // Update arriveeZones
@@ -347,7 +371,7 @@ class _MapToggleState extends State<MapToggle> {
       setState(() {
         markers.add(marker);
         polygons
-            .add(arriveZonePolygon(context, arriveeZone)); // Adding the polygon
+            .add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
     }
     for (var zone in updatedProvenanceZones) {
@@ -365,7 +389,7 @@ class _MapToggleState extends State<MapToggle> {
 
       setState(() {
         markers.add(marker);
-        polygons.add(provenanceZonePolygon(context, zone));
+          polygons.add(provenanceZonePolygon(zone));
       });
     }
     // Update museums
@@ -403,7 +427,7 @@ class _MapToggleState extends State<MapToggle> {
       setState(() {
         markers.add(marker);
         polygons
-            .add(arriveZonePolygon(context, arriveeZone)); // Adding the polygon
+            .add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
 
       for (var zone in updatedProvenanceZones) {
@@ -421,7 +445,7 @@ class _MapToggleState extends State<MapToggle> {
 
         setState(() {
           markers.add(marker);
-          polygons.add(provenanceZonePolygon(context, zone));
+          polygons.add(provenanceZonePolygon(zone));
         });
       }
     }
@@ -462,7 +486,7 @@ class _MapToggleState extends State<MapToggle> {
       );
       setState(() {
         markers.add(marker);
-        polygons.add(arriveZonePolygon(context, arriveeZone)); // Adding the polygon
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon/ Adding the polygon
       });
 
       for (var zone in updatedProvenanceZones) {
@@ -480,7 +504,7 @@ class _MapToggleState extends State<MapToggle> {
 
         setState(() {
           markers.add(marker);
-          polygons.add(provenanceZonePolygon(context, zone));
+        polygons.add(provenanceZonePolygon(zone));
         });
       }
     }
@@ -501,6 +525,10 @@ class _MapToggleState extends State<MapToggle> {
               ),
               markers: markers,
               polygons: polygons,
+              scrollGesturesEnabled: !isDialogOpen,
+              zoomGesturesEnabled: !isDialogOpen,
+              tiltGesturesEnabled: !isDialogOpen,
+              rotateGesturesEnabled: !isDialogOpen,
             ),
             Positioned(
               left: 0,
