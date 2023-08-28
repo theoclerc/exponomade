@@ -25,6 +25,7 @@ class MuseumInfoPopup extends StatelessWidget {
                       // Affiche un message d'erreur ou une image de remplacement en cas d'erreur.
                       return const Text('Erreur lors du chargement de l\'image');
                     },
+                    width: 300,
                   ),
                   Text("Description: ${objet.descriptionObjet}"),
                   Text("De ${objet.chronologie['from']} à ${objet.chronologie['to']}"),

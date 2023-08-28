@@ -54,7 +54,7 @@ class _MapToggleState extends State<MapToggle> {
 
     setState(() {
       periodOptions = periods;
-      selectedPeriod = periodOptions[5];
+      selectedPeriod = periodOptions[0];
     });
   }
 

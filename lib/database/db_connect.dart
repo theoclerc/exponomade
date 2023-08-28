@@ -30,7 +30,7 @@ class DBconnect {
     try {
       DocumentSnapshot querySnapshot = await _firestore
           .collection('zones')
-          .doc('HpaJ7k9BYzlKRKnQA79E')
+          .doc()
           .get();
       Map<String, dynamic> data = querySnapshot.data() as Map<String, dynamic>;
 
@@ -67,7 +67,7 @@ class DBconnect {
     try {
       DocumentSnapshot querySnapshot = await _firestore
           .collection('zones')
-          .doc('HpaJ7k9BYzlKRKnQA79E')
+          .doc()
           .get();
       Map<String, dynamic> data = querySnapshot.data() as Map<String, dynamic>;
 
