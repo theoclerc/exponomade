@@ -560,14 +560,26 @@ void _showPopulationSelection() {
                         children: [
                           const Icon(Icons.history),
                           const SizedBox(width: 8),
-                          RichText(
-                              text: TextSpan(children: [
-                            const TextSpan(
-                              text: "Période choisie :\n",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(text: selectedPeriod)
-                          ])),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Période choisie :",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                selectedPeriod,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -595,14 +607,26 @@ void _showPopulationSelection() {
                         children: [
                           const Icon(Icons.lightbulb_outline),
                           const SizedBox(width: 8),
-                          RichText(
-                              text: TextSpan(children: [
-                            const TextSpan(
-                              text: "Raison choisie :\n",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(text: selectedReason)
-                          ])),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Raison choisie :",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                selectedReason,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -630,14 +654,26 @@ void _showPopulationSelection() {
                         children: [
                           const Icon(Icons.people),
                           const SizedBox(width: 8),
-                          RichText(
-                              text: TextSpan(children: [
-                            const TextSpan(
-                              text: "Population choisie :\n",
-                              style: TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            TextSpan(text: selectedPopulation)
-                          ])),
+                          Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                "Population choisie :",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                selectedPopulation,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
