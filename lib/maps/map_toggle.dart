@@ -253,7 +253,7 @@ void _showReasonsSelection() {
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text(
-          "Select a Reason:",
+          "Sélectionnez une raison :",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         content: Column(
@@ -301,7 +301,7 @@ void _showPopulationSelection() {
     builder: (BuildContext context) {
       return AlertDialog(
         title: const Text(
-          "Select a Population Type:",
+          "Sélectionnez un type de population :",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         content: Column(

@@ -38,7 +38,7 @@ class MuseumInfoPopup extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
-          child: const Text('Close'),
+          child: const Text('Fermer'),
           onPressed: () {
             Navigator.of(context).pop();
           },
