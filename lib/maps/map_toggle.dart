@@ -120,10 +120,11 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
-    Future<void> _addMuseumMarkersForSelectedPopulation(selectedPopulation) async {
+  Future<void> _addMuseumMarkersForSelectedPopulation(
+      selectedPopulation) async {
     // Update museums
-    List<Musee> museums =
-        await db.updateMuseumsAndObjectsForSelectedPopulation(selectedPopulation);
+    List<Musee> museums = await db
+        .updateMuseumsAndObjectsForSelectedPopulation(selectedPopulation);
 
     for (var museum in museums) {
       Marker marker = await createMuseumMarker(context, museum);
@@ -152,11 +153,11 @@ class _MapToggleState extends State<MapToggle> {
           await db.updateProvenanceZonesForSelectedReason(selectedReason);
     }
 
-        if (selectedReason != "Aucune") {
+    if (selectedReason != "Aucune") {
       arriveeZones =
           await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
-      provenanceZones =
-          await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
+      provenanceZones = await db
+          .updateProvenanceZonesForSelectedPopulation(selectedPopulation);
     }
 
     for (var arriveeZone in arriveeZones) {
@@ -196,149 +197,155 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
-void _showPeriodSelection() {
-  setState(() {
-    isDialogOpen = true; // Dialog is about to open, set this to true
-  });
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text(
-          "Sélectionnez une période :",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 2 / 3,
-              width: MediaQuery.of(context).size.width * 1 / 4,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: List.generate(periodOptions.length, (index) {
-                    final period = periodOptions[index];
-                    return ListTile(
-                      title: Text(period),
-                      onTap: () {
-                        setState(() {
-                          selectedPeriod = period;
-                          _updateZonesForSelectedPeriod();
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  }),
+  void _showPeriodSelection() {
+    setState(() {
+      isDialogOpen = true; // Dialog is about to open, set this to true
+    });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une période :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 2 / 3,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(periodOptions.length, (index) {
+                      final period = periodOptions[index];
+                      return ListTile(
+                        title: Text(period),
+                        onTap: () {
+                          setState(() {
+                            selectedPeriod = period;
+                            selectedReason = reasonOptions[0];
+                            selectedPopulation = populationOptions[0];
+                            _updateZonesForSelectedPeriod();
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    }),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  ).then((value) {
-    setState(() {
-      isDialogOpen = false; // Dialog is closed, set this to false
+            ],
+          ),
+        );
+      },
+    ).then((value) {
+      setState(() {
+        isDialogOpen = false; // Dialog is closed, set this to false
+      });
     });
-  });
-}
+  }
 
-void _showReasonsSelection() {
-  setState(() {
-    isDialogOpen = true;
-  });
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text(
-          "Sélectionnez une raison :",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 2 / 3,
-              width: MediaQuery.of(context).size.width * 1 / 4,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: List.generate(reasonOptions.length, (index) {
-                    final reason = reasonOptions[index];
-                    return ListTile(
-                      title: Text(reason),
-                      onTap: () {
-                        setState(() {
-                          selectedReason = reason;
-                          _updateZonesForSelectedReason();
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  }),
+  void _showReasonsSelection() {
+    setState(() {
+      isDialogOpen = true;
+    });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez une raison :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 2 / 3,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(reasonOptions.length, (index) {
+                      final reason = reasonOptions[index];
+                      return ListTile(
+                        title: Text(reason),
+                        onTap: () {
+                          setState(() {
+                            selectedReason = reason;
+                            selectedPeriod = periodOptions[0];
+                            selectedPopulation = populationOptions[0];
+                            _updateZonesForSelectedReason();
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    }),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  ).then((value) {
-    setState(() {
-      isDialogOpen = false;
+            ],
+          ),
+        );
+      },
+    ).then((value) {
+      setState(() {
+        isDialogOpen = false;
+      });
     });
-  });
-}
+  }
 
-void _showPopulationSelection() {
-  setState(() {
-    isDialogOpen = true;
-  });
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text(
-          "Sélectionnez un type de population :",
-          style: TextStyle(fontWeight: FontWeight.bold),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Divider(),
-            SizedBox(
-              height: MediaQuery.of(context).size.height * 2 / 3,
-              width: MediaQuery.of(context).size.width * 1 / 4,
-              child: SingleChildScrollView(
-                child: Column(
-                  children: List.generate(populationOptions.length, (index) {
-                    final population = populationOptions[index];
-                    return ListTile(
-                      title: Text(population),
-                      onTap: () {
-                        setState(() {
-                          selectedPopulation = population;
-                          _updateZonesForSelectedPopulation();
-                        });
-                        Navigator.pop(context);
-                      },
-                    );
-                  }),
+  void _showPopulationSelection() {
+    setState(() {
+      isDialogOpen = true;
+    });
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            "Sélectionnez un type de population :",
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Divider(),
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 2 / 3,
+                width: MediaQuery.of(context).size.width * 1 / 4,
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: List.generate(populationOptions.length, (index) {
+                      final population = populationOptions[index];
+                      return ListTile(
+                        title: Text(population),
+                        onTap: () {
+                          setState(() {
+                            selectedPopulation = population;
+                            selectedPeriod = periodOptions[0];
+                            selectedReason = reasonOptions[0];
+                            _updateZonesForSelectedPopulation();
+                          });
+                          Navigator.pop(context);
+                        },
+                      );
+                    }),
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      );
-    },
-  ).then((value) {
-    setState(() {
-      isDialogOpen = false;
+            ],
+          ),
+        );
+      },
+    ).then((value) {
+      setState(() {
+        isDialogOpen = false;
+      });
     });
-  });
-}
+  }
 
   Future<void> _updateZonesForSelectedPeriod() async {
     // Update arriveeZones
@@ -370,8 +377,7 @@ void _showPopulationSelection() {
       );
       setState(() {
         markers.add(marker);
-        polygons
-            .add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
     }
     for (var zone in updatedProvenanceZones) {
@@ -389,7 +395,7 @@ void _showPopulationSelection() {
 
       setState(() {
         markers.add(marker);
-          polygons.add(provenanceZonePolygon(zone));
+        polygons.add(provenanceZonePolygon(zone));
       });
     }
     // Update museums
@@ -426,8 +432,7 @@ void _showPopulationSelection() {
       );
       setState(() {
         markers.add(marker);
-        polygons
-            .add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
       });
 
       for (var zone in updatedProvenanceZones) {
@@ -453,8 +458,7 @@ void _showPopulationSelection() {
     await _addMuseumMarkersForSelectedReason(selectedReason);
   }
 
-  
-    Future<void> _updateZonesForSelectedPopulation() async {
+  Future<void> _updateZonesForSelectedPopulation() async {
     // Update arriveeZones
     List<arriveZone> updatedArriveeZones =
         await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
@@ -486,7 +490,8 @@ void _showPopulationSelection() {
       );
       setState(() {
         markers.add(marker);
-        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon/ Adding the polygon
+        polygons.add(arriveZonePolygon(
+            arriveeZone)); // Adding the polygon/ Adding the polygon
       });
 
       for (var zone in updatedProvenanceZones) {
@@ -504,12 +509,11 @@ void _showPopulationSelection() {
 
         setState(() {
           markers.add(marker);
-        polygons.add(provenanceZonePolygon(zone));
+          polygons.add(provenanceZonePolygon(zone));
         });
       }
     }
   }
-
 
   @override
   Widget build(BuildContext context) {

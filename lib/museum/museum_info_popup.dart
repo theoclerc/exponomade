@@ -21,14 +21,17 @@ class MuseumInfoPopup extends StatelessWidget {
                 children: [
                   Image.network(
                     objet.image,
-                    errorBuilder: (BuildContext context, Object exception, StackTrace? stackTrace) {
+                    errorBuilder: (BuildContext context, Object exception,
+                        StackTrace? stackTrace) {
                       // Affiche un message d'erreur ou une image de remplacement en cas d'erreur.
-                      return const Text('Erreur lors du chargement de l\'image');
+                      return const Text(
+                          'Erreur lors du chargement de l\'image');
                     },
                     width: 300,
                   ),
                   Text("Description: ${objet.descriptionObjet}"),
-                  Text("De ${objet.chronologie['from']} à ${objet.chronologie['to']}"),
+                  Text(
+                      "De ${objet.chronologie['from']} à ${objet.chronologie['to']}"),
                   Text("Raison de la migration: ${objet.raisons.join(", ")}"),
                   Text("Populations: ${objet.population}"),
                 ],
@@ -39,6 +42,14 @@ class MuseumInfoPopup extends StatelessWidget {
       ),
       actions: <Widget>[
         TextButton(
+          style: TextButton.styleFrom(
+            primary: Colors.white,
+            backgroundColor: Colors.blue[400],
+            onSurface: Colors.grey,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.all(Radius.circular(20)),
+            ),
+          ),
           child: const Text('Fermer'),
           onPressed: () {
             Navigator.of(context).pop();
