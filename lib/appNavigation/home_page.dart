@@ -6,8 +6,9 @@ import 'package:exponomade/appNavigation/quiz_page.dart';
 class HomePage extends StatefulWidget {
   
   final int initialPage;
+  final int? score;
 
-  const HomePage({Key? key, this.initialPage = 0}) : super(key: key);
+  const HomePage({Key? key, this.initialPage = 0, this.score}) : super(key: key);
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -34,7 +35,7 @@ class _HomePageState extends State<HomePage> {
         break;
       //Contact
       case 1:
-        page = const ContactPage();
+        page = ContactPage(score: widget.score); 
         break;
       //Quiz
       case 2:

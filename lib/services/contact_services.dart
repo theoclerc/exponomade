@@ -8,6 +8,8 @@ class ContactService {
   static final subjectController = TextEditingController();
   static final emailController = TextEditingController();
   static final messageController = TextEditingController();
+  static int score = 0;
+  
 
   static Future<int> sendEmail() async {
     final url = Uri.parse("https://api.emailjs.com/api/v1.0/email/send");
@@ -25,6 +27,7 @@ class ContactService {
             "subject": subjectController.text,
             "user_email": emailController.text,
             "message": messageController.text,
+            "score": score,
           }
         }));
     return response.statusCode;
@@ -36,4 +39,5 @@ class ContactService {
     emailController.clear();
     messageController.clear();
   }
+  
 }

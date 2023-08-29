@@ -48,7 +48,7 @@ class QuizServices {
           result: score,
           questionLength: extractedData.length,
           onPressed: () => startOver(context),
-          onContactPressed: () => redirectToContact(context),
+          onContactPressed: () => redirectToContact(context, score),
         ),
       );
     } else {
@@ -71,8 +71,9 @@ class QuizServices {
     Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(initialPage: 2)));
   }
 
-  static void redirectToContact(BuildContext context) {
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(initialPage: 1)));
-  }
+
+static void redirectToContact(BuildContext context, int score) {
+  Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(initialPage: 1, score: score)));
+}
 
 }

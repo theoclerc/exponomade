@@ -5,15 +5,27 @@ import '../widgets/custom_textfield.dart';
 import '../utils/validators.dart';
 
 class ContactPage extends StatefulWidget {
-  const ContactPage({Key? key}) : super(key: key);
+
+  final int? score;
+  const ContactPage({Key? key, this.score}) : super(key: key);
+  
+  
 
   @override
   State<ContactPage> createState() => _ContactPageState();
+  
 }
+
 
 class _ContactPageState extends State<ContactPage> {
 
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    ContactService.score = widget.score ?? 0;
+  }
 
   Widget _sizedBox() => const SizedBox(height: 25);
 
@@ -23,14 +35,14 @@ class _ContactPageState extends State<ContactPage> {
       backgroundColor: background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: const Text('Formulaire de contact'),
+        title: Text('Formulaire de contact - Score de ${widget.score ?? "0"}'),
         backgroundColor: background,
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
-        child: Center( 
-          child: ConstrainedBox( 
-            constraints: const BoxConstraints(maxWidth: 600), 
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 600),
             child: Form(
               key: _formKey,
               child: Column(
@@ -75,7 +87,7 @@ class _ContactPageState extends State<ContactPage> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         ContactService.sendEmail();
-                        ContactService.clearTextFields(); 
+                        ContactService.clearTextFields();
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Formulaire envoyé !'),
@@ -101,7 +113,16 @@ class _ContactPageState extends State<ContactPage> {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  )
+                  ),
+                  _sizedBox(),
+                  Text(
+                    "Note: Votre score de ${widget.score ?? '0'} sera inclus dans le courriel.",
+                    style: const TextStyle(
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white,
+                    ),
+                  ),
                 ],
               ),
             ),
