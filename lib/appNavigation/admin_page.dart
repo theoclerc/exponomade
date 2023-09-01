@@ -53,7 +53,7 @@ class _AdminPageState extends State<AdminPage> {
             e.toString().contains('wrong-password')) {
           _signInError = 'L\u0027utilisateur ou le mot de passe est incorrect.';
         } else {
-          _signInError = 'An error occurred. Please try again later.';
+          _signInError = 'Une erreur est survenue. Veuillez réessayer.';
         }
       });
     }
@@ -149,31 +149,40 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget _buildAdminActions() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text('Bienvenue ${_user!.email} !'),
-        SizedBox(height: 16.0),
-        ElevatedButton(
-          onPressed: _signOut,
-          style: ElevatedButton.styleFrom(
-            backgroundColor: neutral,
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-          ),
-          child: const Text(
-            "Se déconnecter",
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.black,
-              fontWeight: FontWeight.bold,
-            ),
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Bienvenue ${_user!.email} !'),
+              SizedBox(height: 25),
+              ElevatedButton(
+                onPressed: _signOut,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: neutral,
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15.0),
+                  ),
+                ),
+                child: const Text(
+                  "Se déconnecter",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.black,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              // Add admin-specific functionality and UI here
+            ],
           ),
         ),
-        // Add admin-specific functionality and UI here
-      ],
+      ),
     );
   }
 }
