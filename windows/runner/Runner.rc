@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "exponomade" "\0"
+            VALUE "FileDescription", "ExpoNomadeG3" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "exponomade" "\0"
+            VALUE "InternalName", "ExpoNomadeG3" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
             VALUE "OriginalFilename", "exponomade.exe" "\0"
-            VALUE "ProductName", "exponomade" "\0"
+            VALUE "ProductName", "ExpoNomadeG3" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
