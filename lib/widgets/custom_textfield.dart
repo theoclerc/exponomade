@@ -11,6 +11,7 @@ class CustomTextField extends StatelessWidget {
   final int? maxLines;
   final TextInputType? keyboardType;
   final FormFieldValidator<String>? validator;
+  final bool obscureText;
 
   const CustomTextField({
     Key? key,
@@ -23,6 +24,7 @@ class CustomTextField extends StatelessWidget {
     this.minLines,
     this.maxLines,
     this.keyboardType,
+    this.obscureText = false,
   }) : super(key: key);
 
   @override
@@ -39,6 +41,7 @@ class CustomTextField extends StatelessWidget {
         minLines: minLines,
         maxLines: maxLines,
         keyboardType: keyboardType,
+        obscureText: obscureText,
         decoration: InputDecoration(
           icon: Icon(icon),
           labelText: labelText,
@@ -46,7 +49,7 @@ class CustomTextField extends StatelessWidget {
           border: InputBorder.none,
           counterText: '', // this hides the counter
         ),
-        validator: validator ?? 
+        validator: validator ??
             (value) {
               if (value == null || value.isEmpty) {
                 return 'Ce champ est obligatoire';
