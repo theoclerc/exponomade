@@ -9,7 +9,7 @@ import '../models/musee_model.dart';
 import '../database/db_connect.dart';
 import '../zones/arriveZoneInfoPopup.dart';
 import '../zones/provenanceZoneInfoPopup.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
@@ -44,7 +44,7 @@ class _MapToggleState extends State<MapToggle> {
     _fetchReasons();
     _fetchPopulations();
     _createMarkersAndPolygons();
-    rootBundle.loadString('map_style.json').then((string) {
+    rootBundle.loadString('assets/map_style.json').then((string) {
       _mapStyle = string;
     });
   }
