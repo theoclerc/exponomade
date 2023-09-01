@@ -70,15 +70,7 @@ class _HomePageState extends State<HomePage> {
               NavigationRailDestination(
                 icon: Icon(Icons.person_4),
                 label: Text('Admin'),
-                padding: EdgeInsets.only(
-                  top: (MediaQuery.of(context).size.height -
-                          (MediaQuery.of(context).padding.top +
-                              MediaQuery.of(context).padding.bottom) -
-                          kBottomNavigationBarHeight) *
-                      7 /
-                      11,
-                ),
-              ), // Adjust padding as needed
+              ),
             ],
             selectedIndex: selectedIndex,
             onDestinationSelected: (value) {
