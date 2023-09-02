@@ -68,7 +68,7 @@ class _HomePageState extends State<HomePage> {
                 label: Text('Quiz'),
               ),
               NavigationRailDestination(
-                icon: Icon(Icons.person_4),
+                icon: Icon(Icons.person),
                 label: Text('Admin'),
               ),
             ],
