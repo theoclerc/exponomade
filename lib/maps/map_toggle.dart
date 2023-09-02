@@ -10,6 +10,7 @@ import '../database/db_connect.dart';
 import '../zones/arriveZoneInfoPopup.dart';
 import '../zones/provenanceZoneInfoPopup.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'dart:math';
 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
@@ -26,11 +27,6 @@ class _MapToggleState extends State<MapToggle> {
   Set<Polygon> polygons = {};
   var db = DBconnect();
   bool isDialogOpen = false;
-
-  List<arriveZone> updatedArriveeZones = [];
-  List<ProvenanceZone> updatedProvenanceZones = [];
-  int selectedZoneIndex = 0;
-  bool showZones = false;
 
   // Period options
   List<String> periodOptions = [];
@@ -407,73 +403,105 @@ class _MapToggleState extends State<MapToggle> {
     await _addMuseumMarkers(selectedPeriod);
   }
 
+List<arriveZone> arriveeZonesToShow = [];
+List<ProvenanceZone> provenanceZonesToShow = [];
+int currentPairIndex = 1; // Variable pour suivre la paire actuellement affichée
+int totalPairs = 0; // Nombre total de paires de zones
+String buttonText = '';
+
   Future<void> _updateZonesForSelectedReason() async {
-    // Update arriveeZones
-    updatedArriveeZones = await db.updateArriveZonesForSelectedReason(selectedReason);
+    currentPairIndex = 1;
+  // Update arriveeZones
+  List<arriveZone> updatedArriveeZones =
+      await db.updateArriveZonesForSelectedReason(selectedReason);
 
-    // Update provenanceZones
-    updatedProvenanceZones = await db.updateProvenanceZonesForSelectedReason(selectedReason);
+  // Update provenanceZones
+  List<ProvenanceZone> updatedProvenanceZones =
+      await db.updateProvenanceZonesForSelectedReason(selectedReason);
 
-    // Clear existing polygons and markers
+  // Mettre à jour le nombre total de paires de zones
+  totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
+
+  // Clear existing polygons and markers
+  setState(() {
+    polygons.clear();
+    markers.clear();
+  });
+
+  // Add zones to the lists to show
+  arriveeZonesToShow = updatedArriveeZones;
+  provenanceZonesToShow = updatedProvenanceZones;
+
+  // Afficher la première paire de zones dès le départ
+  _afficherZones();
+
+// Update museums
+  await _addMuseumMarkersForSelectedReason(selectedReason);
+}
+
+void _afficherZones() {
+  markers.clear();
+  polygons.clear();
+
+  if (arriveeZonesToShow.isNotEmpty && provenanceZonesToShow.isNotEmpty) {
+    // Afficher la paire actuelle de zone d'arrivée et de zone de provenance
+    var arriveeZone = arriveeZonesToShow[currentPairIndex - 1]; // Utilisez l'index moins 1
+    var provenanceZone = provenanceZonesToShow[currentPairIndex - 1]; // Utilisez l'index moins 1
+
+    // Afficher la zone d'arrivée
+    Marker arriveeMarker = Marker(
+      markerId: MarkerId(arriveeZone.name),
+      position: _getPolygonCenter(arriveeZone.coordinates),
+      infoWindow: InfoWindow(title: arriveeZone.name),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+        );
+      },
+    );
+
+    // Afficher la zone de provenance
+    Marker provenanceMarker = Marker(
+      markerId: MarkerId(provenanceZone.provenanceNom),
+      position: _getPolygonCenter(provenanceZone.provenanceZone),
+      infoWindow: InfoWindow(title: provenanceZone.provenanceNom),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (context) => provenanceZoneInfoPopup(zone: provenanceZone),
+        );
+      },
+    );
+
     setState(() {
-      polygons.clear();
-      markers.clear();
-
-      // Réinitialiser l'indice de la zone actuellement affichée
-    selectedZoneIndex = 0;
-
-    // Afficher automatiquement la première zone
-    _showNextZone();
+      markers.add(arriveeMarker);
+      markers.add(provenanceMarker);
+      polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon for arriveeZone
+      polygons.add(provenanceZonePolygon(provenanceZone)); // Adding the polygon for provenanceZone
     });
 
-    // Update museums
-    await _addMuseumMarkersForSelectedReason(selectedReason);
-  }
+    // Mettre à jour le texte du bouton avec la paire actuellement affichée
+    setState(() {
+      buttonText = "Paire ${currentPairIndex.toString()} sur ${totalPairs.toString()}";
+    });
 
-  void _showNextZone() {
-    if (selectedZoneIndex < updatedArriveeZones.length) {
-      // Ajouter les marqueurs et les polygones pour la zone d'arrivée actuellement sélectionnée
-      Marker marker = Marker(
-        markerId: MarkerId(updatedArriveeZones[selectedZoneIndex].name),
-        position: _getPolygonCenter(updatedArriveeZones[selectedZoneIndex].coordinates),
-        infoWindow: InfoWindow(title: updatedArriveeZones[selectedZoneIndex].name),
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => arriveZoneInfoPopup(zone: updatedArriveeZones[selectedZoneIndex]),
-          );
-        },
-      );
-      markers.add(marker);
-      polygons.add(arriveZonePolygon(updatedArriveeZones[selectedZoneIndex]));
+    // Incrémenter l'index pour afficher la prochaine paire lors de la prochaine pression sur le bouton
+    currentPairIndex++;
 
-      // Ajouter les marqueurs et les polygones pour la zone de provenance correspondante
-      Marker provMarker = Marker(
-        markerId: MarkerId(updatedProvenanceZones[selectedZoneIndex].provenanceNom),
-        position: _getPolygonCenter(updatedProvenanceZones[selectedZoneIndex].provenanceZone),
-        infoWindow: InfoWindow(title: updatedProvenanceZones[selectedZoneIndex].provenanceNom),
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => provenanceZoneInfoPopup(zone: updatedProvenanceZones[selectedZoneIndex]),
-          );
-        },
-      );
-      markers.add(provMarker);
-      polygons.add(provenanceZonePolygon(updatedProvenanceZones[selectedZoneIndex]));
-
-      // Rafraîchir l'interface utilisateur pour afficher la nouvelle zone
-      setState(() {});
-
-      // Passer à la zone suivante
-      selectedZoneIndex++;
-    } else {
-      // Si toutes les zones d'arrivée ont été affichées, masquer le bouton "Zone suivante"
-      setState(() {
-        showZones = false;
-      });
+    // Si nous avons affiché toutes les paires, réinitialiser l'index pour afficher à nouveau la première paire
+    if (currentPairIndex > arriveeZonesToShow.length || currentPairIndex > provenanceZonesToShow.length) {
+      currentPairIndex = 1;
     }
+
+    // Appeler la fonction pour ajouter les marqueurs de musées après avoir mis à jour l'index
+    _addMuseumMarkersForSelectedReason(selectedReason);
   }
+}
+
+
+
+
 
 
   Future<void> _updateZonesForSelectedPopulation() async {
@@ -700,42 +728,37 @@ class _MapToggleState extends State<MapToggle> {
                       ),
                     ),
                   ),
-                  
-                  // Bouton pour afficher la zone suivante
-                  if (showZones)
-                    Container(
-                      width: 180,
-                      height: 80,
-                      margin: const EdgeInsets.symmetric(horizontal: 10),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.2),
-                            blurRadius: 6.0,
-                            spreadRadius: 2.0,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: GestureDetector(
-                        onTap: _showNextZone,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(Icons.arrow_forward),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Zone suivante",
-                              style: const TextStyle(
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                  Container(
+  width: 180,
+  height: 80,
+  margin: const EdgeInsets.symmetric(horizontal: 10),
+  decoration: BoxDecoration(
+    color: Colors.white,
+    borderRadius: BorderRadius.circular(8),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.2),
+        blurRadius: 6.0,
+        spreadRadius: 2.0,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  ),
+  child: GestureDetector(
+    onTap: () {
+      _afficherZones(); // Appeler la fonction pour afficher les zones
+    },
+    child: Center(
+      child: Text(
+        buttonText, // Utiliser le texte du bouton
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize: 14,
+        ),
+      ),
+    ),
+  ),
+),                  
                 ],
               ),
             ),
