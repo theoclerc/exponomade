@@ -60,6 +60,8 @@ class _AdminPageState extends State<AdminPage> {
         }
       });
     }
+    _emailController.clear();
+    _passwordController.clear();
   }
 
   // Function to sign out
