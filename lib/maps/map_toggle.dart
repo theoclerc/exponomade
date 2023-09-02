@@ -405,12 +405,20 @@ class _MapToggleState extends State<MapToggle> {
 
 List<arriveZone> arriveeZonesToShow = [];
 List<ProvenanceZone> provenanceZonesToShow = [];
-int currentPairIndex = 1; // Variable pour suivre la paire actuellement affichée
+int currentPairIndex = 0; // Variable pour suivre la paire actuellement affichée
 int totalPairs = 0; // Nombre total de paires de zones
-String buttonText = '';
+
+String get buttonText {
+  if (totalPairs == 0) {
+    return "Aucune paire de zones disponible";
+  } else {
+    return "Paire ${currentPairIndex + 1} sur $totalPairs";
+  }
+}
 
   Future<void> _updateZonesForSelectedReason() async {
-    currentPairIndex = 1;
+  currentPairIndex = 0;
+
   // Update arriveeZones
   List<arriveZone> updatedArriveeZones =
       await db.updateArriveZonesForSelectedReason(selectedReason);
@@ -432,75 +440,60 @@ String buttonText = '';
   arriveeZonesToShow = updatedArriveeZones;
   provenanceZonesToShow = updatedProvenanceZones;
 
-  // Afficher la première paire de zones dès le départ
-  _afficherZones();
-
-// Update museums
-  await _addMuseumMarkersForSelectedReason(selectedReason);
+  // Si des paires de zones sont disponibles, afficher la première paire
+  if (totalPairs > 0) {
+    _afficherPaire(currentPairIndex);
+  }
 }
 
-void _afficherZones() {
+void _afficherPaire(int pairIndex) {
   markers.clear();
   polygons.clear();
 
   if (arriveeZonesToShow.isNotEmpty && provenanceZonesToShow.isNotEmpty) {
-    // Afficher la paire actuelle de zone d'arrivée et de zone de provenance
-    var arriveeZone = arriveeZonesToShow[currentPairIndex - 1]; // Utilisez l'index moins 1
-    var provenanceZone = provenanceZonesToShow[currentPairIndex - 1]; // Utilisez l'index moins 1
+    // Vérifier si l'index de la paire est valide
+    if (pairIndex >= 0 && pairIndex < totalPairs) {
+      var arriveeZone = arriveeZonesToShow[pairIndex];
+      var provenanceZone = provenanceZonesToShow[pairIndex];
 
-    // Afficher la zone d'arrivée
-    Marker arriveeMarker = Marker(
-      markerId: MarkerId(arriveeZone.name),
-      position: _getPolygonCenter(arriveeZone.coordinates),
-      infoWindow: InfoWindow(title: arriveeZone.name),
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
-        );
-      },
-    );
+      // Afficher la zone d'arrivée
+      Marker arriveeMarker = Marker(
+        markerId: MarkerId(arriveeZone.name),
+        position: _getPolygonCenter(arriveeZone.coordinates),
+        infoWindow: InfoWindow(title: arriveeZone.name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+          );
+        },
+      );
 
-    // Afficher la zone de provenance
-    Marker provenanceMarker = Marker(
-      markerId: MarkerId(provenanceZone.provenanceNom),
-      position: _getPolygonCenter(provenanceZone.provenanceZone),
-      infoWindow: InfoWindow(title: provenanceZone.provenanceNom),
-      onTap: () {
-        showDialog(
-          context: context,
-          builder: (context) => provenanceZoneInfoPopup(zone: provenanceZone),
-        );
-      },
-    );
+      // Afficher la zone de provenance
+      Marker provenanceMarker = Marker(
+        markerId: MarkerId(provenanceZone.provenanceNom),
+        position: _getPolygonCenter(provenanceZone.provenanceZone),
+        infoWindow: InfoWindow(title: provenanceZone.provenanceNom),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => provenanceZoneInfoPopup(zone: provenanceZone),
+          );
+        },
+      );
 
-    setState(() {
-      markers.add(arriveeMarker);
-      markers.add(provenanceMarker);
-      polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon for arriveeZone
-      polygons.add(provenanceZonePolygon(provenanceZone)); // Adding the polygon for provenanceZone
-    });
+      setState(() {
+        markers.add(arriveeMarker);
+        markers.add(provenanceMarker);
+        polygons.add(arriveZonePolygon(arriveeZone));
+        polygons.add(provenanceZonePolygon(provenanceZone));
+      });
 
-    // Mettre à jour le texte du bouton avec la paire actuellement affichée
-    setState(() {
-      buttonText = "Paire ${currentPairIndex.toString()} sur ${totalPairs.toString()}";
-    });
-
-    // Incrémenter l'index pour afficher la prochaine paire lors de la prochaine pression sur le bouton
-    currentPairIndex++;
-
-    // Si nous avons affiché toutes les paires, réinitialiser l'index pour afficher à nouveau la première paire
-    if (currentPairIndex > arriveeZonesToShow.length || currentPairIndex > provenanceZonesToShow.length) {
-      currentPairIndex = 1;
+      // Appeler la fonction pour ajouter les marqueurs de musées après avoir mis à jour l'index
+      _addMuseumMarkersForSelectedReason(selectedReason);
     }
-
-    // Appeler la fonction pour ajouter les marqueurs de musées après avoir mis à jour l'index
-    _addMuseumMarkersForSelectedReason(selectedReason);
   }
 }
-
-
-
 
 
 
@@ -727,41 +720,67 @@ void _afficherZones() {
                         ],
                       ),
                     ),
-                  ),
-                  Container(
-  width: 180,
-  height: 80,
-  margin: const EdgeInsets.symmetric(horizontal: 10),
-  decoration: BoxDecoration(
-    color: Colors.white,
-    borderRadius: BorderRadius.circular(8),
-    boxShadow: [
-      BoxShadow(
-        color: Colors.black.withOpacity(0.2),
-        blurRadius: 6.0,
-        spreadRadius: 2.0,
-        offset: const Offset(0, 3),
-      ),
-    ],
-  ),
-  child: GestureDetector(
-    onTap: () {
-      _afficherZones(); // Appeler la fonction pour afficher les zones
-    },
-    child: Center(
-      child: Text(
-        buttonText, // Utiliser le texte du bouton
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 14,
-        ),
-      ),
-    ),
-  ),
-),                  
+                  ),               
                 ],
               ),
             ),
+             Positioned(
+  bottom: 120, // Ajustez cette valeur pour définir la marge par rapport au bas
+  left: 440,  // Marge gauche de 10 points
+  right: 440,  // Marge droite de 10 points
+  child: Align(
+    alignment: Alignment.bottomCenter,
+    child: Container(
+      decoration: BoxDecoration(
+        color: Colors.orange, // Couleur orange
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 6.0,
+            spreadRadius: 2.0,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: () {
+              // Afficher la paire précédente
+              if (currentPairIndex > 0) {
+                currentPairIndex--;
+                _afficherPaire(currentPairIndex);
+              }
+            },
+            icon: Icon(Icons.navigate_before, color: Colors.white), // Icône blanche
+          ),
+          Text(
+            buttonText,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: Colors.white, // Texte en blanc
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              // Afficher la paire suivante
+              if (currentPairIndex < totalPairs - 1) {
+                currentPairIndex++;
+                _afficherPaire(currentPairIndex);
+              }
+            },
+            icon: Icon(Icons.navigate_next, color: Colors.white), // Icône blanche
+          ),
+        ],
+      ),
+    ),
+  ),
+),
+
+ 
           ],
         ),
       ),
