@@ -27,6 +27,10 @@ class _MapToggleState extends State<MapToggle> {
   Set<Polygon> polygons = {};
   var db = DBconnect();
   bool isDialogOpen = false;
+  List<arriveZone> arriveeZonesToShow = [];
+  List<ProvenanceZone> provenanceZonesToShow = [];
+  int currentPairIndex = 0;
+  int totalPairs = 0;
 
   // Period options
   List<String> periodOptions = [];
@@ -228,6 +232,7 @@ class _MapToggleState extends State<MapToggle> {
                             selectedPeriod = period;
                             selectedReason = reasonOptions[0];
                             selectedPopulation = populationOptions[0];
+                            totalPairs = 0;
                             _updateZonesForSelectedPeriod();
                           });
                           Navigator.pop(context);
@@ -403,63 +408,50 @@ class _MapToggleState extends State<MapToggle> {
     await _addMuseumMarkers(selectedPeriod);
   }
 
-List<arriveZone> arriveeZonesToShow = [];
-List<ProvenanceZone> provenanceZonesToShow = [];
-int currentPairIndex = 0; // Variable pour suivre la paire actuellement affichée
-int totalPairs = 0; // Nombre total de paires de zones
+    Future<void> _updateZonesForSelectedReason() async {
+    currentPairIndex = 0;
 
-String get buttonText {
-  if (totalPairs == 0) {
-    return "Aucune paire de zones disponible";
-  } else {
-    return "Paire ${currentPairIndex + 1} sur $totalPairs";
-  }
-}
+    // Update arriveeZones
+    List<arriveZone> updatedArriveeZones =
+        await db.updateArriveZonesForSelectedReason(selectedReason);
 
-  Future<void> _updateZonesForSelectedReason() async {
-  currentPairIndex = 0;
+    // Update provenanceZones
+    List<ProvenanceZone> updatedProvenanceZones =
+        await db.updateProvenanceZonesForSelectedReason(selectedReason);
 
-  // Update arriveeZones
-  List<arriveZone> updatedArriveeZones =
-      await db.updateArriveZonesForSelectedReason(selectedReason);
+    // Update totalPairs
+    totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
 
-  // Update provenanceZones
-  List<ProvenanceZone> updatedProvenanceZones =
-      await db.updateProvenanceZonesForSelectedReason(selectedReason);
+    // Clear existing polygons and markers
+    setState(() {
+      polygons.clear();
+      markers.clear();
+    });
 
-  // Mettre à jour le nombre total de paires de zones
-  totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
+    // Add zones to the lists to show
+    arriveeZonesToShow = updatedArriveeZones;
+    provenanceZonesToShow = updatedProvenanceZones;
 
-  // Clear existing polygons and markers
-  setState(() {
-    polygons.clear();
-    markers.clear();
-  });
+    //Display first zones
+    if (totalPairs > 0) {
+      _displayPair(currentPairIndex);
+    }
 
-  // Add zones to the lists to show
-  arriveeZonesToShow = updatedArriveeZones;
-  provenanceZonesToShow = updatedProvenanceZones;
-
-  // Si des paires de zones sont disponibles, afficher la première paire
-  if (totalPairs > 0) {
-    _afficherPaire(currentPairIndex);
+    // Update museums
+    await _addMuseumMarkersForSelectedReason(selectedReason);
   }
 
-  // Update museums
-  await _addMuseumMarkersForSelectedReason(selectedReason);
-}
-
-void _afficherPaire(int pairIndex) {
+  Future<void> _displayPair(int pairIndex) async {
   polygons.clear();
   markers.clear();
 
   if (arriveeZonesToShow.isNotEmpty && provenanceZonesToShow.isNotEmpty) {
-    // Vérifier si l'index de la paire est valide
+    // Check if the pair index is valid
     if (pairIndex >= 0 && pairIndex < totalPairs) {
       var arriveeZone = arriveeZonesToShow[pairIndex];
       var provenanceZone = provenanceZonesToShow[pairIndex];
 
-      // Afficher la zone d'arrivée
+      // Display the arrival zone
       Marker arriveeMarker = Marker(
         markerId: MarkerId(arriveeZone.name),
         position: _getPolygonCenter(arriveeZone.coordinates),
@@ -472,7 +464,7 @@ void _afficherPaire(int pairIndex) {
         },
       );
 
-      // Afficher la zone de provenance
+      // Display the provenance zone
       Marker provenanceMarker = Marker(
         markerId: MarkerId(provenanceZone.provenanceNom),
         position: _getPolygonCenter(provenanceZone.provenanceZone),
@@ -490,50 +482,51 @@ void _afficherPaire(int pairIndex) {
         markers.add(provenanceMarker);
         polygons.add(arriveZonePolygon(arriveeZone));
         polygons.add(provenanceZonePolygon(provenanceZone));
-      });   
+      });
     }
-  } 
-
-// Maintenant, déterminez quelle mise à jour des musées doit être effectuée
-      if (selectedReason != "Aucune") {
-        _addMuseumMarkersForSelectedReason(selectedReason);
-      } else if (selectedPopulation != "Aucune") {
-        _addMuseumMarkersForSelectedPopulation(selectedPopulation);
-      }
-}
-
-  Future<void> _updateZonesForSelectedPopulation() async {
-  currentPairIndex = 0;
-
-  // Update arriveeZones
-  List<arriveZone> updatedArriveeZones =
-      await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
-
-  // Update provenanceZones
-  List<ProvenanceZone> updatedProvenanceZones =
-      await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
-
-  // Mettre à jour le nombre total de paires de zones
-  totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
-
-  // Clear existing polygons and markers
-  setState(() {
-    polygons.clear();
-    markers.clear();
-  });
-
-  // Add zones to the lists to show
-  arriveeZonesToShow = updatedArriveeZones;
-  provenanceZonesToShow = updatedProvenanceZones;
-
-  // Si des paires de zones sont disponibles, afficher la première paire
-  if (totalPairs > 0) {
-    _afficherPaire(currentPairIndex);
   }
 
-  // Update museums
-  await _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+  // Now, determine which museum update should be performed
+  if (selectedReason != "Aucune") {
+    _addMuseumMarkersForSelectedReason(selectedReason);
+  } else if (selectedPopulation != "Aucune") {
+    _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+  }
 }
+
+
+    Future<void> _updateZonesForSelectedPopulation() async {
+    currentPairIndex = 0;
+
+    // Update arriveeZones
+    List<arriveZone> updatedArriveeZones =
+        await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
+
+    // Update provenanceZones
+    List<ProvenanceZone> updatedProvenanceZones =
+        await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
+
+    // Mettre à jour le nombre total de paires de zones
+    totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
+
+    // Clear existing polygons and markers
+    setState(() {
+      polygons.clear();
+      markers.clear();
+    });
+
+    // Add zones to the lists to show
+    arriveeZonesToShow = updatedArriveeZones;
+    provenanceZonesToShow = updatedProvenanceZones;
+
+    // Display first zones
+    if (totalPairs > 0) {
+      _displayPair(currentPairIndex);
+    }
+
+    // Update museums
+    await _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -706,62 +699,63 @@ void _afficherPaire(int pairIndex) {
               ),
             ),
              Positioned(
-  bottom: 120, // Ajustez cette valeur pour définir la marge par rapport au bas
-  left: 450,  // Marge gauche de 10 points
-  right: 450,  // Marge droite de 10 points
-  child: Align(
-    alignment: Alignment.bottomCenter,
-    child: Container(
-      decoration: BoxDecoration(
-        color: Colors.orange, // Couleur orange
-        borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.2),
-            blurRadius: 6.0,
-            spreadRadius: 2.0,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () {
-              // Afficher la paire précédente
-              if (currentPairIndex > 0) {
-                currentPairIndex--;
-                _afficherPaire(currentPairIndex);
-              }
-            },
-            icon: Icon(Icons.navigate_before, color: Colors.white), // Icône blanche
-          ),
-          Text(
-            buttonText,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-              color: Colors.white, // Texte en blanc
+              bottom: 120,
+              left: 450,
+              right: 450,
+              child: Visibility(
+                visible: totalPairs > 0,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            
+                            if (currentPairIndex > 0) {
+                              currentPairIndex--;
+                              _displayPair(currentPairIndex);
+                            }
+                          },
+                          icon: Icon(Icons.navigate_before, color: Colors.white),
+                        ),
+                        Text(
+                          "Zone ${currentPairIndex + 1} sur $totalPairs",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            
+                            if (currentPairIndex < totalPairs - 1) {
+                              currentPairIndex++;
+                              _displayPair(currentPairIndex);
+                            }
+                          },
+                          icon: Icon(Icons.navigate_next, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             ),
-          ),
-          IconButton(
-            onPressed: () {
-              // Afficher la paire suivante
-              if (currentPairIndex < totalPairs - 1) {
-                currentPairIndex++;
-                _afficherPaire(currentPairIndex);
-              }
-            },
-            icon: Icon(Icons.navigate_next, color: Colors.white), // Icône blanche
-          ),
-        ],
-      ),
-    ),
-  ),
-),
-
- 
           ],
         ),
       ),
