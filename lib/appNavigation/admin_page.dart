@@ -3,6 +3,7 @@ import '../utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_textfield.dart';
 import '../utils/validators.dart';
+import 'admin_console_page.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -25,9 +26,10 @@ class _AdminPageState extends State<AdminPage> {
   // Function to check if a user is already authenticated
   Future<void> _checkAuthenticationStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
-    setState(() {
-      _user = user;
-    });
+    if (user != null) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => AdminConsolePage()));
+    }
   }
 
   // Function to sign in with email and password
@@ -44,6 +46,11 @@ class _AdminPageState extends State<AdminPage> {
         _user = userCredential.user;
         _signInError = null;
       });
+
+      if (_user != null) {
+        Navigator.pushReplacement(context,
+            MaterialPageRoute(builder: (context) => AdminConsolePage()));
+      }
 
       // Successful sign-in, you can now perform admin actions.
       // Access the signed-in user: userCredential.user
