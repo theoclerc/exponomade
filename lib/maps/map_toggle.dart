@@ -444,11 +444,14 @@ String get buttonText {
   if (totalPairs > 0) {
     _afficherPaire(currentPairIndex);
   }
+
+  // Update museums
+  await _addMuseumMarkersForSelectedReason(selectedReason);
 }
 
 void _afficherPaire(int pairIndex) {
-  markers.clear();
   polygons.clear();
+  markers.clear();
 
   if (arriveeZonesToShow.isNotEmpty && provenanceZonesToShow.isNotEmpty) {
     // Vérifier si l'index de la paire est valide
@@ -487,72 +490,50 @@ void _afficherPaire(int pairIndex) {
         markers.add(provenanceMarker);
         polygons.add(arriveZonePolygon(arriveeZone));
         polygons.add(provenanceZonePolygon(provenanceZone));
-      });
-
-      // Appeler la fonction pour ajouter les marqueurs de musées après avoir mis à jour l'index
-      _addMuseumMarkersForSelectedReason(selectedReason);
+      });   
     }
-  }
+  } 
+
+// Maintenant, déterminez quelle mise à jour des musées doit être effectuée
+      if (selectedReason != "Aucune") {
+        _addMuseumMarkersForSelectedReason(selectedReason);
+      } else if (selectedPopulation != "Aucune") {
+        _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+      }
 }
 
-
-
   Future<void> _updateZonesForSelectedPopulation() async {
-    // Update arriveeZones
-    List<arriveZone> updatedArriveeZones =
-        await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
+  currentPairIndex = 0;
 
-    // Update provenanceZones
-    List<ProvenanceZone> updatedProvenanceZones =
-        await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
+  // Update arriveeZones
+  List<arriveZone> updatedArriveeZones =
+      await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
 
-    // Clear existing polygons and markers
-    setState(() {
-      polygons.clear();
-      markers.clear();
-    });
+  // Update provenanceZones
+  List<ProvenanceZone> updatedProvenanceZones =
+      await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
 
-    await _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+  // Mettre à jour le nombre total de paires de zones
+  totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
 
-    // Add markers and polygons for updated zones
-    for (var arriveeZone in updatedArriveeZones) {
-      Marker marker = Marker(
-        markerId: MarkerId(arriveeZone.name),
-        position: _getPolygonCenter(arriveeZone.coordinates),
-        infoWindow: InfoWindow(title: arriveeZone.name),
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
-          );
-        },
-      );
-      setState(() {
-        markers.add(marker);
-        polygons.add(arriveZonePolygon(
-            arriveeZone)); // Adding the polygon/ Adding the polygon
-      });
+  // Clear existing polygons and markers
+  setState(() {
+    polygons.clear();
+    markers.clear();
+  });
 
-      for (var zone in updatedProvenanceZones) {
-        Marker marker = Marker(
-          markerId: MarkerId(zone.provenanceNom),
-          position: _getPolygonCenter(zone.provenanceZone),
-          infoWindow: InfoWindow(title: zone.provenanceNom),
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => provenanceZoneInfoPopup(zone: zone),
-            );
-          },
-        );
+  // Add zones to the lists to show
+  arriveeZonesToShow = updatedArriveeZones;
+  provenanceZonesToShow = updatedProvenanceZones;
 
-        setState(() {
-          markers.add(marker);
-          polygons.add(provenanceZonePolygon(zone));
-        });
-      }
-    }
+  // Si des paires de zones sont disponibles, afficher la première paire
+  if (totalPairs > 0) {
+    _afficherPaire(currentPairIndex);
   }
+
+  // Update museums
+  await _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -726,8 +707,8 @@ void _afficherPaire(int pairIndex) {
             ),
              Positioned(
   bottom: 120, // Ajustez cette valeur pour définir la marge par rapport au bas
-  left: 440,  // Marge gauche de 10 points
-  right: 440,  // Marge droite de 10 points
+  left: 450,  // Marge gauche de 10 points
+  right: 450,  // Marge droite de 10 points
   child: Align(
     alignment: Alignment.bottomCenter,
     child: Container(
