@@ -28,10 +28,8 @@ class DBconnect {
 
   Future<List<arriveZone>> fetchArriveZones() async {
     try {
-      DocumentSnapshot querySnapshot = await _firestore
-          .collection('zones')
-          .doc()
-          .get();
+      DocumentSnapshot querySnapshot =
+          await _firestore.collection('zones').doc().get();
       Map<String, dynamic> data = querySnapshot.data() as Map<String, dynamic>;
 
       List<dynamic> arriveeZoneData = data['arriveeZone'];
@@ -42,8 +40,6 @@ class DBconnect {
         return LatLng(geoPoint.latitude, geoPoint.longitude);
       }).toList();
 
-      print(
-          "Arrive Zones coordinates: $coordinates"); // Log pour vérifier les coordonnées
       Map<String, dynamic> chronologieZone = data['chronologieZone'];
       int from = chronologieZone['from'];
       int to = chronologieZone['to'];
@@ -57,18 +53,14 @@ class DBconnect {
         ),
       ];
     } catch (e) {
-      print(
-          "Une erreur s'est produite lors de la récupération des données des zones d'arrivée: $e");
       return [];
     }
   }
 
   Future<List<ProvenanceZone>> fetchProvenanceZones() async {
     try {
-      DocumentSnapshot querySnapshot = await _firestore
-          .collection('zones')
-          .doc()
-          .get();
+      DocumentSnapshot querySnapshot =
+          await _firestore.collection('zones').doc().get();
       Map<String, dynamic> data = querySnapshot.data() as Map<String, dynamic>;
 
       List<dynamic> provenanceZoneData = data['provenanceZone'];
@@ -78,9 +70,6 @@ class DBconnect {
         GeoPoint geoPoint = e as GeoPoint;
         return LatLng(geoPoint.latitude, geoPoint.longitude);
       }).toList();
-
-      print(
-          "Provenance Zones coordinates: $coordinates"); // Log pour vérifier les coordonnées
 
       List<String> reasons = List<String>.from(data['raisons']);
 
@@ -93,8 +82,6 @@ class DBconnect {
         ),
       ];
     } catch (e) {
-      print(
-          "Une erreur s'est produite lors de la récupération des données des zones de provenance: $e");
       return [];
     }
   }
@@ -386,48 +373,48 @@ class DBconnect {
   }
 
   Future<List<arriveZone>> updateArriveZonesForSelectedReason(
-    String reason) async {
-  try {
-    QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
+      String reason) async {
+    try {
+      QuerySnapshot querySnapshot = await _firestore.collection('zones').get();
 
-    List<arriveZone> filteredZones = [];
+      List<arriveZone> filteredZones = [];
 
-    for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
-      if (data['raisons'] != null) {
-        // Check if the selected reason is in the list of reasons for this zone
-        List<String> reasons = List<String>.from(data['raisons']);
-        if (reasons.contains(reason)) {
-          int zonePeriodStart = data['chronologieZone']['from'];
-          int zonePeriodEnd = data['chronologieZone']['to'];
+      for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+        if (data['raisons'] != null) {
+          // Check if the selected reason is in the list of reasons for this zone
+          List<String> reasons = List<String>.from(data['raisons']);
+          if (reasons.contains(reason)) {
+            int zonePeriodStart = data['chronologieZone']['from'];
+            int zonePeriodEnd = data['chronologieZone']['to'];
 
-          List<dynamic> arriveeZoneData = data['arriveeZone'];
+            List<dynamic> arriveeZoneData = data['arriveeZone'];
 
-          // Assure that each element is a GeoPoint, then transform it into LatLng
-          List<LatLng> coordinates = arriveeZoneData.map((e) {
-            GeoPoint geoPoint = e as GeoPoint;
-            return LatLng(geoPoint.latitude, geoPoint.longitude);
-          }).toList();
+            // Assure that each element is a GeoPoint, then transform it into LatLng
+            List<LatLng> coordinates = arriveeZoneData.map((e) {
+              GeoPoint geoPoint = e as GeoPoint;
+              return LatLng(geoPoint.latitude, geoPoint.longitude);
+            }).toList();
 
-          arriveZone zone = arriveZone(
-            name: data['nomZone'],
-            coordinates: coordinates,
-            from: zonePeriodStart,
-            to: zonePeriodEnd,
-          );
+            arriveZone zone = arriveZone(
+              name: data['nomZone'],
+              coordinates: coordinates,
+              from: zonePeriodStart,
+              to: zonePeriodEnd,
+            );
 
-          filteredZones.add(zone);
+            filteredZones.add(zone);
+          }
         }
       }
-    }
 
-    return filteredZones;
-  } catch (e) {
-    print(
-        "An error occurred while updating arrivee zones for selected reason: $e");
-    return [];
+      return filteredZones;
+    } catch (e) {
+      print(
+          "An error occurred while updating arrivee zones for selected reason: $e");
+      return [];
+    }
   }
-}
 
   Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedReason(
       String reason) async {
@@ -559,7 +546,6 @@ class DBconnect {
 
         // Check if the zone's population matches the selected population
         if (data['population'] == population) {
-
           int zonePeriodStart = data['chronologieZone']['from'];
           int zonePeriodEnd = data['chronologieZone']['to'];
 
@@ -570,7 +556,6 @@ class DBconnect {
             GeoPoint geoPoint = e as GeoPoint;
             return LatLng(geoPoint.latitude, geoPoint.longitude);
           }).toList();
-
 
           arriveZone zone = arriveZone(
             name: data['nomZone'],
@@ -585,7 +570,8 @@ class DBconnect {
 
       return zones;
     } catch (e) {
-      print("An error occurred while fetching provenance zone data for selected population: $e");
+      print(
+          "An error occurred while fetching provenance zone data for selected population: $e");
       return [];
     }
   }
@@ -602,7 +588,6 @@ class DBconnect {
 
         // Check if the zone's population matches the selected population
         if (data['population'] == population) {
-
           List<dynamic> provenanceZoneData = data['provenanceZone'];
 
           // Assure that each element is a GeoPoint, then transform it into LatLng
@@ -626,7 +611,8 @@ class DBconnect {
 
       return zones;
     } catch (e) {
-      print("An error occurred while fetching provenance zone data for selected population: $e");
+      print(
+          "An error occurred while fetching provenance zone data for selected population: $e");
       return [];
     }
   }
@@ -708,6 +694,4 @@ class DBconnect {
     }
     return updatedMuseums;
   }
-
-  
 }

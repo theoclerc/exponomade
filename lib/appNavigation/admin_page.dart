@@ -52,6 +52,9 @@ class _AdminPageState extends State<AdminPage> {
         if (e.toString().contains('user-not-found') ||
             e.toString().contains('wrong-password')) {
           _signInError = 'L\u0027utilisateur ou le mot de passe est incorrect.';
+        } else if (_emailController.text.isEmpty ||
+            e.toString().contains('invalid-email')) {
+          _signInError = 'Veuillez rentrer une adresse email valide.';
         } else {
           _signInError = 'Une erreur est survenue. Veuillez réessayer.';
         }
@@ -70,7 +73,6 @@ class _AdminPageState extends State<AdminPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Build the admin UI here
     return Scaffold(
       backgroundColor: background,
       appBar: AppBar(
@@ -95,6 +97,14 @@ class _AdminPageState extends State<AdminPage> {
           child: Form(
             child: Column(
               children: [
+                const Text(
+                  "Veuillez vous connecter",
+                  style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(height: 25),
                 CustomTextField(
                   controller: _emailController,
                   icon: Icons.email,
@@ -137,7 +147,8 @@ class _AdminPageState extends State<AdminPage> {
                   Text(
                     _signInError!,
                     style: TextStyle(
-                      color: Colors.red, // Error text color
+                      fontSize: 20,
+                      color: Colors.red,
                     ),
                   ),
               ],
@@ -155,9 +166,16 @@ class _AdminPageState extends State<AdminPage> {
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 600),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Bienvenue ${_user!.email} !'),
+              Text(
+                "Bienvenue ${_user!.email} !",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 25),
+              // Insérer un bouton ou le formulaire de création de zones ici
               SizedBox(height: 25),
               ElevatedButton(
                 onPressed: _signOut,
@@ -178,7 +196,6 @@ class _AdminPageState extends State<AdminPage> {
                   ),
                 ),
               ),
-              // Add admin-specific functionality and UI here
             ],
           ),
         ),
