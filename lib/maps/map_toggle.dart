@@ -27,6 +27,11 @@ class _MapToggleState extends State<MapToggle> {
   var db = DBconnect();
   bool isDialogOpen = false;
 
+  List<arriveZone> updatedArriveeZones = [];
+  List<ProvenanceZone> updatedProvenanceZones = [];
+  int selectedZoneIndex = 0;
+  bool showZones = false;
+
   // Period options
   List<String> periodOptions = [];
   String selectedPeriod = '';
@@ -404,59 +409,72 @@ class _MapToggleState extends State<MapToggle> {
 
   Future<void> _updateZonesForSelectedReason() async {
     // Update arriveeZones
-    List<arriveZone> updatedArriveeZones =
-        await db.updateArriveZonesForSelectedReason(selectedReason);
+    updatedArriveeZones = await db.updateArriveZonesForSelectedReason(selectedReason);
 
     // Update provenanceZones
-    List<ProvenanceZone> updatedProvenanceZones =
-        await db.updateProvenanceZonesForSelectedReason(selectedReason);
+    updatedProvenanceZones = await db.updateProvenanceZonesForSelectedReason(selectedReason);
 
     // Clear existing polygons and markers
     setState(() {
       polygons.clear();
       markers.clear();
+
+      // Réinitialiser l'indice de la zone actuellement affichée
+    selectedZoneIndex = 0;
+
+    // Afficher automatiquement la première zone
+    _showNextZone();
     });
 
-    // Add markers and polygons for updated zones
-    for (var arriveeZone in updatedArriveeZones) {
-      Marker marker = Marker(
-        markerId: MarkerId(arriveeZone.name),
-        position: _getPolygonCenter(arriveeZone.coordinates),
-        infoWindow: InfoWindow(title: arriveeZone.name),
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
-          );
-        },
-      );
-      setState(() {
-        markers.add(marker);
-        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
-      });
-
-      for (var zone in updatedProvenanceZones) {
-        Marker marker = Marker(
-          markerId: MarkerId(zone.provenanceNom),
-          position: _getPolygonCenter(zone.provenanceZone),
-          infoWindow: InfoWindow(title: zone.provenanceNom),
-          onTap: () {
-            showDialog(
-              context: context,
-              builder: (context) => provenanceZoneInfoPopup(zone: zone),
-            );
-          },
-        );
-
-        setState(() {
-          markers.add(marker);
-          polygons.add(provenanceZonePolygon(zone));
-        });
-      }
-    }
     // Update museums
     await _addMuseumMarkersForSelectedReason(selectedReason);
   }
+
+  void _showNextZone() {
+    if (selectedZoneIndex < updatedArriveeZones.length) {
+      // Ajouter les marqueurs et les polygones pour la zone d'arrivée actuellement sélectionnée
+      Marker marker = Marker(
+        markerId: MarkerId(updatedArriveeZones[selectedZoneIndex].name),
+        position: _getPolygonCenter(updatedArriveeZones[selectedZoneIndex].coordinates),
+        infoWindow: InfoWindow(title: updatedArriveeZones[selectedZoneIndex].name),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => arriveZoneInfoPopup(zone: updatedArriveeZones[selectedZoneIndex]),
+          );
+        },
+      );
+      markers.add(marker);
+      polygons.add(arriveZonePolygon(updatedArriveeZones[selectedZoneIndex]));
+
+      // Ajouter les marqueurs et les polygones pour la zone de provenance correspondante
+      Marker provMarker = Marker(
+        markerId: MarkerId(updatedProvenanceZones[selectedZoneIndex].provenanceNom),
+        position: _getPolygonCenter(updatedProvenanceZones[selectedZoneIndex].provenanceZone),
+        infoWindow: InfoWindow(title: updatedProvenanceZones[selectedZoneIndex].provenanceNom),
+        onTap: () {
+          showDialog(
+            context: context,
+            builder: (context) => provenanceZoneInfoPopup(zone: updatedProvenanceZones[selectedZoneIndex]),
+          );
+        },
+      );
+      markers.add(provMarker);
+      polygons.add(provenanceZonePolygon(updatedProvenanceZones[selectedZoneIndex]));
+
+      // Rafraîchir l'interface utilisateur pour afficher la nouvelle zone
+      setState(() {});
+
+      // Passer à la zone suivante
+      selectedZoneIndex++;
+    } else {
+      // Si toutes les zones d'arrivée ont été affichées, masquer le bouton "Zone suivante"
+      setState(() {
+        showZones = false;
+      });
+    }
+  }
+
 
   Future<void> _updateZonesForSelectedPopulation() async {
     // Update arriveeZones
@@ -682,6 +700,42 @@ class _MapToggleState extends State<MapToggle> {
                       ),
                     ),
                   ),
+                  
+                  // Bouton pour afficher la zone suivante
+                  if (showZones)
+                    Container(
+                      width: 180,
+                      height: 80,
+                      margin: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.2),
+                            blurRadius: 6.0,
+                            spreadRadius: 2.0,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: GestureDetector(
+                        onTap: _showNextZone,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.arrow_forward),
+                            const SizedBox(width: 8),
+                            Text(
+                              "Zone suivante",
+                              style: const TextStyle(
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
