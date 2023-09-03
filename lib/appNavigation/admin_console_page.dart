@@ -4,7 +4,6 @@ import '../museum/museum_admin_page.dart';
 import '../quiz/quiz_admin_page.dart';
 import '../zones/zoneAdminPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'admin_page.dart';
 import 'home_page.dart';
 
 class AdminConsolePage extends StatefulWidget {

@@ -35,66 +35,72 @@ class _QuizAdminPageState extends State<QuizAdminPage> {
           }
 
           return ListView.builder(
-            itemCount: snapshot.data!.length,
+            itemCount: snapshot.data!.length * 2 - 1, // Account for Dividers
             itemBuilder: (context, index) {
-              Question question = snapshot.data![index];
-              return ListTile(
-                title: Text(question.title),
-                subtitle: Text(question.options.keys.join(', ')),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.edit),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => EditQuizPage(question: question),
-                          ),
-                        ).then((_) {
-                          setState(() {
-                            questions = db.fetchQuestions();
+              if (index.isEven) {
+                // This is a ListTile
+                Question question = snapshot.data![index ~/ 2];
+                return ListTile(
+                  title: Text(question.title),
+                  subtitle: Text(question.options.keys.join(', ')),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.edit),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => EditQuizPage(question: question),
+                            ),
+                          ).then((_) {
+                            setState(() {
+                              questions = db.fetchQuestions();
+                            });
                           });
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.delete),
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              title: Text('Confirmer la suppression'),
-                              content: Text('Etes-vous sûr de vouloir supprimer cette question ?'),
-                              actions: [
-                                TextButton(
-                                  child: Text('Annuler'),
-                                  onPressed: () {
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                                TextButton(
-                                  child: Text('Effacer'),
-                                  onPressed: () {
-                                    db.deleteQuestion(question.id).then((_) {
-                                      setState(() {
-                                        questions = db.fetchQuestions();
+                        },
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete),
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return AlertDialog(
+                                title: Text('Confirmer la suppression'),
+                                content: Text('Etes-vous sûr de vouloir supprimer cette question ?'),
+                                actions: [
+                                  TextButton(
+                                    child: Text('Annuler'),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                  TextButton(
+                                    child: Text('Effacer'),
+                                    onPressed: () {
+                                      db.deleteQuestion(question.id).then((_) {
+                                        setState(() {
+                                          questions = db.fetchQuestions();
+                                        });
                                       });
-                                    });
-                                    Navigator.of(context).pop();
-                                  },
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
-              );
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ],
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              } else {
+                // This is a Divider
+                return Divider();
+              }
             },
             padding: EdgeInsets.only(bottom: 80.0), // Extra padding at the bottom
           );
@@ -117,4 +123,5 @@ class _QuizAdminPageState extends State<QuizAdminPage> {
       ),
     );
   }
+
 }
