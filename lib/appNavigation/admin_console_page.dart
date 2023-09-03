@@ -1,8 +1,11 @@
+
 import 'package:flutter/material.dart';
 import '../museum/museum_admin_page.dart';
+import '../quiz/quiz_admin_page.dart';
 import '../zones/zoneAdminPage.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'admin_page.dart';
+import 'home_page.dart';
 
 class AdminConsolePage extends StatefulWidget {
   const AdminConsolePage({Key? key}) : super(key: key);
@@ -19,13 +22,14 @@ class _AdminConsolePageState extends State<AdminConsolePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Console administrateur'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
               icon: Icon(Icons.logout),
               onPressed: () async {
                 await FirebaseAuth.instance.signOut();
                 Navigator.pushReplacement(context,
-                    MaterialPageRoute(builder: (context) => AdminPage()));
+                    MaterialPageRoute(builder: (context) => const HomePage(initialPage: 0),));
               }),
         ],
       ),
@@ -39,6 +43,12 @@ class _AdminConsolePageState extends State<AdminConsolePage> {
                 // index for museum
                 Navigator.push(context,
                     MaterialPageRoute(builder: (context) => MuseumAdminPage()));
+                    
+              } else if (index == 1) {
+                // index for quiz
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => QuizAdminPage()));
+                                       
               } else if (index == 2) {
                 // index for zones
                 Navigator.push(context,

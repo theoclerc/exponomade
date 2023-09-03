@@ -35,7 +35,7 @@ class _ContactPageState extends State<ContactPage> {
       backgroundColor: background,
       appBar: AppBar(
         automaticallyImplyLeading: false,
-        title: Text('Formulaire de contact - Score de ${widget.score ?? "0"}'),
+        title: Text('Formulaire de contact'),
         backgroundColor: background,
       ),
       body: Padding(
@@ -116,7 +116,7 @@ class _ContactPageState extends State<ContactPage> {
                   ),
                   _sizedBox(),
                   Text(
-                    "Note: Votre score de ${widget.score ?? '0'} sera inclus dans le courriel.",
+                    "Note: votre score de ${widget.score ?? '0'} sera inclus dans le courriel.",
                     style: const TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.italic,

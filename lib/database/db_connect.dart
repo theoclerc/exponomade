@@ -26,6 +26,17 @@ class DBconnect {
     return newQuestions;
   }
 
+  Future<void> addQuestion(Question question) async {
+    await _firestore.collection('quiz').add({
+      'title': question.title,
+      'options': question.options,
+    });
+  }
+
+  Future<void> deleteQuestion(String id) async {
+    await _firestore.collection('quiz').doc(id).delete();
+  }
+
   Future<List<arriveZone>> fetchArriveZones() async {
     try {
       DocumentSnapshot querySnapshot =
