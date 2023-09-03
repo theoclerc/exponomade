@@ -26,6 +26,63 @@ class DBconnect {
     return newQuestions;
   }
 
+  Future<List<Musee>> fetchMusees() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('musees').get();
+    List<Musee> museums = [];
+
+    for (var doc in querySnapshot.docs) {
+      Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      try {
+        GeoPoint coord = data['coordonneesMusee'];
+        var coordLatLng = LatLng(coord.latitude, coord.longitude);
+
+        List<Map<String, dynamic>> objetsData =
+            List<Map<String, dynamic>>.from(data['objets'] as List);
+        List<Objet> objets = objetsData.map((objetData) {
+          Map<String, String> chronologie = {
+            'from': objetData['chronologie']['from'] as String,
+            'to': objetData['chronologie']['to'] as String,
+          };
+          return Objet(
+            chronologie: chronologie,
+            descriptionObjet: objetData['descriptionObjet'] as String,
+            image: objetData['image'] as String,
+            nomObjet: objetData['nomObjet'] as String,
+            population: objetData['population'] as String,
+            raisons: List<String>.from(objetData['raisons'] as List),
+          );
+        }).toList();
+
+        var musee = Musee(
+          id: doc.id,
+          nomMusee: data['nomMusee'] as String,
+          coord: coordLatLng,
+          objets: objets,
+        );
+
+        museums.add(musee);
+      } catch (e) {
+        print("An error occurred while processing document with ID: ${doc.id}");
+        print("Error details: $e");
+      }
+    }
+
+    return museums;
+  }
+
+  Future<List<DocumentSnapshot>> fetchZones() async {
+    try {
+      QuerySnapshot zonesSnapshot = await _firestore
+          .collection('zones')
+          .orderBy('chronologieZone.from')
+          .get();
+      return zonesSnapshot.docs;
+    } catch (e) {
+      print("Error fetching zones: $e");
+      return [];
+    }
+  }
+
   Future<void> addQuestion(Question question) async {
     await _firestore.collection('quiz').add({
       'title': question.title,
@@ -33,12 +90,13 @@ class DBconnect {
     });
   }
 
-  Future<void> updateQuestion(String id, String title, Map<String, bool> options) async {
+  Future<void> updateQuestion(
+      String id, String title, Map<String, bool> options) async {
     await _firestore.collection('quiz').doc(id).update({
       'title': title,
       'options': options,
     });
-  }  
+  }
 
   Future<void> deleteQuestion(String id) async {
     await _firestore.collection('quiz').doc(id).delete();

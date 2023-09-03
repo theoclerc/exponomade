@@ -1,9 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import '../models/musee_model.dart';
 import '../utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_textfield.dart';
 import '../utils/validators.dart';
-import '../zones/zoneAdminPage.dart';
+import '../zones/editZonePage.dart';
+import '../models/question_model.dart';
+import '../database/db_connect.dart';
+import '../quiz/quiz_add_page.dart';
+import '../quiz/quiz_edit_page.dart';
 
 class AdminPage extends StatefulWidget {
   @override
@@ -13,23 +19,22 @@ class AdminPage extends StatefulWidget {
 class _AdminPageState extends State<AdminPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  List<String> collections = ['Musées', 'Zones'];
+  List<String> collections = ['Musées', 'Quiz', 'Zones'];
   bool showMuseumAdminPage = false;
   bool showZoneAdminPage = false;
+  bool showQuizAdminPage = false;
   User? _user; // To store the authenticated user
   String? _signInError;
-
-// For the sake of demonstration, I'll use a static list, but you can fetch it from Firestore.
-  List<String> museums = [
-    'Musée de Bagnes',
-    'Another Museum',
-    'And another one'
-  ];
+  late Future<List<Question>> questions;
+  late Future<List<Musee>> musees;
+  final DBconnect db = DBconnect();
 
   @override
   void initState() {
     super.initState();
     _checkAuthenticationStatus();
+    questions = db.fetchQuestions();
+    musees = db.fetchMusees();
   }
 
   // Function to check if a user is already authenticated
@@ -184,60 +189,56 @@ class _AdminPageState extends State<AdminPage> {
       padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
       child: showMuseumAdminPage
           ? _buildMuseumAdminPage()
-          : Column(
-              children: [
-                Text(
-                  "Bienvenue ${_user!.email} !",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 25),
-                Text(
-                  "Modifier la base de données :",
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: collections.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          collections[index],
+          : showQuizAdminPage
+              ? _buildQuizAdminPage()
+              : showZoneAdminPage
+                  ? _buildZoneAdminPage()
+                  : Column(
+                      children: [
+                        Text(
+                          "Bienvenue ${_user!.email} !",
                           style: TextStyle(
+                            fontSize: 20,
                             color: Colors.white,
                           ),
                         ),
-                        onTap: () {
-                          if (index == 0) {
-                            setState(() {
-                              showMuseumAdminPage =
-                                  true; // Show MuseumAdminPage
-                            });
-                          } else if (index == 1) {
-                            // index for zones
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ZoneAdminPage(),
-                              ),
-                            );
-                          }
-                        },
-                        trailing: Icon(
-                          Icons.arrow_forward_ios,
-                          color: Colors.white,
+                        SizedBox(height: 25),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: collections.length,
+                            itemBuilder: (context, index) {
+                              return ListTile(
+                                title: Text(
+                                  collections[index],
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                onTap: () {
+                                  if (index == 0) {
+                                    setState(() {
+                                      showMuseumAdminPage = true;
+                                    });
+                                  } else if (index == 1) {
+                                    setState(() {
+                                      showQuizAdminPage = true;
+                                    });
+                                  } else if (index == 2) {
+                                    setState(() {
+                                      showZoneAdminPage = true;
+                                    });
+                                  }
+                                },
+                                trailing: Icon(
+                                  Icons.arrow_forward_ios,
+                                  color: Colors.white,
+                                ),
+                              );
+                            },
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                ),
-              ],
-            ),
+                      ],
+                    ),
     );
   }
 
@@ -264,25 +265,112 @@ class _AdminPageState extends State<AdminPage> {
                   fontWeight: FontWeight.bold,
                 )),
           ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: museums.length,
-              itemBuilder: (context, index) {
-                return ListTile(
-                  title: Text(museums[index],
-                      style: TextStyle(
-                        color: Colors.white,
-                      )),
-                  trailing: Icon(
-                    Icons.edit,
-                    color: Colors.white,
-                  ),
-                  onTap: () {
-                    // Handle tap to edit museum details or other admin actions.
+          FutureBuilder<List<Musee>>(
+            future: musees,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text('Aucun muséee trouvé'));
+              }
+
+              return Expanded(
+                child: ListView.builder(
+                  itemCount:
+                      snapshot.data!.length * 2 - 1, // Account for Dividers
+                  itemBuilder: (context, index) {
+                    if (index.isEven) {
+                      // This is a ListTile
+                      Musee musee = snapshot.data![index ~/ 2];
+                      return ListTile(
+                        title: Text(
+                          musee.nomMusee,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        subtitle: Text(
+                          musee.coord.toString(),
+                          style: TextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                /*Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditMuseumPage(musee: musee),
+                                  ),
+                                ).then((_) {
+                                  setState(() {
+                                    musees = db.fetchMusees();
+                                  });
+                                });*/
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirmer la suppression'),
+                                      content: Text(
+                                          'Etes-vous sûr de vouloir supprimer ce musée ?'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Annuler'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Effacer'),
+                                          onPressed: () {
+                                            /*db
+                                                .deleteQuestion(question.id)
+                                                .then((_) {
+                                              setState(() {
+                                                questions = db.fetchQuestions();
+                                              });
+                                            });
+                                            Navigator.of(context).pop();*/
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // This is a Divider
+                      return Divider();
+                    }
                   },
-                );
-              },
-            ),
+                  padding: EdgeInsets.only(
+                      bottom: 80.0), // Extra padding at the bottom
+                ),
+              );
+            },
           ),
         ],
       ),
@@ -294,6 +382,298 @@ class _AdminPageState extends State<AdminPage> {
         ),
         onPressed: () {
           // Add a new museum.
+        },
+      ),
+    );
+  }
+
+  Widget _buildQuizAdminPage() {
+    return Scaffold(
+      backgroundColor: background,
+      body: Column(
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: neutral,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+            ),
+            onPressed: () {
+              setState(() {
+                showQuizAdminPage = false; // Hide the QuizAdminPage
+              });
+            },
+            child: Text("Retour",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
+          FutureBuilder<List<Question>>(
+            future: questions,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text('Aucune question trouvée'));
+              }
+
+              return Expanded(
+                child: ListView.builder(
+                  itemCount:
+                      snapshot.data!.length * 2 - 1, // Account for Dividers
+                  itemBuilder: (context, index) {
+                    if (index.isEven) {
+                      // This is a ListTile
+                      Question question = snapshot.data![index ~/ 2];
+                      return ListTile(
+                        title: Text(
+                          question.title,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        subtitle: Text(
+                          question.options.keys.join(', '),
+                          style: TextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditQuizPage(question: question),
+                                  ),
+                                ).then((_) {
+                                  setState(() {
+                                    questions = db.fetchQuestions();
+                                  });
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirmer la suppression'),
+                                      content: Text(
+                                          'Etes-vous sûr de vouloir supprimer cette question ?'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Annuler'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Effacer'),
+                                          onPressed: () {
+                                            db
+                                                .deleteQuestion(question.id)
+                                                .then((_) {
+                                              setState(() {
+                                                questions = db.fetchQuestions();
+                                              });
+                                            });
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      // This is a Divider
+                      return Divider();
+                    }
+                  },
+                  padding: EdgeInsets.only(
+                      bottom: 80.0), // Extra padding at the bottom
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: neutral,
+        child: Icon(
+          Icons.add,
+          color: Colors.black,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => QuizAddPage(),
+            ),
+          ).then((_) {
+            setState(() {
+              questions = db.fetchQuestions();
+            });
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildZoneAdminPage() {
+    return Scaffold(
+      backgroundColor: background,
+      body: Column(
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: neutral,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
+              ),
+            ),
+            onPressed: () {
+              setState(() {
+                showZoneAdminPage = false; // Hide the QuizAdminPage
+              });
+            },
+            child: Text("Retour",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                )),
+          ),
+          FutureBuilder<List<DocumentSnapshot>>(
+            future: db.fetchZones(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              } else if (snapshot.hasError) {
+                return Center(child: Text('Error fetching data'));
+              } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+                return Center(child: Text('No zones found'));
+              } else {
+                return Expanded(
+                  child: ListView.builder(
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return ListTile(
+                        title: Text(
+                          snapshot.data![index]['nomZone'],
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        subtitle: Text(
+                          "De ${snapshot.data![index]['chronologieZone']['from']} à ${snapshot.data![index]['chronologieZone']['to']}",
+                          style: TextStyle(
+                            color: Colors.white70,
+                          ),
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditZonePage(
+                                      initialData: snapshot.data![index].data()
+                                          as Map<String, dynamic>,
+                                      docId: snapshot.data![index].id,
+                                      onSave: () {
+                                        setState(
+                                            () {}); // This will refresh your widget
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirmer la suppression'),
+                                      content: Text(
+                                          'Etes-vous sûr de vouloir supprimer ce musée ?'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Annuler'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Effacer'),
+                                          onPressed: () {
+                                            /*db
+                                                .deleteQuestion(question.id)
+                                                .then((_) {
+                                              setState(() {
+                                                questions = db.fetchQuestions();
+                                              });
+                                            });
+                                            Navigator.of(context).pop();*/
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: neutral,
+        child: Icon(
+          Icons.add,
+          color: Colors.black,
+        ),
+        onPressed: () {
+          // todo ajouter le code pour créer une nouvelle zone.
         },
       ),
     );
