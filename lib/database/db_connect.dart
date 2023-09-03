@@ -652,6 +652,49 @@ class DBconnect {
     }
   }
 
+  Future<void> addMusee(Musee musee) async {
+  await _firestore.collection('musees').add({
+    'nomMusee': musee.nomMusee,
+    'coordonneesMusee': GeoPoint(musee.coord.latitude, musee.coord.longitude),
+    'objets': musee.objets.map((objet) {
+      return {
+        'chronologie': objet.chronologie,
+        'descriptionObjet': objet.descriptionObjet,
+        'image': objet.image,
+        'nomObjet': objet.nomObjet,
+        'population': objet.population,
+        'raisons': objet.raisons,
+      };
+    }).toList(),
+  });
+}
+
+Future<void> updateMusee(Musee musee) async {
+  await _firestore.collection('musees').doc(musee.id).update({
+    'nomMusee': musee.nomMusee,
+    'coordonneesMusee': GeoPoint(musee.coord.latitude, musee.coord.longitude),
+    'objets': musee.objets.map((objet) {
+      return {
+        'chronologie': objet.chronologie,
+        'descriptionObjet': objet.descriptionObjet,
+        'image': objet.image,
+        'nomObjet': objet.nomObjet,
+        'population': objet.population,
+        'raisons': objet.raisons,
+      };
+    }).toList(),
+  });
+}
+
+  Future<void> deleteMusee(String museumId) async {
+  try {
+    await _firestore.collection('musees').doc(museumId).delete();
+    print("Museum with ID: $museumId successfully deleted.");
+  } catch (e) {
+    print("An error occurred while deleting museum with ID: $museumId. Error: $e");
+  }
+}
+
   Future<List<ProvenanceZone>> updateProvenanceZonesForSelectedPopulation(
       String population) async {
     try {
