@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import '../database/db_connect.dart';
 import 'package:flutter/material.dart';
 import '../models/question_model.dart';
 
@@ -16,6 +16,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
   TextEditingController titleController = TextEditingController();
   Map<String, TextEditingController> optionsControllers = {};
   Map<String, bool> optionsTruthValues = {};  // To keep track of the truth values
+  final DBconnect dbConnect = DBconnect();
 
   @override
   void initState() {
@@ -63,13 +64,12 @@ class _EditQuizPageState extends State<EditQuizPage> {
       return;
     }
 
-    // Logic to update Firestore
-    final _firestore = FirebaseFirestore.instance;
-    await _firestore.collection('quiz').doc(widget.question.id).update({
-      'title': questionTitle,
-      'options': optionsControllers.map((key, controller) =>
-          MapEntry(controller.text.trim(), optionsTruthValues[key] ?? false)) // Use the updated truth values
-    });
+  // Update Firestore
+  await dbConnect.updateQuestion(
+    widget.question.id,
+    questionTitle,
+    optionsControllers.map((key, controller) => MapEntry(controller.text.trim(), optionsTruthValues[key] ?? false))
+  );
     
     Navigator.pop(context); // Close the edit page and go back
   }

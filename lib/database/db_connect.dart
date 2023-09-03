@@ -33,6 +33,13 @@ class DBconnect {
     });
   }
 
+  Future<void> updateQuestion(String id, String title, Map<String, bool> options) async {
+    await _firestore.collection('quiz').doc(id).update({
+      'title': title,
+      'options': options,
+    });
+  }  
+
   Future<void> deleteQuestion(String id) async {
     await _firestore.collection('quiz').doc(id).delete();
   }
