@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../utils/constants.dart';
+
 class EditZonePage extends StatefulWidget {
   final Map<String, dynamic>? initialData; // null for new entries
   final String? docId;
@@ -97,7 +99,8 @@ class _EditZonePageState extends State<EditZonePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Zone'),
+        title: Text('Modifier une zone'),
+        backgroundColor: background,
         actions: [
           IconButton(
             icon: Icon(Icons.save),

@@ -1,7 +1,7 @@
 import '../database/db_connect.dart';
 import 'package:flutter/material.dart';
 import '../models/question_model.dart';
-
+import '../utils/constants.dart';
 
 class EditQuizPage extends StatefulWidget {
   final Question question;
@@ -15,7 +15,8 @@ class EditQuizPage extends StatefulWidget {
 class _EditQuizPageState extends State<EditQuizPage> {
   TextEditingController titleController = TextEditingController();
   Map<String, TextEditingController> optionsControllers = {};
-  Map<String, bool> optionsTruthValues = {};  // To keep track of the truth values
+  Map<String, bool> optionsTruthValues =
+      {}; // To keep track of the truth values
   final DBconnect dbConnect = DBconnect();
 
   @override
@@ -24,7 +25,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
     titleController.text = widget.question.title;
     widget.question.options.forEach((key, value) {
       optionsControllers[key] = TextEditingController(text: key);
-      optionsTruthValues[key] = value;  // Initialize the truth values
+      optionsTruthValues[key] = value; // Initialize the truth values
     });
   }
 
@@ -54,7 +55,9 @@ class _EditQuizPageState extends State<EditQuizPage> {
     }
 
     // Check for duplicate options
-    List<String> optionTexts = optionsControllers.values.map((controller) => controller.text.trim()).toList();
+    List<String> optionTexts = optionsControllers.values
+        .map((controller) => controller.text.trim())
+        .toList();
     if (optionTexts.toSet().length != optionTexts.length) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -64,13 +67,13 @@ class _EditQuizPageState extends State<EditQuizPage> {
       return;
     }
 
-  // Update Firestore
-  await dbConnect.updateQuestion(
-    widget.question.id,
-    questionTitle,
-    optionsControllers.map((key, controller) => MapEntry(controller.text.trim(), optionsTruthValues[key] ?? false))
-  );
-    
+    // Update Firestore
+    await dbConnect.updateQuestion(
+        widget.question.id,
+        questionTitle,
+        optionsControllers.map((key, controller) => MapEntry(
+            controller.text.trim(), optionsTruthValues[key] ?? false)));
+
     Navigator.pop(context); // Close the edit page and go back
   }
 
@@ -113,14 +116,15 @@ class _EditQuizPageState extends State<EditQuizPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Edit Quiz'),
+        title: Text('Modifier une question'),
+        backgroundColor: background,
       ),
       body: Column(
         children: [
           ListTile(
             title: TextField(
               controller: titleController,
-              decoration: InputDecoration(labelText: 'Question Title'),
+              decoration: InputDecoration(labelText: 'Titre de la question'),
             ),
           ),
           ...optionsControllers.keys.map(
@@ -136,7 +140,8 @@ class _EditQuizPageState extends State<EditQuizPage> {
                     setOnlyOneTrue(option, value);
                   } else {
                     // Ensure that at least one option is true before allowing de-selection
-                    int trueCount = optionsTruthValues.values.where((e) => e).length;
+                    int trueCount =
+                        optionsTruthValues.values.where((e) => e).length;
                     if (trueCount > 1) {
                       setState(() {
                         optionsTruthValues[option] = false;
@@ -147,7 +152,8 @@ class _EditQuizPageState extends State<EditQuizPage> {
                           context: context,
                           builder: (context) => AlertDialog(
                                 title: Text("Erreur"),
-                                content: Text("Au moins une option doit être correcte."),
+                                content: Text(
+                                    "Au moins une option doit être correcte."),
                                 actions: [
                                   TextButton(
                                       onPressed: () {
@@ -168,4 +174,3 @@ class _EditQuizPageState extends State<EditQuizPage> {
     );
   }
 }
-

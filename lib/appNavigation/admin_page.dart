@@ -582,73 +582,70 @@ class _AdminPageState extends State<AdminPage> {
               } else {
                 return Expanded(
                   child: ListView.builder(
-                    itemCount:
-                        snapshot.data!.length * 2 - 1, // Account for Dividers
+                    itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      if (index.isEven) {
-                        final dataIndex = snapshot.data![index ~/ 2];
-                        return ListTile(
-                          title: Text(
-                            dataIndex['nomZone'],
-                            style: TextStyle(
-                              color: Colors.white,
-                            ),
+                      return ListTile(
+                        title: Text(
+                          snapshot.data![index]['nomZone'],
+                          style: TextStyle(
+                            color: Colors.white,
                           ),
-                          subtitle: Text(
-                            "De ${dataIndex['chronologieZone']['from']} à ${dataIndex['chronologieZone']['to']}",
-                            style: TextStyle(
-                              color: Colors.white70,
-                            ),
+                        ),
+                        subtitle: Text(
+                          "De ${snapshot.data![index]['chronologieZone']['from']} à ${snapshot.data![index]['chronologieZone']['to']}",
+                          style: TextStyle(
+                            color: Colors.white70,
                           ),
-                          trailing: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              IconButton(
-                                icon: Icon(
-                                  Icons.edit,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () async {
-                                  await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => EditZonePage(
-                                        initialData: snapshot.data![index]
-                                            .data() as Map<String, dynamic>,
-                                        docId: snapshot.data![index].id,
-                                        onSave: () {
-                                          setState(
-                                              () {}); // This will refresh your widget
-                                        },
-                                      ),
-                                    ),
-                                  );
-                                },
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
                               ),
-                              IconButton(
-                                icon: Icon(
-                                  Icons.delete,
-                                  color: Colors.white,
-                                ),
-                                onPressed: () {
-                                  showDialog(
-                                    context: context,
-                                    builder: (BuildContext context) {
-                                      return AlertDialog(
-                                        title: Text('Confirmer la suppression'),
-                                        content: Text(
-                                            'Etes-vous sûr de vouloir supprimer ce musée ?'),
-                                        actions: [
-                                          TextButton(
-                                            child: Text('Annuler'),
-                                            onPressed: () {
-                                              Navigator.of(context).pop();
-                                            },
-                                          ),
-                                          TextButton(
-                                            child: Text('Effacer'),
-                                            onPressed: () {
-                                              /*db
+                              onPressed: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => EditZonePage(
+                                      initialData: snapshot.data![index].data()
+                                          as Map<String, dynamic>,
+                                      docId: snapshot.data![index].id,
+                                      onSave: () {
+                                        setState(
+                                            () {}); // This will refresh your widget
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirmer la suppression'),
+                                      content: Text(
+                                          'Etes-vous sûr de vouloir supprimer ce musée ?'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Annuler'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Effacer'),
+                                          onPressed: () {
+                                            /*db
                                                 .deleteQuestion(question.id)
                                                 .then((_) {
                                               setState(() {
@@ -656,21 +653,17 @@ class _AdminPageState extends State<AdminPage> {
                                               });
                                             });
                                             Navigator.of(context).pop();*/
-                                            },
-                                          ),
-                                        ],
-                                      );
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                        );
-                      } else {
-                        // This is a Divider
-                        return Divider();
-                      }
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
                     },
                   ),
                 );

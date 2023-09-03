@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/question_model.dart';
 import '../database/db_connect.dart';
+import '../utils/constants.dart';
 
 class QuizAddPage extends StatefulWidget {
   @override
@@ -25,7 +26,7 @@ class _QuizAddPageState extends State<QuizAddPage> {
 
   void addQuestion() async {
     String questionTitle = titleController.text.trim();
-    
+
     // Check if question title is empty
     if (questionTitle.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,7 +61,8 @@ class _QuizAddPageState extends State<QuizAddPage> {
     }
 
     // Check for duplicate options
-    List<String> optionTexts = optionsControllers.values.map((controller) => controller.text).toList();
+    List<String> optionTexts =
+        optionsControllers.values.map((controller) => controller.text).toList();
     if (optionTexts.toSet().length != optionTexts.length) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -71,7 +73,8 @@ class _QuizAddPageState extends State<QuizAddPage> {
     }
 
     Map<String, bool> options = optionsControllers.map(
-      (key, controller) => MapEntry(controller.text, optionsTruthValues[key] ?? false),
+      (key, controller) =>
+          MapEntry(controller.text, optionsTruthValues[key] ?? false),
     );
 
     Question newQuestion = Question(
@@ -84,12 +87,12 @@ class _QuizAddPageState extends State<QuizAddPage> {
     Navigator.pop(context); // Navigate back to the previous screen
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add Question'),
+        title: Text('Ajouter une question'),
+        backgroundColor: background,
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -100,24 +103,27 @@ class _QuizAddPageState extends State<QuizAddPage> {
                 children: [
                   TextFormField(
                     controller: titleController,
-                    decoration: InputDecoration(labelText: 'Question Title'),
+                    decoration:
+                        InputDecoration(labelText: 'Titre de la question'),
                   ),
-                  ...optionsControllers.keys.map(
-                    (option) => ListTile(
-                      title: TextField(
-                        controller: optionsControllers[option],
-                        decoration: InputDecoration(labelText: 'Option'),
-                      ),
-                      trailing: Switch(
-                        value: optionsTruthValues[option] ?? false,
-                        onChanged: (bool value) {
-                          setState(() {
-                            optionsTruthValues[option] = value;
-                          });
-                        },
-                      ),
-                    ),
-                  ).toList(),
+                  ...optionsControllers.keys
+                      .map(
+                        (option) => ListTile(
+                          title: TextField(
+                            controller: optionsControllers[option],
+                            decoration: InputDecoration(labelText: 'Option'),
+                          ),
+                          trailing: Switch(
+                            value: optionsTruthValues[option] ?? false,
+                            onChanged: (bool value) {
+                              setState(() {
+                                optionsTruthValues[option] = value;
+                              });
+                            },
+                          ),
+                        ),
+                      )
+                      .toList(),
                 ],
               ),
             ),
