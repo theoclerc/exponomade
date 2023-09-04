@@ -72,8 +72,8 @@ class QuizServices {
   }
 
 
-static void redirectToContact(BuildContext context, int score) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(initialPage: 1, score: score)));
-}
+  static void redirectToContact(BuildContext context, int score) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(initialPage: 1, score: score)));
+  }
 
 }

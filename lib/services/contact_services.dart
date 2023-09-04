@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+
+import '../appNavigation/home_page.dart';
 
 class ContactService {
   
@@ -42,6 +45,10 @@ class ContactService {
     subjectController.clear();
     emailController.clear();
     messageController.clear();
+  }
+
+    static void redirectToHomecontact(BuildContext context) {
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage(initialPage: 1)));
   }
   
 }

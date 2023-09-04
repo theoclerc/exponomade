@@ -88,6 +88,7 @@ class _ContactPageState extends State<ContactPage> {
                       if (_formKey.currentState!.validate()) {
                         ContactService.sendEmail();
                         ContactService.clearTextFields();
+                        ContactService.redirectToHomecontact(context);
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
                             content: Text('Formulaire envoyé !'),
