@@ -4,6 +4,8 @@ import '../database/db_connect.dart';
 import '../museum/objet.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../utils/constants.dart';
+
 class EditMuseumPage extends StatefulWidget {
   final Musee musee;
 
@@ -64,7 +66,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
             TextField(
@@ -110,13 +112,18 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
                     for (var controller in _objectRaisonsControllers[i])
                       TextField(
                           controller: controller,
-                          decoration: InputDecoration(labelText: 'Raison')),
+                          decoration: InputDecoration(
+                              labelText:
+                                  'Raisons (séparées par des virgules)')),
                   ],
                 ),
               ),
 
             // Button to add a new object
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: background,
+              ),
               onPressed: () {
                 setState(() {
                   _objectNameControllers.add(TextEditingController());

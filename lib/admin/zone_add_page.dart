@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import '../database/db_connect.dart';
 import '../models/zone_model.dart';
+import '../utils/constants.dart';
 
 class ZoneAddPage extends StatefulWidget {
   @override
@@ -65,6 +66,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Ajouter une zone'),
+        backgroundColor: background,
       ),
       body: Form(
         key: _formKey,
@@ -195,6 +197,9 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                       ),
                       SizedBox(height: 8.0),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: background,
+                        ),
                         onPressed: _addArriveeZoneCoordinate,
                         child: Text("Ajouter une autre coordonnée"),
                       ),
@@ -257,6 +262,9 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                       ),
                       SizedBox(height: 8.0),
                       ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: background,
+                        ),
                         onPressed: _addProvenanceZoneCoordinate,
                         child: Text("Ajouter une autre coordonnée"),
                       ),
@@ -269,6 +277,9 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
               // Submit Button
               Center(
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: background,
+                  ),
                   onPressed: _addZone,
                   child: Text("Envoyer"),
                 ),

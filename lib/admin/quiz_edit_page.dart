@@ -168,7 +168,12 @@ class _EditQuizPageState extends State<EditQuizPage> {
               ),
             ),
           ),
-          ElevatedButton(onPressed: saveQuestion, child: Text('Sauvegarder'))
+          ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: background,
+              ),
+              onPressed: saveQuestion,
+              child: Text('Sauvegarder'))
         ],
       ),
     );

@@ -134,8 +134,8 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
           descriptionObjet: _objectDescriptionControllers[i].text,
           image: _objectImageControllers[i].text,
           chronologie: {
-            'from': _objectChronologieControllers[i]['from']!.text,
-            'to': _objectChronologieControllers[i]['to']!.text,
+            'debut': _objectChronologieControllers[i]['from']!.text,
+            'fin': _objectChronologieControllers[i]['to']!.text,
           },
           raisons: _objectReasonControllers[i]
               .text
