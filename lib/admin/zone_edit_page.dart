@@ -191,7 +191,7 @@ class _EditZonePageState extends State<EditZonePage> {
                           .toList(),
                       ElevatedButton(
                         onPressed: _addArriveeZoneCoordinate,
-                        child: Text("Add another coordinate"),
+                        child: Text("Ajouter une autre coordonnée d'arrivée"),
                       ),
                     ],
                   ),
@@ -239,7 +239,8 @@ class _EditZonePageState extends State<EditZonePage> {
                           .toList(),
                       ElevatedButton(
                         onPressed: _addProvenanceZoneCoordinate,
-                        child: Text("Add another provenance coordinate"),
+                        child:
+                            Text("Ajouter une autre coordonnée de provenance"),
                       ),
                     ],
                   ),
