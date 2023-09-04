@@ -251,163 +251,166 @@ class _AdminPageState extends State<AdminPage> {
   }
 
   Widget _buildMuseumAdminPage() {
-  return Scaffold(
-    backgroundColor: background,
-    body: Column(
-      children: [
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: neutral,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0),
-            ),
-          ),
-          onPressed: () {
-            setState(() {
-              showMuseumAdminPage = false; // Hide the MuseumAdminPage
-            });
-          },
-          child: Text("Retour",
-              style: TextStyle(
-                color: Colors.black,
-                fontWeight: FontWeight.bold,
-              )),
-        ),
-        FutureBuilder<List<Musee>>(
-          future: musees,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
-            }
-
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(child: Text('Aucun muséee trouvé'));
-            }
-
-            return Expanded(
-              child: ListView.builder(
-                itemCount:
-                    snapshot.data!.length * 2 - 1, // Account for Dividers
-                itemBuilder: (context, index) {
-                  if (index.isEven) {
-                    Musee musee = snapshot.data![index ~/ 2];
-                    return ListTile(
-                      title: Text(
-                        musee.nomMusee,
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Coordonnées: ${musee.coord.latitude}, ${musee.coord.longitude}',
-                            style: TextStyle(
-                              color: Colors.white70,
-                            ),
-                          ),
-                          ...musee.objets.map((objet) => Text(
-                                objet.nomObjet,
-                                style: TextStyle(
-                                  color: Colors.white70,
-                                ),
-                              )).toList(),
-                        ],
-                      ),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.edit,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => EditMuseumPage(musee: musee),
-                                ),
-                              ).then((_) {
-                                setState(() {
-                                  musees = db.fetchMusees();
-                                });
-                              });
-                            },
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.delete,
-                              color: Colors.white,
-                            ),
-                            onPressed: () {
-                              showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    title: Text('Confirmer la suppression'),
-                                    content: Text(
-                                        'Etes-vous sûr de vouloir supprimer ce musée ?'),
-                                    actions: [
-                                      TextButton(
-                                        child: Text('Annuler'),
-                                        onPressed: () {
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                      TextButton(
-                                        child: Text('Effacer'),
-                                        onPressed: () {
-                                          db.deleteMusee(musee.id).then((_) {
-                                            setState(() {
-                                              musees = db.fetchMusees();
-                                            });
-                                          });
-                                          Navigator.of(context).pop();
-                                        },
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                          ),
-                        ],
-                      ),
-                    );
-                  } else {
-                    return Divider();
-                  }
-                },
-                padding: EdgeInsets.only(bottom: 80.0),
+    return Scaffold(
+      backgroundColor: background,
+      body: Column(
+        children: [
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: neutral,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15.0),
               ),
-            );
-          },
-        ),
-      ],
-    ),
-    floatingActionButton: FloatingActionButton(
-      backgroundColor: neutral,
-      child: Icon(
-        Icons.add,
-        color: Colors.black,
-      ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => AddMuseumPage(),
+            ),
+            onPressed: () {
+              setState(() {
+                showMuseumAdminPage = false; // Hide the MuseumAdminPage
+              });
+            },
+            child: Text("Retour",
+                style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                )),
           ),
-        ).then((_) {
-          setState(() {
-            musees = db.fetchMusees();
+          FutureBuilder<List<Musee>>(
+            future: musees,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: CircularProgressIndicator());
+              }
+
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return Center(child: Text('Aucun muséee trouvé'));
+              }
+
+              return Expanded(
+                child: ListView.builder(
+                  itemCount:
+                      snapshot.data!.length * 2 - 1, // Account for Dividers
+                  itemBuilder: (context, index) {
+                    if (index.isEven) {
+                      Musee musee = snapshot.data![index ~/ 2];
+                      return ListTile(
+                        title: Text(
+                          musee.nomMusee,
+                          style: TextStyle(
+                            color: Colors.white,
+                          ),
+                        ),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Coordonnées: ${musee.coord.latitude}, ${musee.coord.longitude}',
+                              style: TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
+                            ...musee.objets
+                                .map((objet) => Text(
+                                      objet.nomObjet,
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                      ),
+                                    ))
+                                .toList(),
+                          ],
+                        ),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.edit,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditMuseumPage(musee: musee),
+                                  ),
+                                ).then((_) {
+                                  setState(() {
+                                    musees = db.fetchMusees();
+                                  });
+                                });
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.white,
+                              ),
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return AlertDialog(
+                                      title: Text('Confirmer la suppression'),
+                                      content: Text(
+                                          'Etes-vous sûr de vouloir supprimer ce musée ?'),
+                                      actions: [
+                                        TextButton(
+                                          child: Text('Annuler'),
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                        TextButton(
+                                          child: Text('Effacer'),
+                                          onPressed: () {
+                                            db.deleteMusee(musee.id).then((_) {
+                                              setState(() {
+                                                musees = db.fetchMusees();
+                                              });
+                                            });
+                                            Navigator.of(context).pop();
+                                          },
+                                        ),
+                                      ],
+                                    );
+                                  },
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Divider();
+                    }
+                  },
+                  padding: EdgeInsets.only(bottom: 80.0),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: neutral,
+        child: Icon(
+          Icons.add,
+          color: Colors.black,
+        ),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddMuseumPage(),
+            ),
+          ).then((_) {
+            setState(() {
+              musees = db.fetchMusees();
+            });
           });
-        });
-      },
-    ),
-  );
-}
+        },
+      ),
+    );
+  }
 
   Widget _buildQuizAdminPage() {
     return Scaffold(
@@ -681,6 +684,7 @@ class _AdminPageState extends State<AdminPage> {
                         ),
                       );
                     },
+                    padding: EdgeInsets.only(bottom: 80.0),
                   ),
                 );
               }

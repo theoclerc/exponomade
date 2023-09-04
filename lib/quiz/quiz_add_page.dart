@@ -132,6 +132,9 @@ class _QuizAddPageState extends State<QuizAddPage> {
               child: Align(
                 alignment: Alignment.center,
                 child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: background,
+                  ),
                   onPressed: addQuestion,
                   child: Text('Ajouter'),
                 ),

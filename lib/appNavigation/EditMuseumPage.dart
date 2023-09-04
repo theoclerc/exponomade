@@ -4,6 +4,8 @@ import '../database/db_connect.dart';
 import '../museum/objet.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../utils/constants.dart';
+
 class EditMuseumPage extends StatefulWidget {
   final Musee musee;
 
@@ -34,10 +36,14 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
 
     for (var obj in widget.musee.objets) {
       _objectNameControllers.add(TextEditingController(text: obj.nomObjet));
-      _objectPopulationControllers.add(TextEditingController(text: obj.population));
-      _objectDescriptionControllers.add(TextEditingController(text: obj.descriptionObjet));
+      _objectPopulationControllers
+          .add(TextEditingController(text: obj.population));
+      _objectDescriptionControllers
+          .add(TextEditingController(text: obj.descriptionObjet));
       _objectImageControllers.add(TextEditingController(text: obj.image));
-      _objectRaisonsControllers.add(obj.raisons.map((raison) => TextEditingController(text: raison)).toList());
+      _objectRaisonsControllers.add(obj.raisons
+          .map((raison) => TextEditingController(text: raison))
+          .toList());
 
       var chronologieMap = Map<String, TextEditingController>();
       obj.chronologie.forEach((key, value) {
@@ -51,34 +57,77 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Modifier le Musée"),
+        backgroundColor: background,
+        title: Text("Modifier le musée"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(8.0),
+        padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: <Widget>[
-            TextField(controller: _nameController, decoration: InputDecoration(labelText: 'Nom du Musée')),
-            TextField(controller: _latitudeController, decoration: InputDecoration(labelText: 'Latitude')),
-            TextField(controller: _longitudeController, decoration: InputDecoration(labelText: 'Longitude')),
-
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(labelText: 'Nom du musée')),
+                    TextField(
+                        controller: _latitudeController,
+                        decoration: InputDecoration(labelText: 'Latitude')),
+                    TextField(
+                        controller: _longitudeController,
+                        decoration: InputDecoration(labelText: 'Longitude')),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 16.0),
             for (int i = 0; i < widget.musee.objets.length; i++)
               Column(
                 children: <Widget>[
-                  Text('Objet ${i + 1}'),
-                  TextField(controller: _objectNameControllers[i], decoration: InputDecoration(labelText: 'Nom de l\'objet')),
-                  TextField(controller: _objectPopulationControllers[i], decoration: InputDecoration(labelText: 'Population')),
-                  TextField(controller: _objectDescriptionControllers[i], decoration: InputDecoration(labelText: 'Description')),
-                  TextField(controller: _objectImageControllers[i], decoration: InputDecoration(labelText: 'Image URL')),
-                  
-                  for (var entry in _objectChronologieControllers[i].entries)
-                    TextField(controller: entry.value, decoration: InputDecoration(labelText: 'Chronologie - ${entry.key}')),
-                  
-                  for (var controller in _objectRaisonsControllers[i])
-                    TextField(controller: controller, decoration: InputDecoration(labelText: 'Raison')),
+                  Text('Objet n°${i + 1}',
+                      style:
+                          TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(children: [
+                        TextField(
+                            controller: _objectNameControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Nom de l\'objet')),
+                        TextField(
+                            controller: _objectPopulationControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Population')),
+                        TextField(
+                            controller: _objectDescriptionControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Description')),
+                        TextField(
+                            controller: _objectImageControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Image URL')),
+                        for (var entry
+                            in _objectChronologieControllers[i].entries)
+                          TextField(
+                              controller: entry.value,
+                              decoration: InputDecoration(
+                                  labelText: 'Chronologie - ${entry.key}')),
+                        for (var controller in _objectRaisonsControllers[i])
+                          TextField(
+                              controller: controller,
+                              decoration: InputDecoration(labelText: 'Raison')),
+                      ]),
+                    ),
+                  )
                 ],
               ),
-
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: background,
+              ),
               onPressed: () {
                 // Construction de la liste des objets
                 List<Objet> updatedObjets = [];
@@ -88,8 +137,11 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
                     population: _objectPopulationControllers[i].text,
                     descriptionObjet: _objectDescriptionControllers[i].text,
                     image: _objectImageControllers[i].text,
-                    raisons: _objectRaisonsControllers[i].map((controller) => controller.text).toList(),
-                    chronologie: _objectChronologieControllers[i].map((key, controller) => MapEntry(key, controller.text)),
+                    raisons: _objectRaisonsControllers[i]
+                        .map((controller) => controller.text)
+                        .toList(),
+                    chronologie: _objectChronologieControllers[i].map(
+                        (key, controller) => MapEntry(key, controller.text)),
                   ));
                 }
 
