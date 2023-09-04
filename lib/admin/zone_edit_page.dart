@@ -101,12 +101,6 @@ class _EditZonePageState extends State<EditZonePage> {
       appBar: AppBar(
         title: Text('Modifier une zone'),
         backgroundColor: background,
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _saveZone,
-          )
-        ],
       ),
       body: Form(
         key: _formKey,
@@ -292,6 +286,13 @@ class _EditZonePageState extends State<EditZonePage> {
                     ],
                   ),
                 ),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: background,
+                ),
+                onPressed: _saveZone,
+                child: Text("Sauvegarder"),
               ),
             ],
           ),
