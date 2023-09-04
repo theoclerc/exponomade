@@ -1,17 +1,18 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:exponomade/admin/zone_add_page.dart';
 import 'package:flutter/material.dart';
 import '../models/musee_model.dart';
 import '../utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../widgets/custom_textfield.dart';
 import '../utils/validators.dart';
-import '../zones/editZonePage.dart';
+import '../admin/zone_edit_page.dart';
 import '../appNavigation/EditMuseumPage.dart';
 import '../appNavigation/AddMuseumPage.dart';
 import '../models/question_model.dart';
 import '../database/db_connect.dart';
-import '../quiz/quiz_add_page.dart';
-import '../quiz/quiz_edit_page.dart';
+import '../admin/quiz_add_page.dart';
+import '../admin/quiz_edit_page.dart';
 import 'home_page.dart';
 
 class AdminPage extends StatefulWidget {
@@ -638,49 +639,53 @@ class _AdminPageState extends State<AdminPage> {
                                 );
                               },
                             ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.white,
-                              ),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Confirmer la suppression'),
-                                      content: Text(
-                                          'Etes-vous sûr de vouloir supprimer ce musée ?'),
-                                      actions: [
-                                        TextButton(
-                                          child: Text('Annuler'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                        TextButton(
-                                          child: Text('Effacer'),
-                                          onPressed: () {
-                                            /*db
-                                                .deleteQuestion(question.id)
-                                                .then((_) {
+                              IconButton(
+                                icon: Icon(
+                                  Icons.delete,
+                                  color: Colors.white,
+                                ),
+                                onPressed: () {
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title: Text('Confirmer la suppression'),
+                                        content: Text(
+                                            'Etes-vous sûr de vouloir supprimer ce musée ?'),
+                                        actions: [
+                                          TextButton(
+                                            child: Text('Annuler'),
+                                            onPressed: () {
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: Text('Effacer'),
+                                            onPressed: () async {
+                                              // Call the delete function for the selected zone
+                                              await db.deleteZone(snapshot.data![index].id);
+
+                                              // Refresh the list
                                               setState(() {
-                                                questions = db.fetchQuestions();
+                                                db.fetchZones();
                                               });
-                                            });
-                                            Navigator.of(context).pop();*/
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                              },
-                            ),
+                                              
+                                              Navigator.of(context).pop(); 
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+
                           ],
                         ),
                       );
                     },
+                                      padding: EdgeInsets.only(
+                      bottom: 80.0),
                   ),
                 );
               }
@@ -695,7 +700,16 @@ class _AdminPageState extends State<AdminPage> {
           color: Colors.black,
         ),
         onPressed: () {
-          // todo ajouter le code pour créer une nouvelle zone.
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => ZoneAddPage(),
+            ),
+          ).then((_) {
+            setState(() {
+              db.fetchZones();
+            });
+          });
         },
       ),
     );

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/question_model.dart';
 import '../models/musee_model.dart';
+import '../models/zone_model.dart';
 import '../museum/objet.dart';
 import '../zones/arriveZone.dart';
 import '../zones/provenanceZone.dart';
@@ -83,23 +84,62 @@ class DBconnect {
     }
   }
 
-  Future<void> addQuestion(Question question) async {
-    await _firestore.collection('quiz').add({
-      'title': question.title,
-      'options': question.options,
-    });
+  Future<void> deleteZone(String zoneId) async {
+    try {
+      await _firestore.collection('zones').doc(zoneId).delete();
+      print("Zone with ID $zoneId successfully deleted.");
+    } catch (e) {
+      print("Error deleting zone: $e");
+    }
   }
 
-  Future<void> updateQuestion(
-      String id, String title, Map<String, bool> options) async {
-    await _firestore.collection('quiz').doc(id).update({
-      'title': title,
-      'options': options,
-    });
+  Future<void> addZone(Zone zone) async {
+    try {
+      await _firestore.collection('zones').add(zone.toMap());
+    } catch (error) {
+      print("Error adding to Firestore: $error");
+    }
+  }
+
+  Future<void> updateZone(String documentId, Zone zone) async {
+  try {
+    await _firestore.collection('zones').doc(documentId).update(zone.toMap());
+  } catch (error) {
+    print("Error updating to Firestore: $error");
+  }
+}
+
+  Future<void> addQuestion(Question question) async {
+    try {
+      await _firestore.collection('quiz').add({
+        'title': question.title,
+        'options': question.options,
+      });
+      print("Question with title ${question.title} successfully added.");
+    } catch (e) {
+      print("Error adding question: $e");
+    }
+  }
+
+  Future<void> updateQuestion(String id, String title, Map<String, bool> options) async {
+    try {
+      await _firestore.collection('quiz').doc(id).update({
+        'title': title,
+        'options': options,
+      });
+      print("Question with ID $id successfully updated.");
+    } catch (e) {
+      print("Error updating question: $e");
+    }
   }
 
   Future<void> deleteQuestion(String id) async {
-    await _firestore.collection('quiz').doc(id).delete();
+    try {
+      await _firestore.collection('quiz').doc(id).delete();
+      print("Question with ID $id successfully deleted.");
+    } catch (e) {
+      print("Error deleting question: $e");
+    }
   }
 
   Future<List<arriveZone>> fetchArriveZones() async {
