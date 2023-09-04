@@ -114,7 +114,6 @@ class _EditZonePageState extends State<EditZonePage> {
           child: ListView(
             padding: EdgeInsets.all(16.0),
             children: [
-              // Zone Name and Chronology
               Text('Nom de la zone et chronologie',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10.0),
@@ -125,25 +124,25 @@ class _EditZonePageState extends State<EditZonePage> {
                     children: [
                       TextFormField(
                         controller: _nomZoneController,
-                        decoration: InputDecoration(labelText: 'Nom Zone'),
+                        decoration:
+                            InputDecoration(labelText: 'Nom de la zone'),
                         validator: (value) =>
-                            value!.isEmpty ? 'Cannot be empty' : null,
+                            value!.isEmpty ? 'Donnée manquante' : null,
                       ),
                       TextFormField(
                         controller: _fromChronologieController,
                         decoration:
-                            InputDecoration(labelText: 'Chronologie From'),
+                            InputDecoration(labelText: 'Chronologie de'),
                         keyboardType: TextInputType.number,
                         validator: (value) =>
-                            value!.isEmpty ? 'Cannot be empty' : null,
+                            value!.isEmpty ? 'Donnée manquante' : null,
                       ),
                       TextFormField(
                         controller: _toChronologieController,
-                        decoration:
-                            InputDecoration(labelText: 'Chronologie To'),
+                        decoration: InputDecoration(labelText: 'Jusqu\'à'),
                         keyboardType: TextInputType.number,
                         validator: (value) =>
-                            value!.isEmpty ? 'Cannot be empty' : null,
+                            value!.isEmpty ? 'Donnée manquante' : null,
                       ),
                     ],
                   ),
@@ -166,32 +165,36 @@ class _EditZonePageState extends State<EditZonePage> {
                                 children: [
                                   TextFormField(
                                     controller: coordinate['latitude'],
-                                    decoration: InputDecoration(
-                                        labelText: 'Arrivee Zone Latitude'),
+                                    decoration:
+                                        InputDecoration(labelText: 'Latitude'),
                                     keyboardType:
                                         TextInputType.numberWithOptions(
                                             decimal: true),
                                     validator: (value) => value!.isEmpty
-                                        ? 'Cannot be empty'
+                                        ? 'Donnée manquante'
                                         : null,
                                   ),
                                   TextFormField(
                                     controller: coordinate['longitude'],
-                                    decoration: InputDecoration(
-                                        labelText: 'Arrivee Zone Longitude'),
+                                    decoration:
+                                        InputDecoration(labelText: 'Longitude'),
                                     keyboardType:
                                         TextInputType.numberWithOptions(
                                             decimal: true),
                                     validator: (value) => value!.isEmpty
-                                        ? 'Cannot be empty'
+                                        ? 'Donnée manquante'
                                         : null,
                                   ),
                                 ],
                               ))
                           .toList(),
+                      SizedBox(height: 8.0),
                       ElevatedButton(
                         onPressed: _addArriveeZoneCoordinate,
-                        child: Text("Add another coordinate"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: background,
+                        ),
+                        child: Text("Ajouter une autre coordonnée"),
                       ),
                     ],
                   ),
@@ -214,32 +217,36 @@ class _EditZonePageState extends State<EditZonePage> {
                                 children: [
                                   TextFormField(
                                     controller: coordinate['latitude'],
-                                    decoration: InputDecoration(
-                                        labelText: 'Provenance Zone Latitude'),
+                                    decoration:
+                                        InputDecoration(labelText: 'Latitude'),
                                     keyboardType:
                                         TextInputType.numberWithOptions(
                                             decimal: true),
                                     validator: (value) => value!.isEmpty
-                                        ? 'Cannot be empty'
+                                        ? 'Donnée manquante'
                                         : null,
                                   ),
                                   TextFormField(
                                     controller: coordinate['longitude'],
-                                    decoration: InputDecoration(
-                                        labelText: 'Provenance Zone Longitude'),
+                                    decoration:
+                                        InputDecoration(labelText: 'Longitude'),
                                     keyboardType:
                                         TextInputType.numberWithOptions(
                                             decimal: true),
                                     validator: (value) => value!.isEmpty
-                                        ? 'Cannot be empty'
+                                        ? 'Donnée manquante'
                                         : null,
                                   ),
                                 ],
                               ))
                           .toList(),
+                      SizedBox(height: 8.0),
                       ElevatedButton(
                         onPressed: _addProvenanceZoneCoordinate,
-                        child: Text("Add another provenance coordinate"),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: background,
+                        ),
+                        child: Text("Ajouter une autre coordonnée"),
                       ),
                     ],
                   ),
@@ -259,26 +266,27 @@ class _EditZonePageState extends State<EditZonePage> {
                     children: [
                       TextFormField(
                         controller: _populationController,
-                        decoration: InputDecoration(labelText: 'Population'),
+                        decoration:
+                            InputDecoration(labelText: 'Type de population'),
                         validator: (value) =>
-                            value!.isEmpty ? 'Cannot be empty' : null,
+                            value!.isEmpty ? 'Donnée manquante' : null,
                       ),
                       TextFormField(
                         controller: _provenanceNomController,
                         decoration:
                             InputDecoration(labelText: 'Provenance Nom'),
                         validator: (value) =>
-                            value!.isEmpty ? 'Cannot be empty' : null,
+                            value!.isEmpty ? 'Donnée manquante' : null,
                       ),
                       TextFormField(
                         controller: _raisonsController,
                         decoration: InputDecoration(
-                            labelText: 'Raisons (comma separated)'),
+                            labelText: 'Raisons (séparées par des virgules)'),
                       ),
                       TextFormField(
                         controller: _raisonsDescriptionController,
                         decoration:
-                            InputDecoration(labelText: 'Raisons Description'),
+                            InputDecoration(labelText: 'Raisons description'),
                         maxLines: 3,
                       ),
                     ],
@@ -294,49 +302,43 @@ class _EditZonePageState extends State<EditZonePage> {
 
   void _saveZone() async {
     if (_formKey.currentState!.validate()) {
-      try {
-        // Decide if you want to update or add a new document
-        if (widget.initialData != null && widget.docId != null) {
-          await _firestore.collection('zones').doc(widget.docId).update({
-            'nomZone': _nomZoneController.text,
-            'chronologieZone': {
-              'from': int.parse(_fromChronologieController.text),
-              'to': int.parse(_toChronologieController.text),
-            },
-            'population': _populationController.text,
-            'provenanceNom': _provenanceNomController.text,
-            'raisons': _raisonsController.text.split(', ').toList(),
-            'raisonsDescription': _raisonsDescriptionController.text,
-          });
-        } else {
-          List<Map<String, dynamic>> arriveeZoneList = _arriveeZoneCoordinates
-              .map((coordinate) => {
-                    'latitude': double.parse(
-                        (coordinate['latitude'] as TextEditingController).text),
-                    'longitude': double.parse(
-                        (coordinate['longitude'] as TextEditingController)
-                            .text),
-                  })
-              .toList();
+// Extract the coordinates from _arriveeZoneCoordinates
+      List<GeoPoint> arriveeZoneList =
+          _arriveeZoneCoordinates.map((coordinate) {
+        final latitude = double.parse(coordinate['latitude']!.text);
+        final longitude = double.parse(coordinate['longitude']!.text);
+        return GeoPoint(latitude, longitude);
+      }).toList();
 
-          await _firestore.collection('zones').add({
-            'nomZone': _nomZoneController.text,
-            'chronologieZone': {
-              'from': int.parse(_fromChronologieController.text),
-              'to': int.parse(_toChronologieController.text),
-            },
-            'population': _populationController.text,
-            'provenanceNom': _provenanceNomController.text,
-            'raisons': _raisonsController.text.split(', ').toList(),
-            'raisonsDescription': _raisonsDescriptionController.text,
-          });
-        }
+      // Extract the coordinates from _provenanceZoneCoordinates
+      List<GeoPoint> provenanceZoneList =
+          _provenanceZoneCoordinates.map((coordinate) {
+        final latitude = double.parse(coordinate['latitude']!.text);
+        final longitude = double.parse(coordinate['longitude']!.text);
+        return GeoPoint(latitude, longitude);
+      }).toList();
+
+      try {
+        await _firestore.collection('zones').doc(widget.docId).update({
+          'nomZone': _nomZoneController.text,
+          'chronologieZone': {
+            'from': int.parse(_fromChronologieController.text),
+            'to': int.parse(_toChronologieController.text),
+          },
+          'population': _populationController.text,
+          'provenanceNom': _provenanceNomController.text,
+          'raisons': _raisonsController.text.split(', ').toList(),
+          'raisonsDescription': _raisonsDescriptionController.text,
+          'arriveeZone': arriveeZoneList,
+          'provenanceZone': provenanceZoneList,
+        });
+
         Navigator.pop(context);
         if (widget.onSave != null) {
           widget.onSave!();
         }
       } catch (error) {
-        print("Error saving to Firestore: $error");
+        print("Erreur lors de la sauvegarde sur Firestore : $error");
       }
     }
   }
