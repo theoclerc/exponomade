@@ -612,7 +612,7 @@ class _AdminPageState extends State<AdminPage> {
                           ),
                         ),
                         subtitle: Text(
-                          "De ${snapshot.data![index]['chronologieZone']['de']} à ${snapshot.data![index]['chronologieZone']['à']}",
+                          "De ${snapshot.data![index]['chronologieZone']['from']} à ${snapshot.data![index]['chronologieZone']['to']}",
                           style: TextStyle(
                             color: Colors.white70,
                           ),
