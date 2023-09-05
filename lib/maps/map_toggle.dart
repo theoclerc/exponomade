@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../museum/museum_marker.dart';
-import '../zones/arriveZone.dart';
-import '../zones/arriveZonepolygon.dart';
-import '../zones/provenanceZone.dart';
-import '../zones/provenanceZonepolygon.dart';
+import 'museum_marker.dart';
+import '../models/arriveZone_model.dart';
+import '../maps/arriveZone_polygon.dart';
+import '../models/provenanceZone_model.dart';
+import '../maps/provenanceZone_polygon.dart';
 import '../models/musee_model.dart';
 import '../database/db_connect.dart';
-import '../zones/arriveZoneInfoPopup.dart';
-import '../zones/provenanceZoneInfoPopup.dart';
+import 'arriveZone_info_popup.dart';
+import 'provenanceZone_info_popup.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:math';
 

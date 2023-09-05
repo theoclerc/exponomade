@@ -3,9 +3,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../models/question_model.dart';
 import '../models/musee_model.dart';
 import '../models/zone_model.dart';
-import '../museum/objet.dart';
-import '../zones/arriveZone.dart';
-import '../zones/provenanceZone.dart';
+import '../models/objet_model.dart';
+import '../models/arriveZone_model.dart';
+import '../models/provenanceZone_model.dart';
 
 class DBconnect {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;

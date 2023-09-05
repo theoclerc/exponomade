@@ -1,5 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../museum/objet.dart';
+import 'objet_model.dart';
 
 class Musee {
   final String id;

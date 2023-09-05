@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'arriveZone.dart';
+import '../models/arriveZone_model.dart';
 
 class arriveZoneInfoPopup extends StatelessWidget {
   final arriveZone zone;

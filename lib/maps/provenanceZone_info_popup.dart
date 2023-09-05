@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'provenanceZone.dart';
+import '../models/provenanceZone_model.dart';
 
 class provenanceZoneInfoPopup extends StatelessWidget {
   final ProvenanceZone zone;

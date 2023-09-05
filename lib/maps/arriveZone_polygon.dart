@@ -1,5 +1,5 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'arriveZone.dart';
+import '../models/arriveZone_model.dart';
 import 'package:flutter/material.dart';
 
 Polygon arriveZonePolygon(

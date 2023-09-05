@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/musee_model.dart';
 import '../database/db_connect.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import '../museum/objet.dart';
+import '../models/objet_model.dart';
 import '../utils/constants.dart';
 
 class AddMuseumPage extends StatefulWidget {
