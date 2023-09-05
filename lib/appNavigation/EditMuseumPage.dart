@@ -57,87 +57,112 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Modifier le Musée"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _saveMuseum, // Fonction pour sauvegarder
-          ),
-        ],
+        title: Text("Modifier le musée"),
+        backgroundColor: background,
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(8.0),
         child: ListView(
           children: <Widget>[
-            TextField(
-                controller: _nameController,
-                decoration: InputDecoration(labelText: 'Nom du Musée')),
-            TextField(
-                controller: _latitudeController,
-                decoration: InputDecoration(labelText: 'Latitude')),
-            TextField(
-                controller: _longitudeController,
-                decoration: InputDecoration(labelText: 'Longitude')),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    TextField(
+                        controller: _nameController,
+                        decoration: InputDecoration(labelText: 'Nom du musée')),
+                    TextField(
+                        controller: _latitudeController,
+                        decoration: InputDecoration(labelText: 'Latitude')),
+                    TextField(
+                        controller: _longitudeController,
+                        decoration: InputDecoration(labelText: 'Longitude')),
+                  ],
+                ),
+              ),
+            ),
 
             // Dynamic object fields based on controllers
             for (int i = 0; i < _objectNameControllers.length; i++)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Text('Objet ${i + 1}',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.bold)),
-                    TextField(
-                        controller: _objectNameControllers[i],
-                        decoration:
-                            InputDecoration(labelText: 'Nom de l\'objet')),
-                    TextField(
-                        controller: _objectPopulationControllers[i],
-                        decoration: InputDecoration(labelText: 'Population')),
-                    TextField(
-                        controller: _objectDescriptionControllers[i],
-                        decoration: InputDecoration(labelText: 'Description')),
-                    TextField(
-                        controller: _objectImageControllers[i],
-                        decoration: InputDecoration(labelText: 'Image URL')),
-                    for (var entry in _objectChronologieControllers[i].entries)
-                      TextField(
-                        controller: entry.value,
-                        decoration: InputDecoration(
-                            labelText:
-                                'Chronologie - ${entry.key == 'from' ? 'Date début' : (entry.key == 'to' ? 'Date fin' : entry.key)}'),
-                      ),
-                    for (var controller in _objectRaisonsControllers[i])
-                      TextField(
-                          controller: controller,
-                          decoration: InputDecoration(
-                              labelText:
-                                  'Raisons (séparées par des virgules)')),
-                  ],
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Text('Objet ${i + 1}',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        TextField(
+                            controller: _objectNameControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Nom de l\'objet')),
+                        TextField(
+                            controller: _objectPopulationControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Population')),
+                        TextField(
+                            controller: _objectDescriptionControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Description')),
+                        TextField(
+                            controller: _objectImageControllers[i],
+                            decoration:
+                                InputDecoration(labelText: 'Image URL')),
+                        for (var entry
+                            in _objectChronologieControllers[i].entries)
+                          TextField(
+                            controller: entry.value,
+                            decoration: InputDecoration(
+                                labelText:
+                                    'Chronologie - ${entry.key == 'from' ? 'Date début' : (entry.key == 'to' ? 'Date fin' : entry.key)}'),
+                          ),
+                        for (var controller in _objectRaisonsControllers[i])
+                          TextField(
+                              controller: controller,
+                              decoration: InputDecoration(
+                                  labelText:
+                                      'Raisons (séparées par des virgules)')),
+                      ],
+                    ),
+                  ),
                 ),
               ),
 
             // Button to add a new object
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: background,
-              ),
-              onPressed: () {
-                setState(() {
-                  _objectNameControllers.add(TextEditingController());
-                  _objectPopulationControllers.add(TextEditingController());
-                  _objectDescriptionControllers.add(TextEditingController());
-                  _objectImageControllers.add(TextEditingController());
-                  _objectRaisonsControllers.add([TextEditingController()]);
-                  _objectChronologieControllers.add({
-                    'from': TextEditingController(),
-                    'to': TextEditingController(),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: background,
+                ),
+                onPressed: () {
+                  setState(() {
+                    _objectNameControllers.add(TextEditingController());
+                    _objectPopulationControllers.add(TextEditingController());
+                    _objectDescriptionControllers.add(TextEditingController());
+                    _objectImageControllers.add(TextEditingController());
+                    _objectRaisonsControllers.add([TextEditingController()]);
+                    _objectChronologieControllers.add({
+                      'from': TextEditingController(),
+                      'to': TextEditingController(),
+                    });
                   });
-                });
-              },
-              child: Text("Ajouter un objet"),
+                },
+                child: Text("Ajouter un objet"),
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: background,
+                ),
+                onPressed: _saveMuseum,
+                child: Text("Sauvegarder"),
+              ),
             ),
           ],
         ),

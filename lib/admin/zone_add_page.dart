@@ -76,73 +76,87 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Zone Name Field
-              TextFormField(
-                controller: _nomZoneController,
-                decoration: InputDecoration(labelText: 'Nom de la zone'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Donnée manquante' : null,
-              ),
-              SizedBox(height: 16.0),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _nomZoneController,
+                        decoration:
+                            InputDecoration(labelText: 'Nom de la zone'),
+                        validator: (value) =>
+                            value!.isEmpty ? 'Donnée manquante' : null,
+                      ),
+                      SizedBox(height: 16.0),
 
-              // Chronologie Fields
-              Row(
-                children: [
-                  Expanded(
-                    child: TextFormField(
-                      controller: _fromChronologieController,
-                      decoration: InputDecoration(labelText: 'Chronologie de'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value!.isEmpty ? 'Donnée manquante' : null,
-                    ),
+                      // Chronologie Fields
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              controller: _fromChronologieController,
+                              decoration:
+                                  InputDecoration(labelText: 'Chronologie de'),
+                              keyboardType: TextInputType.number,
+                              validator: (value) =>
+                                  value!.isEmpty ? 'Donnée manquante' : null,
+                            ),
+                          ),
+                          SizedBox(width: 16.0),
+                          Expanded(
+                            child: TextFormField(
+                              controller: _toChronologieController,
+                              decoration:
+                                  InputDecoration(labelText: 'Jusqu\'à'),
+                              keyboardType: TextInputType.number,
+                              validator: (value) =>
+                                  value!.isEmpty ? 'Donnée manquante' : null,
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 16.0),
+
+                      // Population Field
+                      TextFormField(
+                        controller: _populationController,
+                        decoration:
+                            InputDecoration(labelText: 'Type de population'),
+                        validator: (value) =>
+                            value!.isEmpty ? 'Donnée manquante' : null,
+                      ),
+                      SizedBox(height: 16.0),
+
+                      // Provenance Name Field
+                      TextFormField(
+                        controller: _provenanceNomController,
+                        decoration:
+                            InputDecoration(labelText: 'Nom provenance'),
+                        validator: (value) =>
+                            value!.isEmpty ? 'Donnée manquante' : null,
+                      ),
+                      SizedBox(height: 16.0),
+
+                      // Raisons Fields
+                      TextFormField(
+                        controller: _raisonsController,
+                        decoration: InputDecoration(
+                            labelText: 'Raisons (séparées par des virgules)'),
+                        validator: (value) =>
+                            value!.isEmpty ? 'Donnée manquante' : null,
+                      ),
+                      SizedBox(height: 16.0),
+                      TextFormField(
+                        controller: _raisonsDescriptionController,
+                        decoration: InputDecoration(labelText: 'Description'),
+                        maxLines: 1,
+                        validator: (value) =>
+                            value!.isEmpty ? 'Donnée manquante' : null,
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    child: TextFormField(
-                      controller: _toChronologieController,
-                      decoration: InputDecoration(labelText: 'Jusqu\'à'),
-                      keyboardType: TextInputType.number,
-                      validator: (value) =>
-                          value!.isEmpty ? 'Donnée manquante' : null,
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16.0),
-
-              // Population Field
-              TextFormField(
-                controller: _populationController,
-                decoration: InputDecoration(labelText: 'Type de population'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Donnée manquante' : null,
-              ),
-              SizedBox(height: 16.0),
-
-              // Provenance Name Field
-              TextFormField(
-                controller: _provenanceNomController,
-                decoration: InputDecoration(labelText: 'Nom provenance'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Donnée manquante' : null,
-              ),
-              SizedBox(height: 16.0),
-
-              // Raisons Fields
-              TextFormField(
-                controller: _raisonsController,
-                decoration: InputDecoration(
-                    labelText: 'Raisons (séparées par des virgules)'),
-                validator: (value) =>
-                    value!.isEmpty ? 'Donnée manquante' : null,
-              ),
-              SizedBox(height: 16.0),
-              TextFormField(
-                controller: _raisonsDescriptionController,
-                decoration: InputDecoration(labelText: 'Description'),
-                maxLines: 1,
-                validator: (value) =>
-                    value!.isEmpty ? 'Donnée manquante' : null,
+                ),
               ),
               SizedBox(height: 16.0),
 
@@ -272,8 +286,6 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 16.0),
-
               // Submit Button
               Center(
                 child: ElevatedButton(

@@ -127,18 +127,12 @@ class _QuizAddPageState extends State<QuizAddPage> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Align(
-                alignment: Alignment.center,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: background,
-                  ),
-                  onPressed: addQuestion,
-                  child: Text('Ajouter'),
-                ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: background,
               ),
+              onPressed: addQuestion,
+              child: Text('Envoyer'),
             ),
           ],
         ),

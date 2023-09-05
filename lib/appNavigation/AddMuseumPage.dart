@@ -3,6 +3,7 @@ import '../models/musee_model.dart';
 import '../database/db_connect.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../museum/objet.dart';
+import '../utils/constants.dart';
 
 class AddMuseumPage extends StatefulWidget {
   @override
@@ -25,29 +26,33 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Ajouter un Musée"),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.save),
-            onPressed: _addMuseum,
-          ),
-        ],
+        title: Text("Ajouter un musée"),
+        backgroundColor: background,
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView(
           children: <Widget>[
-            TextField(
-              controller: _nameController,
-              decoration: InputDecoration(labelText: 'Nom du Musée'),
-            ),
-            TextField(
-              controller: _latitudeController,
-              decoration: InputDecoration(labelText: 'Latitude'),
-            ),
-            TextField(
-              controller: _longitudeController,
-              decoration: InputDecoration(labelText: 'Longitude'),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(12.0),
+                child: Column(
+                  children: [
+                    TextField(
+                      controller: _nameController,
+                      decoration: InputDecoration(labelText: 'Nom du musée'),
+                    ),
+                    TextField(
+                      controller: _latitudeController,
+                      decoration: InputDecoration(labelText: 'Latitude'),
+                    ),
+                    TextField(
+                      controller: _longitudeController,
+                      decoration: InputDecoration(labelText: 'Longitude'),
+                    ),
+                  ],
+                ),
+              ),
             ),
 
             // Pour chaque objet ajouté au musée
@@ -55,7 +60,6 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
                 child: Card(
-                  elevation: 5.0,
                   child: Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
@@ -98,10 +102,24 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
                   ),
                 ),
               ),
-
-            ElevatedButton(
-              onPressed: _addObjectFields,
-              child: Text("Ajouter un objet"),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: background,
+                ),
+                onPressed: _addObjectFields,
+                child: Text("Ajouter un objet"),
+              ),
+            ),
+            SizedBox(height: 8.0),
+            Center(
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: background,
+                ),
+                onPressed: _addMuseum,
+                child: Text("Envoyer"),
+              ),
             ),
           ],
         ),
@@ -134,8 +152,8 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
           descriptionObjet: _objectDescriptionControllers[i].text,
           image: _objectImageControllers[i].text,
           chronologie: {
-            'debut': _objectChronologieControllers[i]['from']!.text,
-            'fin': _objectChronologieControllers[i]['to']!.text,
+            'from': _objectChronologieControllers[i]['from']!.text,
+            'to': _objectChronologieControllers[i]['to']!.text,
           },
           raisons: _objectReasonControllers[i]
               .text

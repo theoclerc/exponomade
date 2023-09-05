@@ -287,12 +287,14 @@ class _EditZonePageState extends State<EditZonePage> {
                   ),
                 ),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: background,
+              Center(
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: background,
+                  ),
+                  onPressed: _saveZone,
+                  child: Text("Sauvegarder"),
                 ),
-                onPressed: _saveZone,
-                child: Text("Sauvegarder"),
               ),
             ],
           ),
