@@ -654,7 +654,7 @@ class _AdminPageState extends State<AdminPage> {
                                     return AlertDialog(
                                       title: Text('Confirmer la suppression'),
                                       content: Text(
-                                          'Etes-vous sûr de vouloir supprimer ce musée ?'),
+                                          'Etes-vous sûr de vouloir supprimer cette zone ?'),
                                       actions: [
                                         TextButton(
                                           child: Text('Annuler'),
