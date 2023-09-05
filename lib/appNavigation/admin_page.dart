@@ -604,87 +604,95 @@ class _AdminPageState extends State<AdminPage> {
                   child: ListView.builder(
                     itemCount: snapshot.data!.length,
                     itemBuilder: (context, index) {
-                      return ListTile(
-                        title: Text(
-                          snapshot.data![index]['nomZone'],
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        ),
-                        subtitle: Text(
-                          "De ${snapshot.data![index]['chronologieZone']['from']} à ${snapshot.data![index]['chronologieZone']['to']}",
-                          style: TextStyle(
-                            color: Colors.white70,
-                          ),
-                        ),
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            IconButton(
-                              icon: Icon(
-                                Icons.edit,
+                      final zoneData =
+                          snapshot.data![index].data() as Map<String, dynamic>;
+
+                      return Column(
+                        children: [
+                          ListTile(
+                            title: Text(
+                              zoneData['nomZone'],
+                              style: TextStyle(
                                 color: Colors.white,
                               ),
-                              onPressed: () async {
-                                await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => EditZonePage(
-                                      initialData: snapshot.data![index].data()
-                                          as Map<String, dynamic>,
-                                      docId: snapshot.data![index].id,
-                                      onSave: () {
-                                        setState(
-                                            () {}); // This will refresh your widget
-                                      },
-                                    ),
-                                  ),
-                                );
-                              },
                             ),
-                            IconButton(
-                              icon: Icon(
-                                Icons.delete,
-                                color: Colors.white,
+                            subtitle: Text(
+                              "De ${zoneData['chronologieZone']['from']} à ${zoneData['chronologieZone']['to']}",
+                              style: TextStyle(
+                                color: Colors.white70,
                               ),
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: Text('Confirmer la suppression'),
-                                      content: Text(
-                                          'Etes-vous sûr de vouloir supprimer cette zone ?'),
-                                      actions: [
-                                        TextButton(
-                                          child: Text('Annuler'),
-                                          onPressed: () {
-                                            Navigator.of(context).pop();
+                            ),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.edit,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => EditZonePage(
+                                          initialData: zoneData,
+                                          docId: snapshot.data![index].id,
+                                          onSave: () {
+                                            setState(() {});
+                                            // This will refresh your widget
                                           },
                                         ),
-                                        TextButton(
-                                          child: Text('Effacer'),
-                                          onPressed: () async {
-                                            // Call the delete function for the selected zone
-                                            await db.deleteZone(
-                                                snapshot.data![index].id);
-
-                                            // Refresh the list
-                                            setState(() {
-                                              db.fetchZones();
-                                            });
-
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
+                                      ),
                                     );
                                   },
-                                );
-                              },
+                                ),
+                                IconButton(
+                                  icon: Icon(
+                                    Icons.delete,
+                                    color: Colors.white,
+                                  ),
+                                  onPressed: () {
+                                    showDialog(
+                                      context: context,
+                                      builder: (BuildContext context) {
+                                        return AlertDialog(
+                                          title:
+                                              Text('Confirmer la suppression'),
+                                          content: Text(
+                                              'Etes-vous sûr de vouloir supprimer cette zone ?'),
+                                          actions: [
+                                            TextButton(
+                                              child: Text('Annuler'),
+                                              onPressed: () {
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                            TextButton(
+                                              child: Text('Effacer'),
+                                              onPressed: () async {
+                                                // Call the delete function for the selected zone
+                                                await db.deleteZone(
+                                                    snapshot.data![index].id);
+
+                                                // Refresh the list
+                                                setState(() {
+                                                  db.fetchZones();
+                                                });
+
+                                                Navigator.of(context).pop();
+                                              },
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                          Divider(),
+                        ],
                       );
                     },
                     padding: EdgeInsets.only(bottom: 80.0),
