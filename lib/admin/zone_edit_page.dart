@@ -18,9 +18,11 @@ class _EditZonePageState extends State<EditZonePage> {
   final _formKey = GlobalKey<FormState>();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  // Lists to hold text controllers for coordinates.
   List<Map<String, TextEditingController>> _arriveeZoneCoordinates = [];
   List<Map<String, TextEditingController>> _provenanceZoneCoordinates = [];
 
+  // Text controllers for various input fields.
   late TextEditingController _nomZoneController;
   late TextEditingController _fromChronologieController;
   late TextEditingController _toChronologieController;
@@ -33,7 +35,7 @@ class _EditZonePageState extends State<EditZonePage> {
   void initState() {
     super.initState();
 
-    // Initialize arriveeZoneCoordinate
+    // Initialize arriveeZoneCoordinate.
     if (widget.initialData?['arriveeZone'] != null) {
       for (GeoPoint coordinate in widget.initialData?['arriveeZone']) {
         _arriveeZoneCoordinates.add({
@@ -48,7 +50,7 @@ class _EditZonePageState extends State<EditZonePage> {
       _addArriveeZoneCoordinate();
     }
 
-    // Initialize provenanceZoneCoordinates
+    // Initialize provenanceZoneCoordinates.
     if (widget.initialData?['provenanceZone'] != null) {
       for (GeoPoint coordinate in widget.initialData?['provenanceZone']) {
         _provenanceZoneCoordinates.add({
@@ -59,6 +61,7 @@ class _EditZonePageState extends State<EditZonePage> {
         });
       }
     }
+    // Add provenance zone coordinate if it is empty.
     if (_provenanceZoneCoordinates.isEmpty) {
       _addProvenanceZoneCoordinate();
     }
@@ -79,6 +82,7 @@ class _EditZonePageState extends State<EditZonePage> {
         text: widget.initialData?['raisonsDescription'] ?? '');
   }
 
+   // Add coordinates for arrival zones. 
   void _addArriveeZoneCoordinate() {
     _arriveeZoneCoordinates.add({
       'latitude': TextEditingController(),
@@ -87,6 +91,7 @@ class _EditZonePageState extends State<EditZonePage> {
     setState(() {});
   }
 
+  // Add coordinates for provenance zones. 
   void _addProvenanceZoneCoordinate() {
     _provenanceZoneCoordinates.add({
       'latitude': TextEditingController(),
@@ -111,11 +116,13 @@ class _EditZonePageState extends State<EditZonePage> {
               Text('Nom de la zone et chronologie',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10.0),
+              // Zone Name Field.
               Card(
                 child: Padding(
                   padding: EdgeInsets.all(8.0),
                   child: Column(
                     children: [
+                      // Input field for the zone name.
                       TextFormField(
                         controller: _nomZoneController,
                         decoration:
@@ -123,6 +130,7 @@ class _EditZonePageState extends State<EditZonePage> {
                         validator: (value) =>
                             value!.isEmpty ? 'Donnée manquante' : null,
                       ),
+                      // Input field for "Chronologie de".
                       TextFormField(
                         controller: _fromChronologieController,
                         decoration:
@@ -131,6 +139,7 @@ class _EditZonePageState extends State<EditZonePage> {
                         validator: (value) =>
                             value!.isEmpty ? 'Donnée manquante' : null,
                       ),
+                      // Input field for "Jusqu'à".
                       TextFormField(
                         controller: _toChronologieController,
                         decoration: InputDecoration(labelText: 'Jusqu\'à'),
@@ -157,6 +166,7 @@ class _EditZonePageState extends State<EditZonePage> {
                       ..._arriveeZoneCoordinates
                           .map((coordinate) => Column(
                                 children: [
+                                  // Input field for "Latitude".
                                   TextFormField(
                                     controller: coordinate['latitude'],
                                     decoration:
@@ -168,6 +178,7 @@ class _EditZonePageState extends State<EditZonePage> {
                                         ? 'Donnée manquante'
                                         : null,
                                   ),
+                                  // Input field for "Longitude".
                                   TextFormField(
                                     controller: coordinate['longitude'],
                                     decoration:
@@ -183,6 +194,7 @@ class _EditZonePageState extends State<EditZonePage> {
                               ))
                           .toList(),
                       SizedBox(height: 8.0),
+                      // Button to add another coordinate.
                       ElevatedButton(
                         onPressed: _addArriveeZoneCoordinate,
                         style: ElevatedButton.styleFrom(
@@ -197,7 +209,7 @@ class _EditZonePageState extends State<EditZonePage> {
 
               SizedBox(height: 16.0),
 
-              // Provenance Zone Coordinates
+              // Provenance Zone Coordinates.
               Text('Coordonnées zone de provenance',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10.0),
@@ -209,6 +221,7 @@ class _EditZonePageState extends State<EditZonePage> {
                       ..._provenanceZoneCoordinates
                           .map((coordinate) => Column(
                                 children: [
+                                  // Input field for "Latitude".
                                   TextFormField(
                                     controller: coordinate['latitude'],
                                     decoration:
@@ -220,6 +233,7 @@ class _EditZonePageState extends State<EditZonePage> {
                                         ? 'Donnée manquante'
                                         : null,
                                   ),
+                                  // Input field for "Longitude".
                                   TextFormField(
                                     controller: coordinate['longitude'],
                                     decoration:
@@ -235,6 +249,7 @@ class _EditZonePageState extends State<EditZonePage> {
                               ))
                           .toList(),
                       SizedBox(height: 8.0),
+                      // Button to add another coordinate.
                       ElevatedButton(
                         onPressed: _addProvenanceZoneCoordinate,
                         style: ElevatedButton.styleFrom(
@@ -249,7 +264,7 @@ class _EditZonePageState extends State<EditZonePage> {
 
               SizedBox(height: 16.0),
 
-              // Additional Information
+              // Additional Information.
               Text('Information additionnelle',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
               SizedBox(height: 10.0),
@@ -258,6 +273,7 @@ class _EditZonePageState extends State<EditZonePage> {
                   padding: EdgeInsets.all(8.0),
                   child: Column(
                     children: [
+                      // Population Field.
                       TextFormField(
                         controller: _populationController,
                         decoration:
@@ -265,6 +281,7 @@ class _EditZonePageState extends State<EditZonePage> {
                         validator: (value) =>
                             value!.isEmpty ? 'Donnée manquante' : null,
                       ),
+                      // Provenance Name Field.
                       TextFormField(
                         controller: _provenanceNomController,
                         decoration:
@@ -272,11 +289,13 @@ class _EditZonePageState extends State<EditZonePage> {
                         validator: (value) =>
                             value!.isEmpty ? 'Donnée manquante' : null,
                       ),
+                      // Raisons Fields.
                       TextFormField(
                         controller: _raisonsController,
                         decoration: InputDecoration(
                             labelText: 'Raisons (séparées par des virgules)'),
                       ),
+                      // Input field for "Description".
                       TextFormField(
                         controller: _raisonsDescriptionController,
                         decoration:
@@ -303,9 +322,10 @@ class _EditZonePageState extends State<EditZonePage> {
     );
   }
 
+  // Function to save an existing zone.
   void _saveZone() async {
     if (_formKey.currentState!.validate()) {
-// Extract the coordinates from _arriveeZoneCoordinates
+      // Extract the coordinates from _arriveeZoneCoordinates.
       List<GeoPoint> arriveeZoneList =
           _arriveeZoneCoordinates.map((coordinate) {
         final latitude = double.parse(coordinate['latitude']!.text);
@@ -313,7 +333,7 @@ class _EditZonePageState extends State<EditZonePage> {
         return GeoPoint(latitude, longitude);
       }).toList();
 
-      // Extract the coordinates from _provenanceZoneCoordinates
+      // Extract the coordinates from _provenanceZoneCoordinates.
       List<GeoPoint> provenanceZoneList =
           _provenanceZoneCoordinates.map((coordinate) {
         final latitude = double.parse(coordinate['latitude']!.text);
@@ -322,6 +342,7 @@ class _EditZonePageState extends State<EditZonePage> {
       }).toList();
 
       try {
+        // Update the Firestore document with the new data.
         await _firestore.collection('zones').doc(widget.docId).update({
           'nomZone': _nomZoneController.text,
           'chronologieZone': {
@@ -336,6 +357,7 @@ class _EditZonePageState extends State<EditZonePage> {
           'provenanceZone': provenanceZoneList,
         });
 
+        // Close the page and trigger onSave callback if provided.
         Navigator.pop(context);
         if (widget.onSave != null) {
           widget.onSave!();
@@ -348,6 +370,7 @@ class _EditZonePageState extends State<EditZonePage> {
 
   @override
   void dispose() {
+    // Dispose of text controllers to free up resources.
     _nomZoneController.dispose();
     _fromChronologieController.dispose();
     _toChronologieController.dispose();

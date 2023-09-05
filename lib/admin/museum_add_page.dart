@@ -11,10 +11,12 @@ class AddMuseumPage extends StatefulWidget {
 }
 
 class _AddMuseumPageState extends State<AddMuseumPage> {
+  // Controllers for capturing museum details.
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _latitudeController = TextEditingController();
   final TextEditingController _longitudeController = TextEditingController();
 
+  // Lists of controllers for capturing details of multiple objects.
   List<TextEditingController> _objectNameControllers = [];
   List<TextEditingController> _objectPopulationControllers = [];
   List<TextEditingController> _objectDescriptionControllers = [];
@@ -37,6 +39,7 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
+                  // Fields to fill in when adding a museum.
                   children: [
                     TextField(
                       controller: _nameController,
@@ -55,7 +58,7 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
               ),
             ),
 
-            // Pour chaque objet ajouté au musée
+            // For each object added to the museum.
             for (int i = 0; i < _objectNameControllers.length; i++)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -64,6 +67,7 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      // Fields to fill in when adding an object.
                       children: <Widget>[
                         Text('Objet ${i + 1}',
                             style: TextStyle(
@@ -102,6 +106,7 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
                   ),
                 ),
               ),
+            // Button to add a new object.
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -112,6 +117,7 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
               ),
             ),
             SizedBox(height: 8.0),
+            // Button to save the changes.
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -127,6 +133,7 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
     );
   }
 
+  // Function to add fields for a new object.
   void _addObjectFields() {
     setState(() {
       _objectNameControllers.add(TextEditingController());
@@ -141,8 +148,9 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
     });
   }
 
+  // Function to add a new museum with objects.
   void _addMuseum() {
-    // Création de la liste des objets à partir des contrôleurs
+    // Create a list of objects from the controllers.
     List<Objet> objetsList = [];
     for (int i = 0; i < _objectNameControllers.length; i++) {
       objetsList.add(
@@ -164,16 +172,20 @@ class _AddMuseumPageState extends State<AddMuseumPage> {
       );
     }
 
+    // Create an new museum with new objects.
     Musee newMusee = Musee(
-      id: '', // Générez un ID ou laissez la DB le faire.
+      // Generate an ID or let the DB handle it.
+      id: '', 
       nomMusee: _nameController.text,
       coord: LatLng(
         double.parse(_latitudeController.text),
         double.parse(_longitudeController.text),
       ),
-      objets: objetsList, // Ajout de la liste des objets au musée
+      // Add the list of objects to the museum.
+      objets: objetsList,
     );
 
+    // Add the museum in the database and navigate back.
     final db = DBconnect();
     db.addMusee(newMusee);
     Navigator.pop(context);

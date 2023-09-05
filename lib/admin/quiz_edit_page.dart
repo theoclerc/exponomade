@@ -13,26 +13,39 @@ class EditQuizPage extends StatefulWidget {
 }
 
 class _EditQuizPageState extends State<EditQuizPage> {
-  TextEditingController titleController = TextEditingController();
-  Map<String, TextEditingController> optionsControllers = {};
-  Map<String, bool> optionsTruthValues =
-      {}; // To keep track of the truth values
+  // Instance of DBconnect for database operations.
   final DBconnect dbConnect = DBconnect();
+  
+  // Controller for the question title input field.
+  TextEditingController titleController = TextEditingController();
+
+  // Controllers for options input fields.
+  Map<String, TextEditingController> optionsControllers = {};
+
+  // Map to track the truth values of options (true for correct options, false for others).
+  Map<String, bool> optionsTruthValues = {};
+
+  
 
   @override
   void initState() {
     super.initState();
+
+    // Initialize the title input field with the current question's title.
     titleController.text = widget.question.title;
+
+    // Initialize option controllers and truth values from the current question.
     widget.question.options.forEach((key, value) {
       optionsControllers[key] = TextEditingController(text: key);
-      optionsTruthValues[key] = value; // Initialize the truth values
+      optionsTruthValues[key] = value;
     });
   }
 
+  // Function to save the edited question.
   void saveQuestion() async {
     String questionTitle = titleController.text.trim();
 
-    // Check if question title is empty
+    // Check if the question title is empty.
     if (questionTitle.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -42,7 +55,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
       return;
     }
 
-    // Check if any option is empty
+    // Check if any option is empty.
     for (var key in optionsControllers.keys) {
       if (optionsControllers[key]!.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -54,7 +67,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
       }
     }
 
-    // Check for duplicate options
+    // Check for duplicate options.
     List<String> optionTexts = optionsControllers.values
         .map((controller) => controller.text.trim())
         .toList();
@@ -67,19 +80,21 @@ class _EditQuizPageState extends State<EditQuizPage> {
       return;
     }
 
-    // Update Firestore
+    // Update the question in Firestore.
     await dbConnect.updateQuestion(
         widget.question.id,
         questionTitle,
         optionsControllers.map((key, controller) => MapEntry(
             controller.text.trim(), optionsTruthValues[key] ?? false)));
 
-    Navigator.pop(context); // Close the edit page and go back
+    // Close the edit page and navigate back.
+    Navigator.pop(context);
   }
 
+  // Function to set only one option as true and handle errors.
   void setOnlyOneTrue(String option, bool value) {
-    // If setting to true, make this the only true option
     if (value) {
+      // If setting to true, make this the only true option.
       setState(() {
         optionsTruthValues.forEach((key, _) {
           optionsTruthValues[key] = false;
@@ -87,14 +102,14 @@ class _EditQuizPageState extends State<EditQuizPage> {
         optionsTruthValues[option] = true;
       });
     } else {
-      // If setting to false, only allow if there's another true option
+      // If setting to false, only allow if there's another true option.
       int trueCount = optionsTruthValues.values.where((e) => e).length;
       if (trueCount > 1) {
         setState(() {
           optionsTruthValues[option] = false;
         });
       } else {
-        // Show a dialog, alert, or some feedback
+        // Show a dialog, alert, or some feedback for the error.
         showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -121,12 +136,14 @@ class _EditQuizPageState extends State<EditQuizPage> {
       ),
       body: Column(
         children: [
+          // Input field for question title.
           ListTile(
             title: TextField(
               controller: titleController,
               decoration: InputDecoration(labelText: 'Titre de la question'),
             ),
           ),
+          // Input fields for options and switches for truth values.
           ...optionsControllers.keys.map(
             (option) => ListTile(
               title: TextField(
@@ -139,7 +156,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
                   if (value) {
                     setOnlyOneTrue(option, value);
                   } else {
-                    // Ensure that at least one option is true before allowing de-selection
+                    // Ensure that at least one option is true before allowing de-selection.
                     int trueCount =
                         optionsTruthValues.values.where((e) => e).length;
                     if (trueCount > 1) {
@@ -147,7 +164,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
                         optionsTruthValues[option] = false;
                       });
                     } else {
-                      // Show a dialog, alert, or some feedback
+                      // Show a dialog, alert, or some feedback for the error.
                       showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
@@ -168,6 +185,7 @@ class _EditQuizPageState extends State<EditQuizPage> {
               ),
             ),
           ),
+          // Button to save the edited question.
           ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: background,

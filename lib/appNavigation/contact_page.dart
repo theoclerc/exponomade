@@ -5,25 +5,22 @@ import '../widgets/custom_textfield.dart';
 import '../utils/validators.dart';
 
 class ContactPage extends StatefulWidget {
-
+  // User's score.
   final int? score;
+
   const ContactPage({Key? key, this.score}) : super(key: key);
-  
-  
 
   @override
   State<ContactPage> createState() => _ContactPageState();
-  
 }
 
-
 class _ContactPageState extends State<ContactPage> {
-
   final _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    // Initialize the score from the widget parameter or set it to 0.
     ContactService.score = widget.score ?? 0;
   }
 
@@ -33,6 +30,7 @@ class _ContactPageState extends State<ContactPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: background,
+      // Appbar for the contact form page.
       appBar: AppBar(
         automaticallyImplyLeading: false,
         title: Text('Formulaire de contact'),
@@ -46,6 +44,7 @@ class _ContactPageState extends State<ContactPage> {
             child: Form(
               key: _formKey,
               child: Column(
+                // Different boxes of the form to fill in.
                 children: [
                   CustomTextField(
                     controller: ContactService.nameController,
@@ -83,7 +82,9 @@ class _ContactPageState extends State<ContactPage> {
                     keyboardType: TextInputType.multiline,
                   ),
                   _sizedBox(),
+                  // Button to validate form submission.
                   ElevatedButton(
+                    // Reaction after pressing the button "Envoyer"
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         ContactService.sendEmail();
@@ -101,7 +102,8 @@ class _ContactPageState extends State<ContactPage> {
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: neutral,
-                      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15.0),
                       ),
@@ -117,6 +119,7 @@ class _ContactPageState extends State<ContactPage> {
                   ),
                   _sizedBox(),
                   Text(
+                    // Display the user's score or a default of '0'.
                     "Note: votre score de ${widget.score ?? '0'} sera inclus dans le courriel.",
                     style: const TextStyle(
                       fontSize: 14,

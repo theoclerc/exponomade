@@ -21,27 +21,37 @@ class AdminPage extends StatefulWidget {
 }
 
 class _AdminPageState extends State<AdminPage> {
+  
+  // Email and password text controllers.
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  // Collection of editing pages for a connected admin.
   List<String> collections = ['Musées', 'Quiz', 'Zones'];
+  // Booleans to manage the display of Museums, Zones and Quizzes pages for a logged-in admin.
   bool showMuseumAdminPage = false;
   bool showZoneAdminPage = false;
   bool showQuizAdminPage = false;
-  User? _user; // To store the authenticated user
+  // To store the authenticated user.
+  User? _user; 
+  // Error variable for admin login.
   String? _signInError;
+  // Future that will hold a List of Questions.
   late Future<List<Question>> questions;
+  // Future that will hold a List of Museums.
   late Future<List<Musee>> musees;
+  // Instance of the DBconnect.
   final DBconnect db = DBconnect();
 
   @override
   void initState() {
     super.initState();
     _checkAuthenticationStatus();
+    // Collecting DB questions and museums.
     questions = db.fetchQuestions();
     musees = db.fetchMusees();
   }
 
-  // Function to check if a user is already authenticated
+  // Function to check if a user is already authenticated.
   Future<void> _checkAuthenticationStatus() async {
     User? user = FirebaseAuth.instance.currentUser;
     setState(() {
@@ -49,7 +59,7 @@ class _AdminPageState extends State<AdminPage> {
     });
   }
 
-  // Function to sign in with email and password
+  // Function to sign in with email and password.
   Future<void> _signInWithEmailAndPassword() async {
     try {
       UserCredential userCredential =
@@ -58,14 +68,14 @@ class _AdminPageState extends State<AdminPage> {
         password: _passwordController.text,
       );
 
-      // Update the UI to reflect the signed-in user
+      // Update the UI to reflect the signed-in user.
       setState(() {
         _user = userCredential.user;
         _signInError = null;
       });
 
       // Successful sign-in, you can now perform admin actions.
-      // Access the signed-in user: userCredential.user
+      // Access the signed-in user: userCredential.user.
     } catch (e) {
       setState(() {
         if (e.toString().contains('user-not-found') ||
@@ -102,13 +112,14 @@ class _AdminPageState extends State<AdminPage> {
     return Scaffold(
       backgroundColor: background,
       appBar: _user != null
+          // Appbar for the admin page.
           ? AppBar(
               automaticallyImplyLeading: false,
               title: Text('Administration'),
               backgroundColor: background,
               actions: [
-                  IconButton(icon: Icon(Icons.logout), onPressed: _signOut),
-                ])
+                IconButton(icon: Icon(Icons.logout), onPressed: _signOut),
+              ])
           : AppBar(
               automaticallyImplyLeading: false,
               title: Text('Administration'),
@@ -116,12 +127,14 @@ class _AdminPageState extends State<AdminPage> {
             ),
       body: Center(
         child: _user == null
-            ? _buildSignInForm() // Show sign-in form when not authenticated
+            // Show sign-in form when not authenticated and show admin actions when authenticated.
+            ? _buildSignInForm() 
             : _buildAdminActions(),
-      ), // Show admin actions when authenticated,
+      ), 
     );
   }
 
+ // Sign-in form when not authenticated.
   Widget _buildSignInForm() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
@@ -139,6 +152,7 @@ class _AdminPageState extends State<AdminPage> {
                   ),
                 ),
                 SizedBox(height: 25),
+                // Fields to fill in for connection.
                 CustomTextField(
                   controller: _emailController,
                   icon: Icons.email,
@@ -157,6 +171,7 @@ class _AdminPageState extends State<AdminPage> {
                   maxLines: 1,
                 ),
                 SizedBox(height: 25),
+                // Connection button.
                 ElevatedButton(
                   onPressed: _signInWithEmailAndPassword,
                   style: ElevatedButton.styleFrom(
@@ -177,6 +192,7 @@ class _AdminPageState extends State<AdminPage> {
                   ),
                 ),
                 SizedBox(height: 25),
+                // 
                 if (_signInError != null)
                   Text(
                     _signInError!,
@@ -193,9 +209,11 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // Actions when admin is logged in.
   Widget _buildAdminActions() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(25.0, 40, 25, 0),
+      // Display of edit pages.
       child: showMuseumAdminPage
           ? _buildMuseumAdminPage()
           : showQuizAdminPage
@@ -251,6 +269,7 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // Creation of the page for the museum edition.
   Widget _buildMuseumAdminPage() {
     return Scaffold(
       backgroundColor: background,
@@ -265,7 +284,8 @@ class _AdminPageState extends State<AdminPage> {
             ),
             onPressed: () {
               setState(() {
-                showMuseumAdminPage = false; // Hide the MuseumAdminPage
+                // Hide the MuseumAdminPage
+                showMuseumAdminPage = false; 
               });
             },
             child: Text("Retour",
@@ -274,6 +294,7 @@ class _AdminPageState extends State<AdminPage> {
                   fontWeight: FontWeight.bold,
                 )),
           ),
+          // Listing of museums available for editing.
           FutureBuilder<List<Musee>>(
             future: musees,
             builder: (context, snapshot) {
@@ -282,13 +303,14 @@ class _AdminPageState extends State<AdminPage> {
               }
 
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return Center(child: Text('Aucun muséee trouvé'));
+                return Center(child: Text('Aucun musée trouvé'));
               }
 
               return Expanded(
                 child: ListView.builder(
                   itemCount:
-                      snapshot.data!.length * 2 - 1, // Account for Dividers
+                      // Account for Dividers.
+                      snapshot.data!.length * 2 - 1, 
                   itemBuilder: (context, index) {
                     if (index.isEven) {
                       Musee musee = snapshot.data![index ~/ 2];
@@ -321,6 +343,7 @@ class _AdminPageState extends State<AdminPage> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            //Edit button.
                             IconButton(
                               icon: Icon(
                                 Icons.edit,
@@ -340,6 +363,7 @@ class _AdminPageState extends State<AdminPage> {
                                 });
                               },
                             ),
+                            // Delete button.
                             IconButton(
                               icon: Icon(
                                 Icons.delete,
@@ -362,6 +386,7 @@ class _AdminPageState extends State<AdminPage> {
                                         ),
                                         TextButton(
                                           child: Text('Effacer'),
+                                          // Call the delete function for the selected museum.
                                           onPressed: () {
                                             db.deleteMusee(musee.id).then((_) {
                                               setState(() {
@@ -413,6 +438,7 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // Creation of the page for the quiz edition.
   Widget _buildQuizAdminPage() {
     return Scaffold(
       backgroundColor: background,
@@ -427,7 +453,8 @@ class _AdminPageState extends State<AdminPage> {
             ),
             onPressed: () {
               setState(() {
-                showQuizAdminPage = false; // Hide the QuizAdminPage
+                // Hide the QuizAdminPage
+                showQuizAdminPage = false; 
               });
             },
             child: Text("Retour",
@@ -436,6 +463,7 @@ class _AdminPageState extends State<AdminPage> {
                   fontWeight: FontWeight.bold,
                 )),
           ),
+          // Listing of questions available for editing.
           FutureBuilder<List<Question>>(
             future: questions,
             builder: (context, snapshot) {
@@ -450,10 +478,10 @@ class _AdminPageState extends State<AdminPage> {
               return Expanded(
                 child: ListView.builder(
                   itemCount:
-                      snapshot.data!.length * 2 - 1, // Account for Dividers
+                  // Account for Dividers
+                      snapshot.data!.length * 2 - 1, 
                   itemBuilder: (context, index) {
                     if (index.isEven) {
-                      // This is a ListTile
                       Question question = snapshot.data![index ~/ 2];
                       return ListTile(
                         title: Text(
@@ -471,6 +499,7 @@ class _AdminPageState extends State<AdminPage> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
+                            // Edit button.
                             IconButton(
                               icon: Icon(
                                 Icons.edit,
@@ -490,6 +519,7 @@ class _AdminPageState extends State<AdminPage> {
                                 });
                               },
                             ),
+                            // Delete button.
                             IconButton(
                               icon: Icon(
                                 Icons.delete,
@@ -512,6 +542,7 @@ class _AdminPageState extends State<AdminPage> {
                                         ),
                                         TextButton(
                                           child: Text('Effacer'),
+                                          // Call the delete function for the selected question.
                                           onPressed: () {
                                             db
                                                 .deleteQuestion(question.id)
@@ -533,12 +564,11 @@ class _AdminPageState extends State<AdminPage> {
                         ),
                       );
                     } else {
-                      // This is a Divider
                       return Divider();
                     }
                   },
                   padding: EdgeInsets.only(
-                      bottom: 80.0), // Extra padding at the bottom
+                      bottom: 80.0),
                 ),
               );
             },
@@ -567,6 +597,7 @@ class _AdminPageState extends State<AdminPage> {
     );
   }
 
+  // Creation of the page for the zones edition.
   Widget _buildZoneAdminPage() {
     return Scaffold(
       backgroundColor: background,
@@ -581,7 +612,8 @@ class _AdminPageState extends State<AdminPage> {
             ),
             onPressed: () {
               setState(() {
-                showZoneAdminPage = false; // Hide the QuizAdminPage
+                // Hide the QuizAdminPage.
+                showZoneAdminPage = false; 
               });
             },
             child: Text("Retour",
@@ -590,6 +622,7 @@ class _AdminPageState extends State<AdminPage> {
                   fontWeight: FontWeight.bold,
                 )),
           ),
+          // Listing of zones available for editing.
           FutureBuilder<List<DocumentSnapshot>>(
             future: db.fetchZones(),
             builder: (context, snapshot) {
@@ -625,6 +658,7 @@ class _AdminPageState extends State<AdminPage> {
                             trailing: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
+                                //Edit button.
                                 IconButton(
                                   icon: Icon(
                                     Icons.edit,
@@ -639,13 +673,13 @@ class _AdminPageState extends State<AdminPage> {
                                           docId: snapshot.data![index].id,
                                           onSave: () {
                                             setState(() {});
-                                            // This will refresh your widget
                                           },
                                         ),
                                       ),
                                     );
                                   },
                                 ),
+                                // Delete button.
                                 IconButton(
                                   icon: Icon(
                                     Icons.delete,
@@ -670,7 +704,7 @@ class _AdminPageState extends State<AdminPage> {
                                             TextButton(
                                               child: Text('Effacer'),
                                               onPressed: () async {
-                                                // Call the delete function for the selected zone
+                                                // Call the delete function for the selected zone.
                                                 await db.deleteZone(
                                                     snapshot.data![index].id);
 

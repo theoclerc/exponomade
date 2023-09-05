@@ -9,25 +9,35 @@ class QuizAddPage extends StatefulWidget {
 }
 
 class _QuizAddPageState extends State<QuizAddPage> {
+  // Instance of DBconnect for database operations.
   final DBconnect dbConnect = DBconnect();
+
+  // Controller for the question title input field.
   TextEditingController titleController = TextEditingController();
+
+  // Controllers for options input fields.
   Map<String, TextEditingController> optionsControllers = {};
+
+  // Map to track the truth values of options (true for correct options, false for others).
   Map<String, bool> optionsTruthValues = {};
 
   @override
   void initState() {
     super.initState();
+    // Initialize option controllers and set all options as false by default.
     for (int i = 1; i <= 4; i++) {
       String key = 'Option $i';
       optionsControllers[key] = TextEditingController();
-      optionsTruthValues[key] = false; // Initialize all options as false
+      optionsTruthValues[key] = false;
     }
   }
 
+  // Function to add a new question.
   void addQuestion() async {
+    // Get the trimmed question title.
     String questionTitle = titleController.text.trim();
 
-    // Check if question title is empty
+    // Check if the question title is empty.
     if (questionTitle.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -37,7 +47,7 @@ class _QuizAddPageState extends State<QuizAddPage> {
       return;
     }
 
-    // Check if any option is empty
+    // Check if any option is empty.
     for (var key in optionsControllers.keys) {
       if (optionsControllers[key]!.text.trim().isEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -49,7 +59,7 @@ class _QuizAddPageState extends State<QuizAddPage> {
       }
     }
 
-    // Check that only one option is true
+    // Check that only one option is marked as true (correct).
     int trueCount = optionsTruthValues.values.where((v) => v).length;
     if (trueCount != 1) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -60,7 +70,7 @@ class _QuizAddPageState extends State<QuizAddPage> {
       return;
     }
 
-    // Check for duplicate options
+    // Check for duplicate options.
     List<String> optionTexts =
         optionsControllers.values.map((controller) => controller.text).toList();
     if (optionTexts.toSet().length != optionTexts.length) {
@@ -72,19 +82,25 @@ class _QuizAddPageState extends State<QuizAddPage> {
       return;
     }
 
+    // Map options with their truth values.
     Map<String, bool> options = optionsControllers.map(
       (key, controller) =>
           MapEntry(controller.text, optionsTruthValues[key] ?? false),
     );
 
+    // Create a new question object.
     Question newQuestion = Question(
-      id: '', // Firestore will auto-generate this
+      // Firestore will auto-generate this.
+      id: '', 
       title: questionTitle,
       options: options,
     );
 
+    // Add the new question to the database.
     await dbConnect.addQuestion(newQuestion);
-    Navigator.pop(context); // Navigate back to the previous screen
+
+    // Navigate back to the previous screen.
+    Navigator.pop(context);
   }
 
   @override
@@ -101,11 +117,13 @@ class _QuizAddPageState extends State<QuizAddPage> {
               padding: EdgeInsets.all(16.0),
               child: Column(
                 children: [
+                  // Input field for question title.
                   TextFormField(
                     controller: titleController,
                     decoration:
                         InputDecoration(labelText: 'Titre de la question'),
                   ),
+                  // Input fields and switches for options.
                   ...optionsControllers.keys
                       .map(
                         (option) => ListTile(
@@ -127,6 +145,7 @@ class _QuizAddPageState extends State<QuizAddPage> {
                 ],
               ),
             ),
+            // Button to add the question.
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: background,

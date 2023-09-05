@@ -12,12 +12,15 @@ class ZoneAddPage extends StatefulWidget {
 class _ZoneAddPageState extends State<ZoneAddPage> {
   final _formKey = GlobalKey<FormState>();
 
+  // Lists to hold controllers for coordinates of arrival zones.
   List<TextEditingController> _arriveeZoneLatitudeControllers = [];
   List<TextEditingController> _arriveeZoneLongitudeControllers = [];
 
+  // Lists to hold controllers for coordinates of provenance zones.
   List<TextEditingController> _provenanceZoneLatitudeControllers = [];
   List<TextEditingController> _provenanceZoneLongitudeControllers = [];
 
+  // Controllers for various input fields.
   late TextEditingController _nomZoneController;
   late TextEditingController _fromChronologieController;
   late TextEditingController _toChronologieController;
@@ -30,6 +33,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
   void initState() {
     super.initState();
 
+    // Initialize controllers for various input fields.
     _nomZoneController = TextEditingController();
     _fromChronologieController = TextEditingController();
     _toChronologieController = TextEditingController();
@@ -38,27 +42,30 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
     _raisonsController = TextEditingController();
     _raisonsDescriptionController = TextEditingController();
 
+    // Add initial coordinates for arrival and provenance zones.
     _addArriveeZoneCoordinate();
     _addProvenanceZoneCoordinate();
   }
 
+  // Function to add a new arrival zone coordinate.
   void _addArriveeZoneCoordinate() {
     _arriveeZoneLatitudeControllers.add(TextEditingController());
     _arriveeZoneLongitudeControllers.add(TextEditingController());
     setState(() {});
   }
 
+  // Function to add a new provenance zone coordinate.
   void _addProvenanceZoneCoordinate() {
     _provenanceZoneLatitudeControllers.add(TextEditingController());
     _provenanceZoneLongitudeControllers.add(TextEditingController());
     setState(() {});
   }
 
+  // Style for input field labels.
   final inputLabelStyle = TextStyle(
-    fontWeight: FontWeight.bold, // Regular font weight
-    fontSize: 16.0, // You can adjust this value to your preference
-    color: Colors
-        .grey[600], // Assuming this is the default color. Adjust as needed.
+    fontWeight: FontWeight.bold,
+    fontSize: 16.0,
+    color: Colors.grey[600],
   );
 
   @override
@@ -75,12 +82,13 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Zone Name Field
+              // Zone Name Field.
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Column(
                     children: [
+                      // Input field for the zone name.
                       TextFormField(
                         controller: _nomZoneController,
                         decoration:
@@ -90,9 +98,10 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                       ),
                       SizedBox(height: 16.0),
 
-                      // Chronologie Fields
+                      // Chronology Fields.
                       Row(
                         children: [
+                          // Input field for "Chronologie de".
                           Expanded(
                             child: TextFormField(
                               controller: _fromChronologieController,
@@ -104,6 +113,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                             ),
                           ),
                           SizedBox(width: 16.0),
+                          // Input field for "Jusqu'à".
                           Expanded(
                             child: TextFormField(
                               controller: _toChronologieController,
@@ -118,7 +128,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                       ),
                       SizedBox(height: 16.0),
 
-                      // Population Field
+                      // Population Field.
                       TextFormField(
                         controller: _populationController,
                         decoration:
@@ -128,7 +138,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                       ),
                       SizedBox(height: 16.0),
 
-                      // Provenance Name Field
+                      // Provenance Name Field.
                       TextFormField(
                         controller: _provenanceNomController,
                         decoration:
@@ -138,7 +148,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                       ),
                       SizedBox(height: 16.0),
 
-                      // Raisons Fields
+                      // Raisons Fields.
                       TextFormField(
                         controller: _raisonsController,
                         decoration: InputDecoration(
@@ -147,6 +157,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                             value!.isEmpty ? 'Donnée manquante' : null,
                       ),
                       SizedBox(height: 16.0),
+                      // Input field for "Description".
                       TextFormField(
                         controller: _raisonsDescriptionController,
                         decoration: InputDecoration(labelText: 'Description'),
@@ -160,7 +171,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
               ),
               SizedBox(height: 16.0),
 
-              // Arrivee Zone Coordinates
+              // Arrival Zone Coordinates.
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -175,6 +186,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                           children: [
                             Row(
                               children: [
+                                // Input field for "Latitude".
                                 Expanded(
                                   child: TextFormField(
                                     controller:
@@ -190,6 +202,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                                   ),
                                 ),
                                 SizedBox(width: 16.0),
+                                // Input field for "Longitude".
                                 Expanded(
                                   child: TextFormField(
                                     controller:
@@ -210,6 +223,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                         ),
                       ),
                       SizedBox(height: 8.0),
+                      // Button to add another coordinate.
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: background,
@@ -223,7 +237,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
               ),
               SizedBox(height: 16.0),
 
-              // Provenance Zone Coordinates
+              // Provenance Zone Coordinates.
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
@@ -238,6 +252,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                           children: [
                             Row(
                               children: [
+                                // Input field for "Latitude".
                                 Expanded(
                                   child: TextFormField(
                                     controller:
@@ -254,6 +269,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                                   ),
                                 ),
                                 SizedBox(width: 16.0),
+                                // Input field for "Longitude".
                                 Expanded(
                                   child: TextFormField(
                                     controller:
@@ -275,6 +291,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                         ),
                       ),
                       SizedBox(height: 8.0),
+                      // Button to add another coordinate.
                       ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: background,
@@ -286,7 +303,7 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                   ),
                 ),
               ),
-              // Submit Button
+              // Submit Button.
               Center(
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -303,8 +320,10 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
     );
   }
 
+  // Function to add a new zone.
   void _addZone() async {
     if (_formKey.currentState!.validate()) {
+      // Create lists of GeoPoint objects for arrival and provenance zones.
       List<GeoPoint> arriveeZoneList = List<GeoPoint>.generate(
           _arriveeZoneLatitudeControllers.length,
           (index) => GeoPoint(
@@ -319,9 +338,10 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
                 double.parse(_provenanceZoneLongitudeControllers[index].text),
               ));
 
-      // Create an instance of the DBconnect class
+      // Create an instance of the DBconnect class.
       DBconnect db = DBconnect();
 
+      // Create a new Zone object with input data.
       Zone newZone = Zone(
         nomZone: _nomZoneController.text,
         chronologieZone: {
@@ -336,14 +356,17 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
         provenanceZoneList: provenanceZoneList,
       );
 
+      // Add the new Zone to the database.
       await db.addZone(newZone);
 
+      // Navigate back to the previous screen.
       Navigator.pop(context);
     }
   }
 
   @override
   void dispose() {
+    // Dispose all controllers when the widget is disposed.
     _nomZoneController.dispose();
     _fromChronologieController.dispose();
     _toChronologieController.dispose();
@@ -352,9 +375,8 @@ class _ZoneAddPageState extends State<ZoneAddPage> {
     _raisonsController.dispose();
     _raisonsDescriptionController.dispose();
 
-    // Dispose all controllers in the lists:
-    _arriveeZoneLatitudeControllers
-        .forEach((controller) => controller.dispose());
+    // Dispose all controllers in the lists.
+    _arriveeZoneLatitudeControllers.forEach((controller) => controller.dispose());
     _arriveeZoneLongitudeControllers
         .forEach((controller) => controller.dispose());
     _provenanceZoneLatitudeControllers

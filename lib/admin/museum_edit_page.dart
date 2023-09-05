@@ -16,10 +16,12 @@ class EditMuseumPage extends StatefulWidget {
 }
 
 class _EditMuseumPageState extends State<EditMuseumPage> {
+  // Controllers for capturing museum details.
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _latitudeController = TextEditingController();
   final TextEditingController _longitudeController = TextEditingController();
 
+  // Lists of controllers for capturing details of multiple objects.
   List<TextEditingController> _objectNameControllers = [];
   List<TextEditingController> _objectPopulationControllers = [];
   List<TextEditingController> _objectDescriptionControllers = [];
@@ -30,21 +32,23 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
   @override
   void initState() {
     super.initState();
+
+    // Initialize controllers with existing museum data.
     _nameController.text = widget.musee.nomMusee;
     _latitudeController.text = widget.musee.coord.latitude.toString();
     _longitudeController.text = widget.musee.coord.longitude.toString();
 
+    // Initialize controllers for each object.
     for (var obj in widget.musee.objets) {
       _objectNameControllers.add(TextEditingController(text: obj.nomObjet));
-      _objectPopulationControllers
-          .add(TextEditingController(text: obj.population));
-      _objectDescriptionControllers
-          .add(TextEditingController(text: obj.descriptionObjet));
+      _objectPopulationControllers.add(TextEditingController(text: obj.population));
+      _objectDescriptionControllers.add(TextEditingController(text: obj.descriptionObjet));
       _objectImageControllers.add(TextEditingController(text: obj.image));
-      _objectRaisonsControllers.add(obj.raisons
-          .map((raison) => TextEditingController(text: raison))
-          .toList());
 
+      // Initialize controllers for object reasons.
+      _objectRaisonsControllers.add(obj.raisons.map((raison) => TextEditingController(text: raison)).toList());
+
+      // Initialize controllers for object chronology.
       var chronologieMap = Map<String, TextEditingController>();
       obj.chronologie.forEach((key, value) {
         chronologieMap[key] = TextEditingController(text: value);
@@ -68,6 +72,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
               child: Padding(
                 padding: const EdgeInsets.all(12.0),
                 child: Column(
+                  // Fields to modify when editing a museum.
                   children: [
                     TextField(
                         controller: _nameController,
@@ -83,7 +88,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
               ),
             ),
 
-            // Dynamic object fields based on controllers
+            // For each object of the museum.
             for (int i = 0; i < _objectNameControllers.length; i++)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 16.0),
@@ -92,6 +97,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
                     padding: const EdgeInsets.all(12.0),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
+                      // Fields to modify when editing an object.
                       children: <Widget>[
                         Text('Objet ${i + 1}',
                             style: TextStyle(
@@ -132,7 +138,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
                 ),
               ),
 
-            // Button to add a new object
+            // Button to add a new object.
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -155,6 +161,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
               ),
             ),
             SizedBox(height: 8.0),
+            // Button to save the changes.
             Center(
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -170,9 +177,9 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
     );
   }
 
-// Fonction pour sauvegarder le musée
+  // Function to save the museum.
   void _saveMuseum() {
-    // Construction de la liste des objets
+    // Create a list of updated objects from the controllers
     List<Objet> updatedObjets = [];
     for (int i = 0; i < _objectNameControllers.length; i++) {
       updatedObjets.add(Objet(
@@ -188,6 +195,7 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
       ));
     }
 
+    // Create an updated museum with updated objects.
     Musee updatedMusee = Musee(
       id: widget.musee.id,
       nomMusee: _nameController.text,
@@ -195,9 +203,11 @@ class _EditMuseumPageState extends State<EditMuseumPage> {
         double.parse(_latitudeController.text),
         double.parse(_longitudeController.text),
       ),
+      // Update the list of objects to the museum.
       objets: updatedObjets,
     );
 
+    // Update the museum in the database and navigate back.
     final db = DBconnect();
     db.updateMusee(updatedMusee);
     Navigator.pop(context);
