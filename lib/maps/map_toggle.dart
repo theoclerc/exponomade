@@ -12,7 +12,7 @@ import 'provenanceZone_info_popup.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:math';
 
-// This class manages the Google Maps, displaying various elements and making it interactive. 
+// This class manages the Google Maps, displaying various elements and making it interactive.
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
 
@@ -40,13 +40,13 @@ class _MapToggleState extends State<MapToggle> {
   // Current pair used.
   int currentPairIndex = 0;
 
-  // Period options
+  // Period options.
   List<String> periodOptions = [];
   String selectedPeriod = '';
-  // Reasons options
+  // Reasons options.
   List<String> reasonOptions = [];
   String selectedReason = '';
-  // Population options
+  // Population options.
   List<String> populationOptions = [];
   String selectedPopulation = '';
 
@@ -113,8 +113,8 @@ class _MapToggleState extends State<MapToggle> {
   }
 
   // Add museum markers based on the selected period.
-  Future<void> _addMuseumMarkersForSelectedPeriod(selectedPeriod) async {
-    // Update museums
+  Future<void> _addMuseumMarkers(selectedPeriod) async {
+    // Update museums.
     List<Musee> museums =
         await db.updateMuseumsAndObjectsForSelectedPeriod(selectedPeriod);
 
@@ -128,7 +128,7 @@ class _MapToggleState extends State<MapToggle> {
 
   // Add museum markers based on the selected reason.
   Future<void> _addMuseumMarkersForSelectedReason(selectedReason) async {
-    // Update museums
+    // Update museums.
     List<Musee> museums =
         await db.updateMuseumsAndObjectsForSelectedReason(selectedReason);
 
@@ -143,7 +143,7 @@ class _MapToggleState extends State<MapToggle> {
   // Add museum markers based on the selected population.
   Future<void> _addMuseumMarkersForSelectedPopulation(
       selectedPopulation) async {
-    // Update museums
+    // Update museums.
     List<Musee> museums = await db
         .updateMuseumsAndObjectsForSelectedPopulation(selectedPopulation);
 
@@ -159,7 +159,7 @@ class _MapToggleState extends State<MapToggle> {
   Future<void> _createMarkersAndPolygons() async {
     List<arriveZone> arriveeZones = await db.fetchArriveZones();
     List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
-    await _addMuseumMarkersForSelectedPeriod(selectedPeriod);
+    await _addMuseumMarkers(selectedPeriod);
 
     // When "Aucune" is selected, no zone appears.
     if (selectedPeriod != "Aucune") {
@@ -383,6 +383,7 @@ class _MapToggleState extends State<MapToggle> {
     });
   }
 
+
   // Update zones when a new period is selected.
   Future<void> _updateZonesForSelectedPeriod() async {
     // Update arriveeZones.
@@ -439,7 +440,7 @@ class _MapToggleState extends State<MapToggle> {
     }
 
     // Update museums.
-    await _addMuseumMarkersForSelectedPeriod(selectedPeriod);
+    await _addMuseumMarkers(selectedPeriod);
   }
 
   // Update zones when a new reason is selected.
@@ -662,7 +663,7 @@ class _MapToggleState extends State<MapToggle> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.filter_list),
+                          const Icon(Icons.lightbulb_outline),
                           const SizedBox(width: 8),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -710,7 +711,7 @@ class _MapToggleState extends State<MapToggle> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.group),
+                          const Icon(Icons.people),
                           const SizedBox(width: 8),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -735,8 +736,66 @@ class _MapToggleState extends State<MapToggle> {
                         ],
                       ),
                     ),
-                  ),
+                  ),               
                 ],
+              ),
+            ),
+             Positioned(
+              bottom: 120,
+              left: 450,
+              right: 450,
+              child: Visibility(
+                visible: totalPairs > 0,
+                child: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.orange,
+                      borderRadius: BorderRadius.circular(8),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.2),
+                          blurRadius: 6.0,
+                          spreadRadius: 2.0,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            
+                            if (currentPairIndex > 0) {
+                              currentPairIndex--;
+                              _displayPair(currentPairIndex);
+                            }
+                          },
+                          icon: Icon(Icons.navigate_before, color: Colors.white),
+                        ),
+                        Text(
+                          "Zone ${currentPairIndex + 1} sur $totalPairs",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 14,
+                            color: Colors.white,
+                          ),
+                        ),
+                        IconButton(
+                          onPressed: () {
+                            
+                            if (currentPairIndex < totalPairs - 1) {
+                              currentPairIndex++;
+                              _displayPair(currentPairIndex);
+                            }
+                          },
+                          icon: Icon(Icons.navigate_next, color: Colors.white),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -745,4 +804,3 @@ class _MapToggleState extends State<MapToggle> {
     );
   }
 }
-
