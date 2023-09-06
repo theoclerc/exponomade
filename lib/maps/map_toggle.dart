@@ -12,6 +12,7 @@ import 'provenanceZone_info_popup.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'dart:math';
 
+// This class manages the Google Maps, displaying various elements and making it interactive. 
 class MapToggle extends StatefulWidget {
   const MapToggle({Key? key}) : super(key: key);
 
