@@ -774,6 +774,7 @@ class _MapToggleState extends State<MapToggle> {
                           },
                           icon: Icon(Icons.navigate_before, color: Colors.white),
                         ),
+                        // Display a button to scroll through zone pairs.
                         Text(
                           "Zone ${currentPairIndex + 1} sur $totalPairs",
                           style: const TextStyle(
@@ -784,7 +785,6 @@ class _MapToggleState extends State<MapToggle> {
                         ),
                         IconButton(
                           onPressed: () {
-                            
                             if (currentPairIndex < totalPairs - 1) {
                               currentPairIndex++;
                               _displayPair(currentPairIndex);
