@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
+// This custom widget represents a styled "Next" button for navigating to the next question.
 class NextButton extends StatelessWidget {
   const NextButton({Key? key}) : super(key: key);
 
@@ -17,7 +18,6 @@ class NextButton extends StatelessWidget {
         'Question suivante',
         textAlign: TextAlign.center,
         style: TextStyle(fontSize: 22.0, fontWeight: FontWeight.bold),
-        
       ),
     );
   }

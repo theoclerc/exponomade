@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
+// This custom widget represents an option card with a colored background.
 class OptionCard extends StatelessWidget {
   const OptionCard({Key? key, required this.option, required this.color,}) : super(key: key);
   final String option;

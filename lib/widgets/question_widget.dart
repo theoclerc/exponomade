@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
+// This custom widget displays a question along with its index and total question count.
 class QuestionWidget extends StatelessWidget {
   const QuestionWidget({
     Key? key,
@@ -19,6 +20,7 @@ class QuestionWidget extends StatelessWidget {
       alignment: Alignment.centerLeft,
       child: Padding(
         padding: const EdgeInsets.only(top: 20.0),
+        // Display question index, total questions, and the question text.
         child: Text(
           'Question ${indexAction + 1}/$totalQuestions : $question',
           style: const TextStyle(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
+// This custom widget displays the result of a quiz.
 class ResultBox extends StatelessWidget {
   const ResultBox({
     Key? key,
@@ -33,11 +34,14 @@ class ResultBox extends StatelessWidget {
             CircleAvatar(
               radius: 70.0,
               backgroundColor: result == questionLength / 2
+                  // Display a red circle if the result is less than half correct.
+                  // Display a green circle if the result is more than half correct.
                   ? Colors.yellow
                   : result < questionLength / 2
-                      ? incorrect
+                      ? incorrect 
                       : correct,
-              child: Text('$result/$questionLength',
+              // Display the result fraction (e.g., "7/10").
+              child: Text('$result/$questionLength', 
                   style: const TextStyle(fontSize: 30.0)),
             ),
             const SizedBox(height: 20.0),
@@ -51,7 +55,8 @@ class ResultBox extends StatelessWidget {
             ),
             const SizedBox(height: 25.0),
             ElevatedButton(
-              onPressed: onPressed,
+              // Triggered when "Recommencer" button is pressed.
+              onPressed: onPressed, 
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
                 backgroundColor: Colors.transparent,
@@ -74,6 +79,7 @@ class ResultBox extends StatelessWidget {
             ),
             const SizedBox(height: 20.0),
             ElevatedButton(
+               // Triggered when "Nous contacter" button is pressed.
               onPressed: onContactPressed,
               style: ElevatedButton.styleFrom(
                 padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),

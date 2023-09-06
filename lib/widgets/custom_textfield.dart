@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../utils/constants.dart';
 
+// This custom widget represents a stylized text input field.
 class CustomTextField extends StatelessWidget {
   final TextEditingController controller;
   final IconData icon;
@@ -13,6 +14,7 @@ class CustomTextField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final bool obscureText;
 
+  // Constructor to initialize the custom text field.
   const CustomTextField({
     Key? key,
     required this.controller,
@@ -47,7 +49,7 @@ class CustomTextField extends StatelessWidget {
           labelText: labelText,
           hintText: hintText,
           border: InputBorder.none,
-          counterText: '', // this hides the counter
+          counterText: '', // Hide the character counter.
         ),
         validator: validator ??
             (value) {
