@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../models/arriveZone_model.dart';
 
+// This custom widget displays information about a final zone in a popup dialog.
 class arriveZoneInfoPopup extends StatelessWidget {
   final arriveZone zone;
 
@@ -20,6 +21,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
             ),
             child: Column(
               children: [
+                // Title for the final zone.
                 Text(
                   'Zone d\'arrivée :',
                   style: TextStyle(
@@ -29,6 +31,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
                   ),
                   textAlign: TextAlign.center,
                 ),
+                // Space between the two texts.
                 SizedBox(height: 8.0),
                 Text(
                   zone.name,
@@ -55,6 +58,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 12.0),
+              // Subtitle for migration.
               child: Text(
                 'Époque de l\'immigration :',
                 style: TextStyle(
@@ -80,6 +84,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
                       color: Colors.blueGrey[800],
                     ),
                   ),
+                  // Display zone "from" attribute.
                   Text(zone.from.toString()),
                 ],
               ),
@@ -94,6 +99,7 @@ class arriveZoneInfoPopup extends StatelessWidget {
                     color: Colors.blueGrey[800],
                   ),
                 ),
+                // Display zone "to" attribute.
                 Text(zone.to.toString()),
               ],
             ),
@@ -103,13 +109,12 @@ class arriveZoneInfoPopup extends StatelessWidget {
       actions: <Widget>[
         TextButton(
           style: TextButton.styleFrom(
-            primary: Colors.white,
-            backgroundColor: Colors.blue[400],
-            onSurface: Colors.grey,
+            foregroundColor: Colors.white, backgroundColor: Colors.blue[400], disabledForegroundColor: Colors.grey.withOpacity(0.38),
             shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(20)),
             ),
           ),
+          // Button text for closing the popup.
           child: const Text('Fermer'),
           onPressed: () {
             Navigator.of(context).pop();

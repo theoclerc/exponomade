@@ -1,5 +1,6 @@
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+// Model for a provenance zone.
 class ProvenanceZone {
   final String provenanceNom;
   final List<LatLng> provenanceZone;

@@ -1,3 +1,4 @@
+// Model for a question.
 class Question {
   final String id;
   final String title;

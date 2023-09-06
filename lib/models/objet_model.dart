@@ -1,3 +1,4 @@
+// Model for an object stored in a museum.
 class Objet {
   final Map<String, String> chronologie;
   final String descriptionObjet;

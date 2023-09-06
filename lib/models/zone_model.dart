@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+// Model for a zone.
 class Zone {
   final String nomZone;
   final Map<String, int> chronologieZone;
