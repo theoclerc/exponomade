@@ -22,15 +22,22 @@ class MapToggle extends StatefulWidget {
 class _MapToggleState extends State<MapToggle> {
   late GoogleMapController mapController;
   late String _mapStyle;
-  final LatLng _center = const LatLng(46.229352, 7.362049);
+
+  var db = DBconnect();
+
   Set<Marker> markers = {};
   Set<Polygon> polygons = {};
-  var db = DBconnect();
-  bool isDialogOpen = false;
   List<arriveZone> arriveeZonesToShow = [];
   List<ProvenanceZone> provenanceZonesToShow = [];
-  int currentPairIndex = 0;
+
+  // Default map view.
+  final LatLng _center = const LatLng(46.229352, 7.362049);
+  // Boolean for background map management.
+  bool isDialogOpen = false; 
+  // Number of zone pairs to be displayed (arrival zone + provenance zone).
   int totalPairs = 0;
+  // Current pair used.
+  int currentPairIndex = 0;
 
   // Period options
   List<String> periodOptions = [];
@@ -54,6 +61,7 @@ class _MapToggleState extends State<MapToggle> {
     });
   }
 
+  // Fetch available periods and set the initial selection.
   Future<void> _fetchPeriods() async {
     List<String> periods = await db.fetchPeriods();
 
@@ -63,6 +71,7 @@ class _MapToggleState extends State<MapToggle> {
     });
   }
 
+  // Fetch available reasons and set the initial selection.
   Future<void> _fetchReasons() async {
     List<String> reasons = await db.fetchReasons();
 
@@ -72,6 +81,7 @@ class _MapToggleState extends State<MapToggle> {
     });
   }
 
+  // Fetch available populations and set the initial selection.
   Future<void> _fetchPopulations() async {
     List<String> populations = await db.fetchPopulations();
 
@@ -81,11 +91,13 @@ class _MapToggleState extends State<MapToggle> {
     });
   }
 
+  // Callback when the Google Map is created.
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
     controller.setMapStyle(_mapStyle);
   }
 
+  // Calculate the center of a polygon using its coordinates.
   LatLng _getPolygonCenter(List<LatLng> coordinates) {
     double latitude = 0;
     double longitude = 0;
@@ -99,7 +111,8 @@ class _MapToggleState extends State<MapToggle> {
     return LatLng(latitude / count, longitude / count);
   }
 
-  Future<void> _addMuseumMarkers(selectedPeriod) async {
+  // Add museum markers based on the selected period.
+  Future<void> _addMuseumMarkersForSelectedPeriod(selectedPeriod) async {
     // Update museums
     List<Musee> museums =
         await db.updateMuseumsAndObjectsForSelectedPeriod(selectedPeriod);
@@ -112,6 +125,7 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
+  // Add museum markers based on the selected reason.
   Future<void> _addMuseumMarkersForSelectedReason(selectedReason) async {
     // Update museums
     List<Musee> museums =
@@ -125,6 +139,7 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
+  // Add museum markers based on the selected population.
   Future<void> _addMuseumMarkersForSelectedPopulation(
       selectedPopulation) async {
     // Update museums
@@ -139,25 +154,27 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
+  // Create markers and polygons for arrival and provenance zones.
   Future<void> _createMarkersAndPolygons() async {
     List<arriveZone> arriveeZones = await db.fetchArriveZones();
     List<ProvenanceZone> provenanceZones = await db.fetchProvenanceZones();
-    await _addMuseumMarkers(selectedPeriod);
+    await _addMuseumMarkersForSelectedPeriod(selectedPeriod);
 
+    // When "Aucune" is selected, no zone appears.
     if (selectedPeriod != "Aucune") {
       arriveeZones =
           await db.updateArriveZonesForSelectedPeriod(selectedPeriod);
       provenanceZones =
           await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
     }
-
+    // When "Aucune" is selected, no zone appears.
     if (selectedReason != "Aucune") {
       arriveeZones =
           await db.updateArriveZonesForSelectedReason(selectedReason);
       provenanceZones =
           await db.updateProvenanceZonesForSelectedReason(selectedReason);
     }
-
+    // When "Aucune" is selected, no zone appears.
     if (selectedReason != "Aucune") {
       arriveeZones =
           await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
@@ -165,6 +182,7 @@ class _MapToggleState extends State<MapToggle> {
           .updateProvenanceZonesForSelectedPopulation(selectedPopulation);
     }
 
+    // Create markers for each arrival zone.
     for (var arriveeZone in arriveeZones) {
       Marker marker = Marker(
         markerId: MarkerId(arriveeZone.name),
@@ -183,6 +201,7 @@ class _MapToggleState extends State<MapToggle> {
       });
     }
 
+    // Create markers for each provenance zone.
     for (var provenanceZone in provenanceZones) {
       Marker marker = Marker(
         markerId: MarkerId(provenanceZone.provenanceNom),
@@ -202,9 +221,10 @@ class _MapToggleState extends State<MapToggle> {
     }
   }
 
+  // Show a dialog to select a period (filter).
   void _showPeriodSelection() {
     setState(() {
-      isDialogOpen = true; // Dialog is about to open, set this to true
+      isDialogOpen = true; // Dialog is about to open, set this to true.
     });
     showDialog(
       context: context,
@@ -227,12 +247,15 @@ class _MapToggleState extends State<MapToggle> {
                       final period = periodOptions[index];
                       return ListTile(
                         title: Text(period),
+                        // Set the selected period and reset other filters.
                         onTap: () {
                           setState(() {
                             selectedPeriod = period;
                             selectedReason = reasonOptions[0];
                             selectedPopulation = populationOptions[0];
+                            // All zones are displayed, set to 0.
                             totalPairs = 0;
+                            // Zone update according to filter.
                             _updateZonesForSelectedPeriod();
                           });
                           Navigator.pop(context);
@@ -248,14 +271,15 @@ class _MapToggleState extends State<MapToggle> {
       },
     ).then((value) {
       setState(() {
-        isDialogOpen = false; // Dialog is closed, set this to false
+        isDialogOpen = false; // Dialog is closed, set this to false.
       });
     });
   }
 
+  // Show a dialog to select a reason.
   void _showReasonsSelection() {
     setState(() {
-      isDialogOpen = true;
+      isDialogOpen = true; // Dialog is about to open, set this to true.
     });
     showDialog(
       context: context,
@@ -279,10 +303,12 @@ class _MapToggleState extends State<MapToggle> {
                       return ListTile(
                         title: Text(reason),
                         onTap: () {
+                          // Set the selected reason and reset other filters.
                           setState(() {
                             selectedReason = reason;
                             selectedPeriod = periodOptions[0];
                             selectedPopulation = populationOptions[0];
+                           // Zone update according to filter.
                             _updateZonesForSelectedReason();
                           });
                           Navigator.pop(context);
@@ -298,14 +324,15 @@ class _MapToggleState extends State<MapToggle> {
       },
     ).then((value) {
       setState(() {
-        isDialogOpen = false;
+        isDialogOpen = false; // Dialog is closed, set this to false.
       });
     });
   }
 
+  // Show a dialog to select a population.
   void _showPopulationSelection() {
     setState(() {
-      isDialogOpen = true;
+      isDialogOpen = true; // Dialog is about to open, set this to true.
     });
     showDialog(
       context: context,
@@ -329,10 +356,12 @@ class _MapToggleState extends State<MapToggle> {
                       return ListTile(
                         title: Text(population),
                         onTap: () {
+                          // Set the selected reason and reset other filters.
                           setState(() {
                             selectedPopulation = population;
                             selectedPeriod = periodOptions[0];
                             selectedReason = reasonOptions[0];
+                            // Zone update according to filter.
                             _updateZonesForSelectedPopulation();
                           });
                           Navigator.pop(context);
@@ -348,27 +377,28 @@ class _MapToggleState extends State<MapToggle> {
       },
     ).then((value) {
       setState(() {
-        isDialogOpen = false;
+        isDialogOpen = false; // Dialog is closed, set this to false.
       });
     });
   }
 
+  // Update zones when a new period is selected.
   Future<void> _updateZonesForSelectedPeriod() async {
-    // Update arriveeZones
+    // Update arriveeZones.
     List<arriveZone> updatedArriveeZones =
         await db.updateArriveZonesForSelectedPeriod(selectedPeriod);
 
-    // Update provenanceZones
+    // Update provenanceZones.
     List<ProvenanceZone> updatedProvenanceZones =
         await db.updateProvenanceZonesForSelectedPeriod(selectedPeriod);
 
-    // Clear existing polygons and markers
+    // Clear existing polygons and markers.
     setState(() {
       polygons.clear();
       markers.clear();
     });
 
-    // Add markers and polygons for updated zones
+    // Add markers and polygons for updated zones (arrival zone).
     for (var arriveeZone in updatedArriveeZones) {
       Marker marker = Marker(
         markerId: MarkerId(arriveeZone.name),
@@ -383,9 +413,11 @@ class _MapToggleState extends State<MapToggle> {
       );
       setState(() {
         markers.add(marker);
-        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon
+        polygons.add(arriveZonePolygon(arriveeZone)); // Adding the polygon.
       });
     }
+
+    // Add markers and polygons for updated zones (provenance zone).
     for (var zone in updatedProvenanceZones) {
       Marker marker = Marker(
         markerId: MarkerId(zone.provenanceNom),
@@ -404,128 +436,132 @@ class _MapToggleState extends State<MapToggle> {
         polygons.add(provenanceZonePolygon(zone));
       });
     }
-    // Update museums
-    await _addMuseumMarkers(selectedPeriod);
+
+    // Update museums.
+    await _addMuseumMarkersForSelectedPeriod(selectedPeriod);
   }
 
-    Future<void> _updateZonesForSelectedReason() async {
+  // Update zones when a new reason is selected.
+  Future<void> _updateZonesForSelectedReason() async {
+    // Set to 0.
     currentPairIndex = 0;
 
-    // Update arriveeZones
+    // Update arriveeZones.
     List<arriveZone> updatedArriveeZones =
         await db.updateArriveZonesForSelectedReason(selectedReason);
 
-    // Update provenanceZones
+    // Update provenanceZones.
     List<ProvenanceZone> updatedProvenanceZones =
         await db.updateProvenanceZonesForSelectedReason(selectedReason);
 
-    // Update totalPairs
+    // Update totalPairs.
     totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
 
-    // Clear existing polygons and markers
+    // Clear existing polygons and markers.
     setState(() {
       polygons.clear();
       markers.clear();
     });
 
-    // Add zones to the lists to show
+    // Add zones to the lists to show.
     arriveeZonesToShow = updatedArriveeZones;
     provenanceZonesToShow = updatedProvenanceZones;
 
-    //Display first zones
+    // Display first zones (pair of zones displayed according to index).
     if (totalPairs > 0) {
       _displayPair(currentPairIndex);
     }
 
-    // Update museums
+    // Update museums.
     await _addMuseumMarkersForSelectedReason(selectedReason);
   }
 
-  Future<void> _displayPair(int pairIndex) async {
-  polygons.clear();
-  markers.clear();
-
-  if (arriveeZonesToShow.isNotEmpty && provenanceZonesToShow.isNotEmpty) {
-    // Check if the pair index is valid
-    if (pairIndex >= 0 && pairIndex < totalPairs) {
-      var arriveeZone = arriveeZonesToShow[pairIndex];
-      var provenanceZone = provenanceZonesToShow[pairIndex];
-
-      // Display the arrival zone
-      Marker arriveeMarker = Marker(
-        markerId: MarkerId(arriveeZone.name),
-        position: _getPolygonCenter(arriveeZone.coordinates),
-        infoWindow: InfoWindow(title: arriveeZone.name),
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
-          );
-        },
-      );
-
-      // Display the provenance zone
-      Marker provenanceMarker = Marker(
-        markerId: MarkerId(provenanceZone.provenanceNom),
-        position: _getPolygonCenter(provenanceZone.provenanceZone),
-        infoWindow: InfoWindow(title: provenanceZone.provenanceNom),
-        onTap: () {
-          showDialog(
-            context: context,
-            builder: (context) => provenanceZoneInfoPopup(zone: provenanceZone),
-          );
-        },
-      );
-
-      setState(() {
-        markers.add(arriveeMarker);
-        markers.add(provenanceMarker);
-        polygons.add(arriveZonePolygon(arriveeZone));
-        polygons.add(provenanceZonePolygon(provenanceZone));
-      });
-    }
-  }
-
-  // Now, determine which museum update should be performed
-  if (selectedReason != "Aucune") {
-    _addMuseumMarkersForSelectedReason(selectedReason);
-  } else if (selectedPopulation != "Aucune") {
-    _addMuseumMarkersForSelectedPopulation(selectedPopulation);
-  }
-}
-
-
-    Future<void> _updateZonesForSelectedPopulation() async {
+  // Update zones when a new population is selected.
+  Future<void> _updateZonesForSelectedPopulation() async {
     currentPairIndex = 0;
 
-    // Update arriveeZones
+    // Update arriveeZones.
     List<arriveZone> updatedArriveeZones =
         await db.updateArriveZonesForSelectedPopulation(selectedPopulation);
 
-    // Update provenanceZones
+    // Update provenanceZones.
     List<ProvenanceZone> updatedProvenanceZones =
         await db.updateProvenanceZonesForSelectedPopulation(selectedPopulation);
 
-    // Mettre à jour le nombre total de paires de zones
+    // Update the total number of pairs of zones to display.
     totalPairs = min(updatedArriveeZones.length, updatedProvenanceZones.length);
 
-    // Clear existing polygons and markers
+    // Clear existing polygons and markers.
     setState(() {
       polygons.clear();
       markers.clear();
     });
 
-    // Add zones to the lists to show
+    // Add zones to the lists to show.
     arriveeZonesToShow = updatedArriveeZones;
     provenanceZonesToShow = updatedProvenanceZones;
 
-    // Display first zones
+    // Display first zones (pair of zones displayed according to index).
     if (totalPairs > 0) {
       _displayPair(currentPairIndex);
     }
 
-    // Update museums
+    // Update museums.
     await _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+  }
+
+  // Display a pair of zones (arrival + provenance zone).
+  Future<void> _displayPair(int pairIndex) async {
+    polygons.clear();
+    markers.clear();
+
+    if (arriveeZonesToShow.isNotEmpty && provenanceZonesToShow.isNotEmpty) {
+      // Check if the pair index is valid.
+      if (pairIndex >= 0 && pairIndex < totalPairs) {
+        var arriveeZone = arriveeZonesToShow[pairIndex];
+        var provenanceZone = provenanceZonesToShow[pairIndex];
+
+        // Display the arrival zone.
+        Marker arriveeMarker = Marker(
+          markerId: MarkerId(arriveeZone.name),
+          position: _getPolygonCenter(arriveeZone.coordinates),
+          infoWindow: InfoWindow(title: arriveeZone.name),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => arriveZoneInfoPopup(zone: arriveeZone),
+            );
+          },
+        );
+
+        // Display the provenance zone.
+        Marker provenanceMarker = Marker(
+          markerId: MarkerId(provenanceZone.provenanceNom),
+          position: _getPolygonCenter(provenanceZone.provenanceZone),
+          infoWindow: InfoWindow(title: provenanceZone.provenanceNom),
+          onTap: () {
+            showDialog(
+              context: context,
+              builder: (context) => provenanceZoneInfoPopup(zone: provenanceZone),
+            );
+          },
+        );
+
+        setState(() {
+          markers.add(arriveeMarker);
+          markers.add(provenanceMarker);
+          polygons.add(arriveZonePolygon(arriveeZone));
+          polygons.add(provenanceZonePolygon(provenanceZone));
+        });
+      }
+    }
+
+    // Now, determine which museum update should be performed.
+    if (selectedReason != "Aucune") {
+      _addMuseumMarkersForSelectedReason(selectedReason);
+    } else if (selectedPopulation != "Aucune") {
+      _addMuseumMarkersForSelectedPopulation(selectedPopulation);
+    }
   }
 
   @override
@@ -542,6 +578,7 @@ class _MapToggleState extends State<MapToggle> {
               ),
               markers: markers,
               polygons: polygons,
+              // Block the map if the filters are open.
               scrollGesturesEnabled: !isDialogOpen,
               zoomGesturesEnabled: !isDialogOpen,
               tiltGesturesEnabled: !isDialogOpen,
@@ -570,6 +607,7 @@ class _MapToggleState extends State<MapToggle> {
                         ),
                       ],
                     ),
+                    // Display the period filter.
                     child: GestureDetector(
                       onTap: _showPeriodSelection,
                       child: Row(
@@ -617,12 +655,13 @@ class _MapToggleState extends State<MapToggle> {
                         ),
                       ],
                     ),
+                    // Display the reason filter.
                     child: GestureDetector(
                       onTap: _showReasonsSelection,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.lightbulb_outline),
+                          const Icon(Icons.filter_list),
                           const SizedBox(width: 8),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -664,12 +703,13 @@ class _MapToggleState extends State<MapToggle> {
                         ),
                       ],
                     ),
+                    // Display the population filter.
                     child: GestureDetector(
                       onTap: _showPopulationSelection,
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const Icon(Icons.people),
+                          const Icon(Icons.group),
                           const SizedBox(width: 8),
                           Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -694,66 +734,8 @@ class _MapToggleState extends State<MapToggle> {
                         ],
                       ),
                     ),
-                  ),               
-                ],
-              ),
-            ),
-             Positioned(
-              bottom: 120,
-              left: 450,
-              right: 450,
-              child: Visibility(
-                visible: totalPairs > 0,
-                child: Align(
-                  alignment: Alignment.bottomCenter,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.orange,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.2),
-                          blurRadius: 6.0,
-                          spreadRadius: 2.0,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          onPressed: () {
-                            
-                            if (currentPairIndex > 0) {
-                              currentPairIndex--;
-                              _displayPair(currentPairIndex);
-                            }
-                          },
-                          icon: Icon(Icons.navigate_before, color: Colors.white),
-                        ),
-                        Text(
-                          "Zone ${currentPairIndex + 1} sur $totalPairs",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            
-                            if (currentPairIndex < totalPairs - 1) {
-                              currentPairIndex++;
-                              _displayPair(currentPairIndex);
-                            }
-                          },
-                          icon: Icon(Icons.navigate_next, color: Colors.white),
-                        ),
-                      ],
-                    ),
                   ),
-                ),
+                ],
               ),
             ),
           ],
@@ -762,3 +744,4 @@ class _MapToggleState extends State<MapToggle> {
     );
   }
 }
+
