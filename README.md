@@ -10,6 +10,7 @@ All these elements can be displayed according to filters for period, reason or t
 - Marguet Romain
 - Dellea Jérémie
 - Bourquin Jonathan
+- Salamin Bastien
 - Clerc Théo
 
 ## Technical
