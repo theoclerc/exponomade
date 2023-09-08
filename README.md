@@ -1,15 +1,19 @@
-# exponomade
+# 645-2 Project - Exponomade application
 
-A new Flutter project.
+This Flutter project consisted in creating an application with an interactive map displaying museums and areas linked to migrations.
 
-## Getting Started
+The museums displayed contain different objects and information, and the zones contain the reasons for migration, the period and other information.
 
-This project is a starting point for a Flutter application.
+All these elements can be displayed according to filters for period, reason or type of population concerned.
 
-A few resources to get you started if this is your first Flutter project:
+## Developers
+- Marguet Romain
+- Dellea Jérémie
+- Bourquin Jonathan
+- Clerc Théo
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Technical
+Please refer to the user guide provided as part of the project.
 
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
